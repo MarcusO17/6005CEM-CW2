@@ -1,2 +1,0 @@
-# 6005CEM-CW2
-For 6005CEM Group  CW2
