@@ -227,6 +227,21 @@ INSERT INTO `specialties` (`id`, `sname`) VALUES
 (55, 'Vascular surgery'),
 (56, 'Venereology');
 
+CREATE TABLE IF NOT EXISTS `prescription` (
+  `prescription_id` int(11) NOT NULL AUTO_INCREMENT,
+  `pid` int(11) NOT NULL,            
+  `appointment_id` int(11) NOT NULL, 
+  `medication` varchar(255) NOT NULL,
+  `dosage` varchar(100) NOT NULL,
+  `frequency` varchar(100) NOT NULL,
+  `additional_notes` text DEFAULT NULL,
+  PRIMARY KEY (`prescription_id`),
+  KEY `pid` (`pid`),
+  KEY `appointment_id` (`appointment_id`),
+  CONSTRAINT `fk_patient` FOREIGN KEY (`pid`) REFERENCES `patient` (`pid`) ON DELETE CASCADE,
+  CONSTRAINT `fk_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointment` (`appoid`) ON DELETE CASCADE
+) 
+
 -- --------------------------------------------------------
 
 --
