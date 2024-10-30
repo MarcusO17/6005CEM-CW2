@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/add-prescription.css">
         
     <title>Patients</title>
     <style>
@@ -260,6 +261,7 @@
                                     Date of Birth
                                     
                                 </th>
+                                <th class="table-headin">Prescription</th>
                                 <th class="table-headin">
                                     
                                     Events
@@ -316,6 +318,12 @@
                                         <td>
                                         '.substr($dob,0,10).'
                                         </td>
+                                        <td>
+                                            <div style="display:flex;justify-content: center;">
+                                                <a href="?action=viewPrescription&id='.$pid .'" class="non-style-link"><button class="btn-primary-soft btn button-icon btn-view" style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View Prescription</font></button></a>
+                                            </div>
+                                        </td>
+
                                         <td >
                                         <div style="display:flex;justify-content: center;">
                                         
@@ -348,6 +356,8 @@
         
         $id=$_GET["id"];
         $action=$_GET["action"];
+
+        if ($action == "view") {
             $sqlmain= "select * from patient where pid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
@@ -467,10 +477,74 @@
                     <br><br>
             </div>
             </div>
-            ';
+            ';}
         
     };
 
+?>
+
+<?php
+if ($_GET) {
+    $id = $_GET["id"];
+    $action = $_GET["action"];
+    
+    if ($action == "viewPrescription") {
+        $sqlPrescription = "SELECT * FROM prescription WHERE pid='$id'";
+        $result = $database->query($sqlPrescription);
+        
+        echo '
+        <div id="popup-prescription" class="overlay">
+            <div class="popup">
+                <center>
+                    <a class="close" href="patient.php">&times;</a>
+                    <div class="content">
+                        <h2>Prescription Details</h2>';
+                        
+        if ($result->num_rows > 0) {
+            echo '
+            <table class="prescription-table">
+                <thead>
+                    <tr>
+                        <th>Appointment ID</th>
+                        <th>Medication</th>
+                        <th>Dosage</th>
+                        <th>Frequency</th>
+                        <th>Additional Notes</th>
+                    </tr>
+                </thead>
+                <tbody>';
+            
+            while ($prescription = $result->fetch_assoc()) {
+                echo '
+                    <tr>
+                        <td>' . htmlspecialchars($prescription["appointment_id"]) . '</td>
+                        <td>' . htmlspecialchars($prescription["medication"]) . '</td>
+                        <td>' . htmlspecialchars($prescription["dosage"]) . '</td>
+                        <td>' . htmlspecialchars($prescription["frequency"]) . '</td>
+                        <td>' . htmlspecialchars($prescription["additional_notes"]) . '</td>
+                    </tr>';
+            }
+            
+            echo '
+                </tbody>
+            </table>';
+        } else {
+            echo '
+            <div class="no-data">
+                <p>No prescription records are available for this patient.</p>
+            </div>';
+        }
+        
+        echo '
+                        <div class="action-btn">
+                            <a href="patient.php"><button class="login-btn">Close</button></a>
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>';
+    }
+};
 ?>
 </div>
 
