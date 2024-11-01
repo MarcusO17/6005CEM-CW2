@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="css/add-prescription.css"> 
+    <link rel="stylesheet" href="../css/add-prescription.css"> 
         
     <title>Appointments</title>
     <style>
@@ -619,8 +619,8 @@
                         <a class="close" href="appointment.php">&times;</a>
                         <div class="content">
                             <form action="submit_prescription.php" method="POST" class="sub-table scrolldown add-doc-form-container">
-                                <input type="hidden" name="appointment_id" value="' . htmlspecialchars($id) . '">
-                                <input type="hidden" name="pid" value="' . htmlspecialchars($pidget) . '">
+                                <input type="hidden" name="appointment_id" value="' . $id . '">
+                                <input type="hidden" name="pid" value="' . $pidget . '">
                                 
                                 <div class="form-group">
                                     <label for="medication" class="form-label">Medication:</label>
