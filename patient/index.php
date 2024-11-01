@@ -93,7 +93,11 @@
                         <a href="doctors.php" class="non-style-link-menu"><div><p class="menu-text">All Doctors</p></a></div>
                     </td>
                 </tr>
-                
+                <tr class="menu-row" >
+                    <td class="menu-btn menu-icon-session">
+                        <a href="prescriptions.php" class="non-style-link-menu"><div><p class="menu-text">My Prescriptions</p></div></a>
+                    </td>
+                </tr>
                 <tr class="menu-row" >
                     <td class="menu-btn menu-icon-session">
                         <a href="schedule.php" class="non-style-link-menu"><div><p class="menu-text">Scheduled Sessions</p></div></a>
