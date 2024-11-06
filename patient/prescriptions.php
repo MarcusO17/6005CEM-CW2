@@ -25,11 +25,13 @@
     if(isset($_SESSION["user"])) {
         if(($_SESSION["user"]) == "" || $_SESSION['usertype'] != 'p') {
             header("location: ../login.php");
+            exit();
         } else {
             $useremail = $_SESSION["user"];
         }
     } else {
         header("location: ../login.php");
+        exit();
     }
 
     include("../connection.php");
@@ -201,47 +203,22 @@
                                 ?>
 
                                 <?php
-                                if($_GET){
-        
-                                    $action=$_GET["action"];
-                            
-                                    if ($action == "view") {
-                                        $additional_notes = $_GET["note"];
-
-                                        echo '
-                                        <div id="popup1" class="overlay">
-                                            <div class="popup">
-                                                <center>
-                                                    <a class="close" href="patient.php">&times;</a>
-                                                    <div class="content">
-                                                    </div>
-                                                    <div style="display: flex; justify-content: center;">
-                                                        <table width="80%" class="sub-table scrolldown add-doc-form-container" border="0">
-                                                            <tr>
-                                                                <td>
-                                                                    <p style="padding: 0; margin: 0; text-align: left; font-size: 25px; font-weight: 500;">Additional Notes</p>
-                                                                    <br><br>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="label-td" colspan="2">
-                                                                    ' . nl2br(htmlspecialchars($additional_notes)) . '<br><br>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="2" style="text-align: center;">
-                                                                    <a href="patient.php"><input type="button" value="OK" class="login-btn btn-primary-soft btn"></a>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
-                                                </center>
-                                                <br><br>
-                                            </div>
-                                        </div>';
-
+                                if (isset($_GET["action"]) && $_GET["action"] == "view" && isset($_GET["note"])) {
+                                    $additional_notes = htmlspecialchars($_GET["note"]);
+                                
+                                    echo '
+                                    <div id="popup1" class="overlay">
+                                        <div class="popup">
+                                            <center>
+                                                <a class="close" href="prescriptions.php">&times;</a>
+                                                <div class="content">
+                                                    <h2>Additional Notes</h2>
+                                                    <p style="text-align: left; font-size: 18px;">' . nl2br($additional_notes) . '</p>
+                                                </div>
+                                            </center>
+                                        </div>
+                                    </div>';
                                     }
-                                }
                                 ?>
                         </tbody>
                         </table>
