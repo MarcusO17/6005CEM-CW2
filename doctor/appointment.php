@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/add-prescription.css"> 
         
     <title>Appointments</title>
     <style>
@@ -182,7 +183,7 @@
                 <?php
 
 
-                    $sqlmain= "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ";
+                    $sqlmain= "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pid,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ";
 
                     if($_POST){
                         //print_r($_POST);
@@ -242,7 +243,14 @@
                                 <th class="table-headin">
                                     
                                     Events
+
+                                </th>
+                                <th class="table-headin">
                                     
+                                    Prescriptions
+
+                                </th>
+
                                 </tr>
                         </thead>
                         <tbody>
@@ -278,6 +286,7 @@
                                     $docname=$row["docname"];
                                     $scheduledate=$row["scheduledate"];
                                     $scheduletime=$row["scheduletime"];
+                                    $pid =$row["pid"];
                                     $pname=$row["pname"];
                                     $apponum=$row["apponum"];
                                     $appodate=$row["appodate"];
@@ -308,6 +317,12 @@
                                        &nbsp;&nbsp;&nbsp;-->
                                        <a href="?action=drop&id='.$appoid.'&name='.$pname.'&session='.$title.'&apponum='.$apponum.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
                                        &nbsp;&nbsp;&nbsp;</div>
+                                        </td>
+                                          <td>
+                                        <div style="display:flex;justify-content: center;">
+                                        <a href="?action=add-prescription&id='.$appoid.'&pid='.$pid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
+                                       &nbsp;&nbsp;&nbsp;
+                                        </div>
                                         </td>
                                     </tr>';
                                     
@@ -500,7 +515,6 @@
             $name=$row["docname"];
             $email=$row["docemail"];
             $spe=$row["specialties"];
-            
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
@@ -595,8 +609,75 @@
             </div>
             </div>
             ';  
+    }elseif($action=='add-prescription'){
+            $pidget = $_GET["pid"];
+            echo '
+                <div id="popup1" class="overlay">
+                <div class="popup">
+                    <center>
+                        <h2>Add Prescription</h2>
+                        <a class="close" href="appointment.php">&times;</a>
+                        <div class="content">
+                            <form action="submit_prescription.php" method="POST" class="sub-table scrolldown add-doc-form-container">
+                                <input type="hidden" name="appointment_id" value="' . $id . '">
+                                <input type="hidden" name="pid" value="' . $pidget . '">
+                                
+                                <div class="form-group">
+                                    <label for="medication" class="form-label">Medication:</label>
+                                    <input type="text" id="medication" name="medication" required class="form-input">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="dosage" class="form-label">Dosage:</label>
+                                    <input type="text" id="dosage" name="dosage" required class="form-input">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="frequency" class="form-label">Frequency:</label>
+                                    <input type="text" id="frequency" name="frequency" required class="form-input">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="notes" class="form-label">Additional Notes:</label>
+                                    <textarea id="notes" name="notes" class="form-textarea"></textarea>
+                                </div>
+
+                                <div class="form-actions">
+                                    <input type="submit" value="Submit Prescription" class="login-btn btn-primary-soft btn">
+                                    <a href="appointment.php" class="cancel-btn"><button type="button" class="login-btn btn-primary-soft btn">Cancel</button></a>
+                                </div>
+                            </form>
+                        </div>
+                    </center>
+                </div>
+            </div>
+        ';
+    }elseif($action=='prescription-added'){
+                echo '
+                <div id="popup1" class="overlay">
+                    <div class="popup">
+                        <center>
+                            <br><br>
+                            <h2>Prescription Added Successfully.</h2>
+                            <a class="close" href="appointment.php">&times;</a>
+                            <div class="content">
+                                <br><br>
+                                Your prescription has been added successfully. You can view your appointments for further details.
+                            </div>
+                            <div style="display: flex; justify-content: center;">
+                                <a href="appointment.php" class="non-style-link">
+                                    <button class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin:10px; padding:10px;">
+                                        <font class="tn-in-text">&nbsp;&nbsp;OK&nbsp;&nbsp;</font>
+                                    </button>
+                                </a>
+                                <br><br><br><br>
+                            </div>
+                        </center>
+                    </div>
+                </div>
+                ';
+        }
     }
-}
 
     ?>
     </div>
