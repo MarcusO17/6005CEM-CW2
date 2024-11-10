@@ -21,8 +21,6 @@
 
     session_start();
 
-    include('session_handler.php');
-
     $_SESSION["user"]="";
     $_SESSION["usertype"]="";
     
@@ -60,6 +58,10 @@
                     //   Patient dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='p';
+                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+                    include('session_handler.php');
                     
                     header('location: patient/index.php');
 
@@ -77,6 +79,10 @@
                     //   Admin dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='a';
+                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+                    include('session_handler.php');
                     
                     header('location: admin/index.php');
 
@@ -95,6 +101,11 @@
                     //   doctor dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='d';
+                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+                    include('session_handler.php');
+
                     header('location: doctor/index.php');
 
                 }else{
@@ -195,6 +206,14 @@
         <?php if (isset($_GET['expired']) && $_GET['expired'] == 'true'): ?>
             alert('Your session has expired due to inactivity. Please log in again.');
         <?php endif; ?>
+
+        <?php
+        if (isset($_GET['error'])) {
+            if ($_GET['error'] == 'session_hijacked') {
+                echo "alert('Your session was hijacked. Please log in again.');";
+            } 
+        }
+        ?>
     </script>
 
 </body>
