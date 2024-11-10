@@ -21,6 +21,8 @@
 
     session_start();
 
+    include('session_handler.php');
+
     $_SESSION["user"]="";
     $_SESSION["usertype"]="";
     
@@ -188,5 +190,12 @@
 
     </div>
 </center>
+
+<script>
+        <?php if (isset($_GET['expired']) && $_GET['expired'] == 'true'): ?>
+            alert('Your session has expired due to inactivity. Please log in again.');
+        <?php endif; ?>
+    </script>
+
 </body>
 </html>

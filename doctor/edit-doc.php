@@ -1,7 +1,7 @@
 
     <?php
     
-    
+    include('../session_handler.php');
 
     //import database
     include("../connection.php");
