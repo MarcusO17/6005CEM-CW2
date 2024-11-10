@@ -1,0 +1,211 @@
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.bg-top {
+    display: flex;
+    flex-direction: column;
+    background-image: url(../img/bg01.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.bg-dark {
+    background: rgba(26, 26, 26, 0.548);
+}
+
+/* Navbar */
+.navbar {
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.nav-logo {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo:hover {
+    opacity: 0.7;
+    transition: 0.3s ease-out;
+}
+
+.edoc-logo{
+    color: white;
+    font-weight: bolder;
+    font-size: 20px;
+    padding-left: 20px;
+    padding-right: 10px;
+    animation: transitionIn-Y-over 0.5s;
+}
+
+.edoc-logo-sub{
+    color: rgba(255, 255, 255, 0.733);
+    font-size: 12px;
+}
+
+.nav-item{
+    width: 10%;
+    color: rgba(255, 255, 255, 0.671);
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    animation: transitionIn-Y-over 0.5s;
+}
+
+.nav-item:hover{
+    color: #f0f0f0;
+}
+
+
+/* Header */
+.header-container {
+    padding: 2rem 0 4rem 0;
+}
+
+.heading-text2 {
+    margin: 0;
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Main */
+.main-container {
+    width: 75%;
+    padding: 1rem 0 3rem 0;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.body-text1 {
+    font-size: medium;
+}
+
+.body-text2 {
+    font-size: small;
+}
+
+.collapsible-button {
+    width: 100%;
+    padding: 0.7rem 0;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid rgb(211, 211, 211);
+    cursor: pointer;
+    font-size: large;
+    font-weight: 500;
+    text-align: left;
+}
+
+.collapsible-button:hover {
+    opacity: 0.7;
+    transition: 0.5s;
+}
+
+.collapsible-button:before {
+    content: "+";
+    color: black;
+    font-size: 1em;
+    float: left;
+    margin-right: 0.5rem;
+}
+
+.active:before {
+    content: "-";
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.intro-container {
+    margin-bottom: 1rem;
+}
+
+.intro-text {
+    line-height: 1.5em;
+    text-align: justify;
+}
+
+.outro-text {
+    margin-top: 2rem;
+    line-height: 1.5em;
+    text-align: justify;
+}
+
+.tips-update-date {
+    color: black;
+    font-weight: 200;
+}
+
+.tips-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tips-item-title {
+    margin: 0;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.link-text {
+    color: var(--primarycolor);
+    text-decoration: none;
+}
+.link-text:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+/* Footer */
+.footer-container {
+    width: 100%;
+    margin-top: auto;
+    padding: 1rem 0 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--primarycolor);
+    animation: transitionIn-Y-over 0.5s;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.footer-text, .footer-link {
+    margin-top: 0;
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
