@@ -16,6 +16,9 @@
 <body>
     <?php
 
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', 1);
+
     //learn from w3schools.com
     //Unset all the server side variables
 

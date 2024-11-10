@@ -1,6 +1,8 @@
 <?php
 
 if (session_status() == PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', 1);
     session_start();
 }
 
@@ -38,11 +40,6 @@ function checkSessionExpiration() {
 
 function checkSessionHijacking() {
     if (isset($_SESSION['ip_address']) && isset($_SESSION['user_agent'])) {
-        echo "Session IP Address: " . $_SESSION['ip_address'] . "<br>";
-        echo "Session User Agent: " . $_SESSION['user_agent'] . "<br>";
-        
-        echo "Current IP Address: " . $_SERVER['REMOTE_ADDR'] . "<br>";
-        echo "Current User Agent: " . $_SERVER['HTTP_USER_AGENT'] . "<br>";
         if ($_SESSION['ip_address'] !== $_SERVER['REMOTE_ADDR'] || $_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
 
             if (isset($_COOKIE[session_name()])) {
