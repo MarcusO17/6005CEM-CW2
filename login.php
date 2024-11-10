@@ -53,6 +53,7 @@
                 $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
                 if ($checker->num_rows==1){
 
+                    session_regenerate_id(true);
 
                     //   Patient dashbord
                     $_SESSION['user']=$email;
@@ -69,6 +70,7 @@
                 $checker = $database->query("select * from admin where aemail='$email' and apassword='$password'");
                 if ($checker->num_rows==1){
 
+                    session_regenerate_id(true);
 
                     //   Admin dashbord
                     $_SESSION['user']=$email;
@@ -86,6 +88,7 @@
                 $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
                 if ($checker->num_rows==1){
 
+                    session_regenerate_id(true);
 
                     //   doctor dashbord
                     $_SESSION['user']=$email;

@@ -159,11 +159,15 @@
 
                         </td>
                         
-                    <td width="12%">
-                        <input type="submit"  name="filter" value=" Filter" class=" btn-primary-soft btn button-icon btn-filter"  style="padding: 15px; margin :0;width:100%">
-                        </form>
+                    <<td width="20%">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <a href="?action=<?php echo isset($_GET['action']) && $_GET['action'] == 'upcoming' ? 'all' : 'upcoming'; ?>" class="non-style-link">
+                                <input type="button" value="<?php echo isset($_GET['action']) && $_GET['action'] == 'upcoming' ? 'Show All' : 'View Upcoming'; ?>" class="btn-primary-soft btn button-icon btn-view" style="padding: 12px 40px;">
+                            </a>
+                            <input type="submit" name="filter" value="Filter" class="btn-primary-soft btn button-icon btn-filter" style="padding: 12px 40px;">
+                        </div>
                     </td>
-
+                    </form>
                     </tr>
                             </table>
 
@@ -183,6 +187,10 @@
                             $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
                         }
 
+                    }
+                    if (isset($_GET['action']) && $_GET['action'] == 'upcoming') {
+                        $today = date("Y-m-d");
+                        $sqlmain .= " AND schedule.scheduledate >= '$today'";
                     }
 
                 ?>
@@ -210,6 +218,12 @@
                                 <th class="table-headin">
                                     
                                 Max num that can be booked
+                                    
+                                </th>
+
+                                <th class="table-headin">
+                                    
+                                Session Details
                                     
                                 </th>
                                 
@@ -266,12 +280,22 @@
 
                                         <td>
                                         <div style="display:flex;justify-content: center;">
-                                        
-                                        <a href="?action=view&id='.$scheduleid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
-                                       &nbsp;&nbsp;&nbsp;
-                                       <a href="?action=drop&id='.$scheduleid.'&name='.$title.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel Session</font></button></a>
+                                            <a href="?action=view&id=' . $scheduleid . '" class="non-style-link">
+                                                <button class="btn-primary-soft btn button-icon btn-view" style="padding: 12px 40px;margin-top: 10px;">
+                                                    <font class="tn-in-text">View</font>
+                                                </button>
+                                            </a>
                                         </div>
-                                        </td>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;justify-content: center;">
+                                            <a href="?action=drop&id=' . $scheduleid . '&name=' . urlencode($title) . '" class="non-style-link">
+                                                <button class="btn-primary-soft btn button-icon btn-delete" style="padding: 12px 40px;margin-top: 10px;">
+                                                    <font class="tn-in-text">Cancel Session</font>
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </td>
                                     </tr>';
                                     
                                 }
