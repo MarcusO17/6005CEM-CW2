@@ -16,6 +16,10 @@
 <body>
     <?php
 
+    //Constants
+    define('MAX_ATTEMPTS',3);
+    define('LOCKOUT_DURATION','+60 seconds');
+
     //learn from w3schools.com
     //Unset all the server side variables
 
@@ -35,8 +39,6 @@
     include("connection.php");
 
     
-
-
 
     if($_POST){
 
@@ -61,6 +63,7 @@
                     header('location: patient/index.php');
 
                 }else{
+                    recordFailedLogin($database,$email);
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
 
@@ -93,6 +96,7 @@
                     header('location: doctor/index.php');
 
                 }else{
+                    recordFailedLogin($database,$email);
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
 
@@ -111,6 +115,39 @@
     }else{
         $error='<label for="promter" class="form-label">&nbsp;</label>';
     }
+    
+
+function recordFailedLogin($database,$email){
+
+    $result= $database->query("select * from webuser where email='$email'");
+    if ($result->num_rows== 1){
+        $row = $result->fetch_assoc();
+        if($row != NULL){
+            $attempt = $row["attempts"];
+            $lastfailedattempt = $row["last_recorded_attempt"];
+            if ($lastfailedattempt != NULL){
+                $lastfailedattempt = strtotime($lastfailedattempt);
+            }
+     
+            $failedAttempts = $attempt+1;
+        }
+
+        if($failedAttempts >= MAX_ATTEMPTS){
+            $endDate= date('Y-m-d H:i:s', strtotime(LOCKOUT_DURATION, $lastfailedattempt));
+            $sql1="UPDATE webuser SET end_lockout='$endDate' where email='$email';";
+            $database->query($sql1);
+        }else{ 
+            $sql1=  " UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt=NOW() where email='$email';";
+            $database->query($sql1);
+        }
+    } 
+
+}
+
+
+
+
+
 
     ?>
 
