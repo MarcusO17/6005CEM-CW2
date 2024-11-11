@@ -49,69 +49,71 @@
 
         $result= $database->query("select * from webuser where email='$email'");
         if($result->num_rows==1){
-            $utype=$result->fetch_assoc()['usertype'];
-            if ($utype=='p'){
-                //TODO
-                $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
-                if ($checker->num_rows==1){
+            $row = $result->fetch_assoc();
+            $locktime =$row["end_lockout"];
+            if(!testAccountLock($locktime,$database,$email)){
+                $utype = $row['usertype'];
+                if ($utype=='p'){
+                    //TODO
+                    $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
+                    if ($checker->num_rows==1){
 
 
-                    //   Patient dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='p';
-                    
-                    header('location: patient/index.php');
+                        //   Patient dashbord
+                        $_SESSION['user']=$email;
+                        $_SESSION['usertype']='p';
 
-                }else{
-                    recordFailedLogin($database,$email);
-                    $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                        resetAccountLock($database,$email);
+                        header('location: patient/index.php');
+
+                    }else{
+                        recordFailedLogin($database,$email);
+                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
+                    }
+
+                }elseif($utype=='a'){
+                    //TODO
+                    $checker = $database->query("select * from admin where aemail='$email' and apassword='$password'");
+                    if ($checker->num_rows==1){
+
+
+                        //   Admin dashbord
+                        $_SESSION['user']=$email;
+                        $_SESSION['usertype']='a';
+                        
+                        header('location: admin/index.php');
+
+                    }else{
+                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                    }
+
+
+                }elseif($utype=='d'){
+                    //TODO
+                    $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
+                    if ($checker->num_rows==1){
+
+
+                        //   doctor dashbord
+                        $_SESSION['user']=$email;
+                        $_SESSION['usertype']='d';
+
+                        resetAccountLock($database,$email);
+                        header('location: doctor/index.php');
+
+                    }else{
+                        recordFailedLogin($database,$email);
+                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . '  attempt(s) left. </label>';
+                    }
+
                 }
-
-            }elseif($utype=='a'){
-                //TODO
-                $checker = $database->query("select * from admin where aemail='$email' and apassword='$password'");
-                if ($checker->num_rows==1){
-
-
-                    //   Admin dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='a';
-                    
-                    header('location: admin/index.php');
-
-                }else{
-                    $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
-                }
-
-
-            }elseif($utype=='d'){
-                //TODO
-                $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
-                if ($checker->num_rows==1){
-
-
-                    //   doctor dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='d';
-                    header('location: doctor/index.php');
-
-                }else{
-                    recordFailedLogin($database,$email);
-                    $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
-                }
-
+            }else{
+                $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Your account is locked till '. $row['end_lockout'].'</label>';
             }
-            
         }else{
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any acount for this email.</label>';
         }
 
-
-
-
-
-
-        
     }else{
         $error='<label for="promter" class="form-label">&nbsp;</label>';
     }
@@ -128,20 +130,38 @@ function recordFailedLogin($database,$email){
             if ($lastfailedattempt != NULL){
                 $lastfailedattempt = strtotime($lastfailedattempt);
             }
-     
             $failedAttempts = $attempt+1;
         }
-
+      
         if($failedAttempts >= MAX_ATTEMPTS){
             $endDate= date('Y-m-d H:i:s', strtotime(LOCKOUT_DURATION, $lastfailedattempt));
             $sql1="UPDATE webuser SET end_lockout='$endDate' where email='$email';";
             $database->query($sql1);
-        }else{ 
-            $sql1=  " UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt=NOW() where email='$email';";
+        }else{
+            $now = date('Y-m-d H:i:s');
+            $sql1=  " UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt='$now' where email='$email';";
             $database->query($sql1);
         }
     } 
 
+}
+
+function testAccountLock($lockout,$database,$email) {
+    if ($lockout == NULL) {
+        return false;  
+    }
+    $now = time();
+    $lockoutTime = strtotime($lockout);
+
+    if ($lockoutTime <= $now) {
+        resetAccountLock($database, $email);  // Reset attempts and lockout data
+        return false;  
+    }
+    return true;  
+}
+function resetAccountLock($database,$email){
+    $sql1=  " UPDATE webuser SET attempts=NULL, last_recorded_attempt=NULL, end_lockout=NULL where email='$email';";
+    $database->query($sql1);
 }
 
 
