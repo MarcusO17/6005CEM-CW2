@@ -15,7 +15,6 @@
 </head>
 <body>
     <?php
-
     //learn from w3schools.com
     //Unset all the server side variables
 
@@ -52,13 +51,24 @@
                 //TODO
                 $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
                 if ($checker->num_rows==1){
+                    $OTPSettings = getOTP();
+                    $_SESSION['otp'] = $OTPSettings['otp']; 
+                    $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
+                    
 
+                    echo '<script>
+                        const userOtp = prompt("Enter the OTP sent to your email:");
+                        if (userOtp !== null) {
+                            window.location.href = "verify_otp.php?otp=" + userOtp;
+                        }
+                    </script>';
+                    sendMail($email,$_SESSION['otp']);
 
                     //   Patient dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='p';
                     
-                    header('location: patient/index.php');
+                    //header('location: patient/index.php');
 
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
@@ -112,6 +122,62 @@
         $error='<label for="promter" class="form-label">&nbsp;</label>';
     }
 
+function sendMail($email,$otp){
+    $data = [
+        'Messages' => [
+            [
+            'From' => [
+                'Email' => getenv("SenderEmail"),
+                'Name' => "EDoc Services"
+            ],
+            'To' => [
+                [
+                    'Email' => $email,
+                    'Name' => "RECIPIENT_NAME"
+                ]
+            ],
+            'Subject' => "Your OTP for Edoc Services",
+            'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b></h3><br />"
+            ]
+        ]
+    ];
+     
+    $ch = curl_init();
+     
+    curl_setopt($ch, CURLOPT_URL, "https://api.mailjet.com/v3.1/send");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_USERPWD, getenv("MJPublicKey") . ":" . getenv("MJSecretKey"));
+    curl_exec($ch);
+    curl_close ($ch);
+       
+}
+
+function getOTP(){
+    $otp = rand(100000,999999);
+    $expiryTime = time() + 60;
+    return ['otp' => $otp, 'expires_at' => $expiryTime];
+}
+
+function verifyOTP($input) {
+    if (!isset($_SESSION['otp'], $_SESSION['otp_expiryTime'])) {
+        return "OTP not generated";
+    }
+
+    if (time() > $_SESSION['otp_expiryTime']) {
+        unset($_SESSION['otp'], $_SESSION['otp_expiryTime']); // Clear expired OTP
+        return 1;
+    }
+
+    if ($input== $_SESSION['otp']) {
+        unset($_SESSION['otp'], $_SESSION['otp_expiryTime']); // Clear OTP after verification
+        return true;
+    } else {
+        return false;
+    }
+}
     ?>
 
 
