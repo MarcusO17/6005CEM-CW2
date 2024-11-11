@@ -15,7 +15,7 @@
     if($_GET){
         //import database
         include("../connection.php");
-        $id=$_GET["id"];
+        $id=htmlspecialchars($_GET["id"], ENT_QUOTES, 'UTF-8');
         //$result001= $database->query("select * from schedule where scheduleid=$id;");
         //$email=($result001->fetch_assoc())["docemail"];
         $sql= $database->query("delete from schedule where scheduleid='$id';");

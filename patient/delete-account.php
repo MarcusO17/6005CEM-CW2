@@ -29,7 +29,7 @@
     if($_GET){
         //import database
         include("../connection.php");
-        $id=$_GET["id"];
+        $id=htmlspecialchars($_GET["id"]);
         $sqlmain= "select * from patient where pid=?";
         $stmt = $database->prepare($sqlmain);
         $stmt->bind_param("i",$id);

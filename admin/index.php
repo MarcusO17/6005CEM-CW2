@@ -112,8 +112,8 @@
         
                                         for ($y=0;$y<$list11->num_rows;$y++){
                                             $row00=$list11->fetch_assoc();
-                                            $d=$row00["docname"];
-                                            $c=$row00["docemail"];
+                                            $d=htmlspecialchars($row00["docname"]);
+                                            $c=htmlspecialchars($row00["docemail"]);
                                             echo "<option value='$d'><br/>";
                                             echo "<option value='$c'><br/>";
                                         };
@@ -314,15 +314,15 @@
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $appoid=$row["appoid"];
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
-                                                    $pname=$row["pname"];
-                                                    $apponum=$row["apponum"];
-                                                    $appodate=$row["appodate"];
+                                                    $appoid=htmlspecialchars($row["appoid"]);
+                                                    $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                                    $title=htmlspecialchars($row["title"]);
+                                                    $docname=htmlspecialchars($row["docname"]);
+                                                    $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                                    $scheduletime=htmlspecialchars($row["scheduletime"]);
+                                                    $pname=htmlspecialchars($row["pname"]);
+                                                    $apponum=htmlspecialchars($row["apponum"]);
+                                                    $appodate=htmlspecialchars($row["appodate"]);
                                                     echo '<tr>
 
 
@@ -409,12 +409,12 @@
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
-                                                    $nop=$row["nop"];
+                                                    $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                                    $title=htmlspecialchars($row["title"]);
+                                                    $docname=htmlspecialchars($row["docname"]);
+                                                    $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                                    $scheduletime=htmlspecialchars($row["scheduletime"]);
+                                                    $nop=htmlspecialchars($row["nop"]);
                                                     echo '<tr>
                                                         <td style="padding:20px;"> &nbsp;'.
                                                         substr($title,0,30)

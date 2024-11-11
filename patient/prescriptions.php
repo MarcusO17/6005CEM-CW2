@@ -111,10 +111,10 @@
                                 $list11 = $database->query("SELECT appointment_id, medication, dosage, frequency, additional_notes FROM prescription;");
 
                                 while ($row00 = $list11->fetch_assoc()) {
-                                    $medication = $row00["medication"];
-                                    $dosage = $row00["dosage"];
-                                    $frequency = $row00["frequency"];
-                                    $additional_notes = $row00["additional_notes"];
+                                    $medication = htmlspecialchars($row00["medication"]);
+                                    $dosage = htmlspecialchars($row00["dosage"]);
+                                    $frequency = htmlspecialchars($row00["frequency"]);
+                                    $additional_notes = htmlspecialchars($row00["additional_notes"]);
                                     
                                     $option_value = "$medication - $dosage - $frequency - $additional_notes";
                                     echo "<option value='$option_value'>";
@@ -146,7 +146,7 @@
                     </td>
                 </tr>
                 <?php
-                    $keyword = $_POST["search"] ?? '';
+                    $keyword = htmlspecialchars($_POST["search"]) ?? '';
                     $sqlmain = $keyword ? 
                         "SELECT * FROM prescription WHERE medication LIKE '%$keyword%' OR additional_notes LIKE '%$keyword%'" : 
                         "SELECT * FROM prescription WHERE pid ='$userid'";
@@ -179,10 +179,10 @@
                                           </tr>';
                                 } else {
                                     while ($row = $result->fetch_assoc()) {
-                                        $medication = $row["medication"];
-                                        $dosage = $row["dosage"];
-                                        $frequency = $row["frequency"];
-                                        $additional_notes = $row["additional_notes"];
+                                        $medication = htmlspecialchars($row["medication"]);
+                                        $dosage = htmlspecialchars($row["dosage"]);
+                                        $frequency = htmlspecialchars($row["frequency"]);
+                                        $additional_notes = htmlspecialchars($row["additional_notes"]);
                                         
                                         echo "<tr>
                                                     <td>&nbsp;" . substr($medication, 0, 30) . "</td>

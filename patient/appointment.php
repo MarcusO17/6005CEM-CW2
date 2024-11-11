@@ -63,7 +63,7 @@
 
         
         if(!empty($_POST["sheduledate"])){
-            $sheduledate=$_POST["sheduledate"];
+            $sheduledate=htmlspecialchars($_POST["sheduledate"]);
             $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
         };
 
@@ -253,14 +253,14 @@
                                             if (!isset($row)){
                                             break;
                                             };
-                                            $scheduleid=$row["scheduleid"];
-                                            $title=$row["title"];
-                                            $docname=$row["docname"];
-                                            $scheduledate=$row["scheduledate"];
-                                            $scheduletime=$row["scheduletime"];
-                                            $apponum=$row["apponum"];
-                                            $appodate=$row["appodate"];
-                                            $appoid=$row["appoid"];
+                                            $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                            $title=htmlspecialchars($row["title"]);
+                                            $docname=htmlspecialchars($row["docname"]);
+                                            $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                            $scheduletime=htmlspecialchars($row["scheduletime"]);
+                                            $apponum=htmlspecialchars($row["apponum"]);
+                                            $appodate=htmlspecialchars($row["appodate"]);
+                                            $appoid=htmlspecialchars($row["appoid"]);
     
                                             if($scheduleid==""){
                                                 break;
@@ -290,7 +290,7 @@
                                                                     Scheduled Date: '.$scheduledate.'<br>Starts: <b>@'.substr($scheduletime,0,5).'</b> (24h)
                                                                 </div>
                                                                 <br>
-                                                                <a href="?action=drop&id='.$appoid.'&title='.$title.'&doc='.$docname.'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Cancel Booking</font></button></a>
+                                                                <a href="?action=drop&id='.urlencode($appoid).'&title='.urlencode($title).'&doc='.urlencode($docname).'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Cancel Booking</font></button></a>
                                                         </div>
                                                                 
                                                     </div>
@@ -361,8 +361,8 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id=htmlspecialchars($_GET["id"]);
+        $action=htmlspecialchars($_GET["action"]);
         if($action=='booking-added'){
             
             echo '
@@ -386,8 +386,8 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $title=$_GET["title"];
-            $docname=$_GET["doc"];
+            $title=htmlspecialchars($_GET["title"]);
+            $docname=htmlspecialchars($_GET["doc"]);
             
             echo '
             <div id="popup1" class="overlay">
@@ -402,7 +402,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-appointment.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -417,9 +417,9 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name=htmlspecialchars($row["docname"]);
+            $email=htmlspecialchars($row["docemail"]);
+            $spe=htmlspecialchars($row["specialties"]);
             
             $sqlmain= "select sname from specialties where id=?";
             $stmt = $database->prepare($sqlmain);
@@ -427,9 +427,9 @@
             $stmt->execute();
             $spcil_res = $stmt->get_result();
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name=htmlspecialchars($spcil_array["sname"]);
+            $nic=htmlspecialchars($row['docnic']);
+            $tele=htmlspecialchars($row['doctel']);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

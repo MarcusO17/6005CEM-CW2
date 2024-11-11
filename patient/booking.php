@@ -141,7 +141,7 @@
 
                                             for ($y=0;$y<$list11->num_rows;$y++){
                                                 $row00=$list11->fetch_assoc();
-                                                $d=$row00["docname"];
+                                                $d=htmlspecialchars($row00["docname"]);
                                                
                                                 echo "<option value='$d'><br/>";
                                                
@@ -150,7 +150,7 @@
 
                                             for ($y=0;$y<$list12->num_rows;$y++){
                                                 $row00=$list12->fetch_assoc();
-                                                $d=$row00["title"];
+                                                $d=htmlspecialchars($row00["title"]);
                                                
                                                 echo "<option value='$d'><br/>";
                                                                                          };
@@ -220,12 +220,12 @@
                                     $result = $stmt->get_result();
                                     //echo $sqlmain;
                                     $row=$result->fetch_assoc();
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $docemail=$row["docemail"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
+                                    $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                    $title=htmlspecialchars($row["title"]);
+                                    $docname=htmlspecialchars($row["docname"]);
+                                    $docemail=htmlspecialchars($row["docemail"]);
+                                    $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                    $scheduletime=htmlspecialchars($row["scheduletime"]);
                                     $sql2="select * from appointment where scheduleid=$id";
                                     //echo $sql2;
                                      $result12= $database->query($sql2);

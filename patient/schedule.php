@@ -127,7 +127,7 @@
                         
                         if(!empty($_POST["search"])){
                             /*TODO: make and understand */
-                            $keyword=$_POST["search"];
+                            $keyword=htmlspecialchars($_POST["search"]);
                             $sqlmain= "select * from schedule inner join doctor on schedule.docid=doctor.docid where schedule.scheduledate>='$today' and (doctor.docname='$keyword' or doctor.docname like '$keyword%' or doctor.docname like '%$keyword' or doctor.docname like '%$keyword%' or schedule.title='$keyword' or schedule.title like '$keyword%' or schedule.title like '%$keyword' or schedule.title like '%$keyword%' or schedule.scheduledate like '$keyword%' or schedule.scheduledate like '%$keyword' or schedule.scheduledate like '%$keyword%' or schedule.scheduledate='$keyword' )  order by schedule.scheduledate asc";
                             //echo $sqlmain;
                             $insertkey=$keyword;
@@ -165,7 +165,7 @@
 
                                             for ($y=0;$y<$list11->num_rows;$y++){
                                                 $row00=$list11->fetch_assoc();
-                                                $d=$row00["docname"];
+                                                $d=htmlspecialchars($row00["docname"]);
                                                
                                                 echo "<option value='$d'><br/>";
                                                
@@ -174,7 +174,7 @@
 
                                             for ($y=0;$y<$list12->num_rows;$y++){
                                                 $row00=$list12->fetch_assoc();
-                                                $d=$row00["title"];
+                                                $d=htmlspecialchars($row00["title"]);
                                                
                                                 echo "<option value='$d'><br/>";
                                                                                          };
@@ -258,11 +258,11 @@
                                         if (!isset($row)){
                                             break;
                                         };
-                                        $scheduleid=$row["scheduleid"];
-                                        $title=$row["title"];
-                                        $docname=$row["docname"];
-                                        $scheduledate=$row["scheduledate"];
-                                        $scheduletime=$row["scheduletime"];
+                                        $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                        $title=htmlspecialchars($row["title"]);
+                                        $docname=htmlspecialchars($row["docname"]);
+                                        $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                        $scheduletime=htmlspecialchars($row["scheduletime"]);
 
                                         if($scheduleid==""){
                                             break;
@@ -283,7 +283,7 @@
                                                                 '.$scheduledate.'<br>Starts: <b>@'.substr($scheduletime,0,5).'</b> (24h)
                                                             </div>
                                                             <br>
-                                                            <a href="booking.php?id='.$scheduleid.'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Book Now</font></button></a>
+                                                            <a href="booking.php?id='.urlencode($scheduleid).'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Book Now</font></button></a>
                                                     </div>
                                                             
                                                 </div>

@@ -354,12 +354,12 @@
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $apponum=$row["apponum"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
+                                                    $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                                    $title=htmlspecialchars($row["title"]);
+                                                    $apponum=htmlspecialchars($row["apponum"]);
+                                                    $docname=htmlspecialchars($row["docname"]);
+                                                    $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                                    $scheduletime=htmlspecialchars($row["scheduletime"]);
                                                    
                                                     echo '<tr>
                                                         <td style="padding:30px;font-size:25px;font-weight:700;"> &nbsp;'.

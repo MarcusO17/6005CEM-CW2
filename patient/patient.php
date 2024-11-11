@@ -45,8 +45,8 @@
     $stmt->execute();
     $userrow = $stmt->get_result();
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $userid= htmlspecialchars($userfetch["docid"]);
+    $username=htmlspecialchars($userfetch["docname"]);
 
 
     //echo $userid;
@@ -111,7 +111,7 @@
                     if($_POST){
 
                         if(isset($_POST["search"])){
-                            $keyword=$_POST["search12"];
+                            $keyword=htmlspecialchars($_POST["search12"]);
                             /*TODO: make and understand */
                             $sqlmain= "select * from patient where pemail='$keyword' or pname='$keyword' or pname like '$keyword%' or pname like '%$keyword' or pname like '%$keyword%' ";
                             $selecttype="my";
@@ -157,8 +157,8 @@
 
                                 for ($y=0;$y<$list11->num_rows;$y++){
                                     $row00=$list11->fetch_assoc();
-                                    $d=$row00["pname"];
-                                    $c=$row00["pemail"];
+                                    $d=htmlspecialchars($row00["pname"]);
+                                    $c=htmlspecialchars($row00["pemail"]);
                                     echo "<option value='$d'><br/>";
                                     echo "<option value='$c'><br/>";
                                 };
@@ -297,12 +297,12 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $pid=$row["pid"];
-                                    $name=$row["pname"];
-                                    $email=$row["pemail"];
-                                    $nic=$row["pnic"];
-                                    $dob=$row["pdob"];
-                                    $tel=$row["ptel"];
+                                    $pid=htmlspecialchars($row["pid"]);
+                                    $name=htmlspecialchars($row["pname"]);
+                                    $email=htmlspecialchars($row["pemail"]);
+                                    $nic=htmlspecialchars($row["pnic"]);
+                                    $dob=htmlspecialchars($row["pdob"]);
+                                    $tel=htmlspecialchars($row["ptel"]);
                                     
                                     echo '<tr>
                                         <td> &nbsp;'.
@@ -323,7 +323,7 @@
                                         <td >
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <a href="?action=view&id='.$pid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <a href="?action=view&id='.urlencode($pid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        
                                         </div>
                                         </td>
@@ -350,20 +350,20 @@
     <?php 
     if($_GET){
         
-            $id=$_GET["id"];
-            $action=$_GET["action"];
+            $id=htmlspecialchars($_GET["id"]);
+            $action=htmlspecialchars($_GET["action"]);
             $sqlmain= "select * from patient where pid=?";
             $stmt = $database->prepare($sqlmain);
             $stmt->bind_param("i",$id);
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
-            $nic=$row["pnic"];
-            $dob=$row["pdob"];
-            $tele=$row["ptel"];
-            $address=$row["paddress"];
+            $name=htmlspecialchars($row["pname"]);
+            $email=htmlspecialchars($row["pemail"]);
+            $nic=htmlspecialchars($row["pnic"]);
+            $dob=htmlspecialchars($row["pdob"]);
+            $tele=htmlspecialchars($row["ptel"]);
+            $address=htmlspecialchars($row["paddress"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

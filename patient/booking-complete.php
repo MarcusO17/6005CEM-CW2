@@ -30,14 +30,14 @@
 
     if($_POST){
         if(isset($_POST["booknow"])){
-            $apponum=$_POST["apponum"];
-            $scheduleid=$_POST["scheduleid"];
-            $date=$_POST["date"];
-            $scheduleid=$_POST["scheduleid"];
+            $apponum=htmlspecialchars($_POST["apponum"]);
+            $scheduleid=htmlspecialchars($_POST["scheduleid"]);
+            $date=htmlspecialchars($_POST["date"]);
+            $scheduleid=htmlspecialchars($_POST["scheduleid"]);
             $sql2="insert into appointment(pid,apponum,scheduleid,appodate) values ($userid,$apponum,$scheduleid,'$date')";
             $result= $database->query($sql2);
             //echo $apponom;
-            header("location: appointment.php?action=booking-added&id=".$apponum."&titleget=none");
+            header("location: appointment.php?action=booking-added&id=".urlencode($apponum)."&titleget=none");
 
         }
     }

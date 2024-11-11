@@ -173,8 +173,8 @@
 
                                 for ($y=0;$y<$list11->num_rows;$y++){
                                     $row00=$list11->fetch_assoc();
-                                    $sn=$row00["docname"];
-                                    $id00=$row00["docid"];
+                                    $sn= htmlspecialchars($row00["docname"]);
+                                    $id00=htmlspecialchars($row00["docid"]);
                                     echo "<option value=".$id00.">$sn</option><br/>";
                                 };
 
@@ -201,14 +201,14 @@
                         //print_r($_POST);
                         $sqlpt1="";
                         if(!empty($_POST["sheduledate"])){
-                            $sheduledate=$_POST["sheduledate"];
+                            $sheduledate=htmlspecialchars($_POST["sheduledate"]);
                             $sqlpt1=" schedule.scheduledate='$sheduledate' ";
                         }
 
 
                         $sqlpt2="";
                         if(!empty($_POST["docid"])){
-                            $docid=$_POST["docid"];
+                            $docid=htmlspecialchars($_POST["docid"]);
                             $sqlpt2=" doctor.docid=$docid ";
                         }
                         //echo $sqlpt2;
@@ -310,15 +310,15 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $appoid=$row["appoid"];
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
-                                    $pname=$row["pname"];
-                                    $apponum=$row["apponum"];
-                                    $appodate=$row["appodate"];
+                                    $appoid=htmlspecialchars($row["appoid"]);
+                                    $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                    $title=htmlspecialchars($row["title"]);
+                                    $docname=htmlspecialchars($row["docname"]);
+                                    $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                    $scheduletime=htmlspecialchars($row["scheduletime"]);
+                                    $pname=htmlspecialchars($row["pname"]);
+                                    $apponum=htmlspecialchars($row["apponum"]);
+                                    $appodate=htmlspecialchars($row["appodate"]);
                                     echo '<tr >
                                         <td style="font-weight:600;"> &nbsp;'.
                                         
@@ -345,9 +345,9 @@
                                         <td>
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <!--<a href="?action=view&id='.$appoid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <!--<a href="?action=view&id='.urlencode($appoid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;-->
-                                       <a href="?action=drop&id='.$appoid.'&name='.$pname.'&session='.$title.'&apponum='.$apponum.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
+                                       <a href="?action=drop&id='.urlencode($appoid).'&name='.urlencode($pname).'&session='.urlencode($title).'&apponum='.urlencode($apponum).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
                                        &nbsp;&nbsp;&nbsp;</div>
                                         </td>
                                     </tr>';
@@ -373,8 +373,8 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id=htmlspecialchars($_GET["id"]);
+        $action=htmlspecialchars($_GET["action"]);
         if($action=='add-session'){
 
             echo '
@@ -426,8 +426,8 @@
         
                                         for ($y=0;$y<$list11->num_rows;$y++){
                                             $row00=$list11->fetch_assoc();
-                                            $sn=$row00["docname"];
-                                            $id00=$row00["docid"];
+                                            $sn=htmlspecialchars($row00["docname"]);
+                                            $id00=htmlspecialchars($row00["docid"]);
                                             echo "<option value=".$id00.">$sn</option><br/>";
                                         };
         
@@ -488,7 +488,7 @@
             </div>
             ';
         }elseif($action=='session-added'){
-            $titleget=$_GET["title"];
+            $titleget=htmlspecialchars($_GET["title"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -510,9 +510,9 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $nameget=$_GET["name"];
-            $session=$_GET["session"];
-            $apponum=$_GET["apponum"];
+            $nameget=htmlspecialchars($_GET["name"]);
+            $session=htmlspecialchars($_GET["session"]);
+            $apponum=htmlspecialchars($_GET["apponum"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -526,7 +526,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-appointment.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -538,15 +538,15 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name=htmlspecialchars($row["docname"]);
+            $email=htmlspecialchars($row["docemail"]);
+            $spe=htmlspecialchars($row["specialties"]);
             
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name=htmlspecialchars($spcil_array["sname"]);
+            $nic=htmlspecialchars($row['docnic']);
+            $tele=htmlspecialchars($row['doctel']);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

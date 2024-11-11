@@ -165,7 +165,7 @@
                             </tr>
                             <tr>
                                 <td style="width: 25%;">
-                                    <a href="?action=edit&id=<?php echo $userid ?>&error=0" class="non-style-link">
+                                    <a href="?action=edit&id=<?php echo urlencode($userid) ?>&error=0" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/doctors-hover.svg');"></div>
                                         <div>
@@ -191,7 +191,7 @@
                             </tr>
                             <tr>
                             <td style="width: 25%;">
-                                    <a href="?action=view&id=<?php echo $userid ?>" class="non-style-link">
+                                    <a href="?action=view&id=<?php echo urlencode($userid) ?>" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting " style="background-image: url('../img/icons/view-iceblue.svg');"></div>
                                         <div>
@@ -216,7 +216,7 @@
                             </tr>
                             <tr>
                             <td style="width: 25%;">
-                                    <a href="?action=drop&id=<?php echo $userid.'&name='.$username ?>" class="non-style-link">
+                                    <a href="?action=drop&id=<?php echo urlencode($userid).'&name='.urlencode($username) ?>" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/patients-hover.svg');"></div>
                                         <div>
@@ -245,10 +245,10 @@
     <?php 
     if($_GET){
         
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id=htmlspecialchars($_GET["id"]);
+        $action=htmlspecialchars($_GET["action"]);
         if($action=='drop'){
-            $nameget=$_GET["name"];
+            $nameget=htmlspecialchars($_GET["name"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -260,7 +260,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-account.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-account.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="settings.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -275,14 +275,14 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
-            $address=$row["paddress"];
+            $name=htmlspecialchars($row["pname"]);
+            $email=htmlspecialchars($row["pemail"]);
+            $address=htmlspecialchars($row["paddress"]);
             
            
-            $dob=$row["pdob"];
-            $nic=$row['pnic'];
-            $tele=$row['ptel'];
+            $dob=htmlspecialchars($row["pdob"]);
+            $nic=htmlspecialchars($row['pnic']);
+            $tele=htmlspecialchars($row['ptel']);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -390,14 +390,14 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
+            $name=htmlspecialchars($row["pname"]);
+            $email=htmlspecialchars($row["pemail"]);
            
             
             
-            $address=$row["paddress"];
-            $nic=$row['pnic'];
-            $tele=$row['ptel'];
+            $address=htmlspecialchars($row["paddress"]);
+            $nic=htmlspecialchars($row['pnic']);
+            $tele=htmlspecialchars($row['ptel']);
 
             $error_1=$_GET["error"];
                 $errorlist= array(

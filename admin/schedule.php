@@ -173,8 +173,8 @@
 
                                 for ($y=0;$y<$list11->num_rows;$y++){
                                     $row00=$list11->fetch_assoc();
-                                    $sn=$row00["docname"];
-                                    $id00=$row00["docid"];
+                                    $sn=htmlspecialchars($row00["docname"]);
+                                    $id00=htmlspecialchars($row00["docid"]);
                                     echo "<option value=".$id00.">$sn</option><br/>";
                                 };
 
@@ -201,14 +201,14 @@
                         //print_r($_POST);
                         $sqlpt1="";
                         if(!empty($_POST["sheduledate"])){
-                            $sheduledate=$_POST["sheduledate"];
+                            $sheduledate=htmlspecialchars($_POST["sheduledate"]);
                             $sqlpt1=" schedule.scheduledate='$sheduledate' ";
                         }
 
 
                         $sqlpt2="";
                         if(!empty($_POST["docid"])){
-                            $docid=$_POST["docid"];
+                            $docid=htmlspecialchars($_POST["docid"]);
                             $sqlpt2=" doctor.docid=$docid ";
                         }
                         //echo $sqlpt2;
@@ -299,12 +299,12 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
-                                    $nop=$row["nop"];
+                                    $scheduleid=htmlspecialchars($row["scheduleid"]);
+                                    $title=htmlspecialchars($row["title"]);
+                                    $docname=htmlspecialchars($row["docname"]);
+                                    $scheduledate=htmlspecialchars($row["scheduledate"]);
+                                    $scheduletime=htmlspecialchars($row["scheduletime"]);
+                                    $nop=htmlspecialchars($row["nop"]);
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($title,0,30)
@@ -322,9 +322,9 @@
                                         <td>
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <a href="?action=view&id='.$scheduleid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <a href="?action=view&id='.urlencode($scheduleid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;
-                                       <a href="?action=drop&id='.$scheduleid.'&name='.$title.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Remove</font></button></a>
+                                       <a href="?action=drop&id='.urlencode($scheduleid).'&name='.urlencode($title).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Remove</font></button></a>
                                         </div>
                                         </td>
                                     </tr>';
@@ -350,8 +350,8 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id=htmlspecialchars($_GET["id"]);
+        $action=htmlspecialchars($_GET["action"]);
         if($action=='add-session'){
 
             echo '
@@ -403,8 +403,8 @@
         
                                         for ($y=0;$y<$list11->num_rows;$y++){
                                             $row00=$list11->fetch_assoc();
-                                            $sn=$row00["docname"];
-                                            $id00=$row00["docid"];
+                                            $sn=htmlspecialchars($row00["docname"]);
+                                            $id00=htmlspecialchars($row00["docid"]);
                                             echo "<option value=".$id00.">$sn</option><br/>";
                                         };
         
@@ -465,7 +465,7 @@
             </div>
             ';
         }elseif($action=='session-added'){
-            $titleget=$_GET["title"];
+            $titleget=htmlspecialchars($_GET["title"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -487,7 +487,7 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $nameget=$_GET["name"];
+            $nameget=htmlspecialchars($_GET["name"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -499,7 +499,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-session.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-session.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="schedule.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -511,14 +511,14 @@
             $sqlmain= "select schedule.scheduleid,schedule.title,doctor.docname,schedule.scheduledate,schedule.scheduletime,schedule.nop from schedule inner join doctor on schedule.docid=doctor.docid  where  schedule.scheduleid=$id";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $docname=$row["docname"];
-            $scheduleid=$row["scheduleid"];
-            $title=$row["title"];
-            $scheduledate=$row["scheduledate"];
-            $scheduletime=$row["scheduletime"];
+            $docname=htmlspecialchars($row["docname"]);
+            $scheduleid=htmlspecialchars($row["scheduleid"]);
+            $title=htmlspecialchars($row["title"]);
+            $scheduledate=htmlspecialchars($row["scheduledate"]);
+            $scheduletime=htmlspecialchars($row["scheduletime"]);
             
            
-            $nop=$row['nop'];
+            $nop=htmlspecialchars($row['nop']);
 
 
             $sqlmain12= "select * from appointment inner join patient on patient.pid=appointment.pid inner join schedule on schedule.scheduleid=appointment.scheduleid where schedule.scheduleid=$id;";
@@ -644,10 +644,10 @@
                                          else{
                                          for ( $x=0; $x<$result->num_rows;$x++){
                                              $row=$result->fetch_assoc();
-                                             $apponum=$row["apponum"];
-                                             $pid=$row["pid"];
-                                             $pname=$row["pname"];
-                                             $ptel=$row["ptel"];
+                                             $apponum=htmlspecialchars($row["apponum"]);
+                                             $pid=htmlspecialchars($row["pid"]);
+                                             $pname=htmlspecialchars($row["pname"]);
+                                             $ptel=htmlspecialchars($row["ptel"]);
                                              
                                              echo '<tr style="text-align:center;">
                                                 <td>

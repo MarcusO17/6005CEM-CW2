@@ -314,12 +314,12 @@
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
-                                                    $nop=$row["nop"];
+                                                    $scheduleid= htmlspecialchars($row["scheduleid"]);
+                                                    $title= htmlspecialchars($row["title"]);
+                                                    $docname= htmlspecialchars($row["docname"]);
+                                                    $scheduledate= htmlspecialchars($row["scheduledate"]);
+                                                    $scheduletime= htmlspecialchars($row["scheduletime"]);
+                                                    $nop= htmlspecialchars($row["nop"]);
                                                     echo '<tr>
                                                         <td style="padding:20px;"> &nbsp;'.
                                                         substr($title,0,30)

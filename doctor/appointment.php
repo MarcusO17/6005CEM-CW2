@@ -293,34 +293,34 @@
                                     echo '<tr >
                                         <td style="font-weight:600;"> &nbsp;'.
                                         
-                                        substr($pname,0,25)
+                                        htmlspecialchars(substr($pname,0,25), ENT_QUOTES, 'UTF-8')
                                         .'</td >
                                         <td style="text-align:center;font-size:23px;font-weight:500; color: var(--btnnicetext);">
-                                        '.$apponum.'
+                                        '.htmlspecialchars($apponum, ENT_QUOTES, 'UTF-8').'
                                         
                                         </td>
                                         <td>
-                                        '.substr($title,0,15).'
+                                        '.htmlspecialchars(substr($title, 0, 15), ENT_QUOTES, 'UTF-8').'
                                         </td>
                                         <td style="text-align:center;;">
-                                            '.substr($scheduledate,0,10).' @'.substr($scheduletime,0,5).'
+                                            '. htmlspecialchars(substr($scheduledate, 0, 10), ENT_QUOTES, 'UTF-8') . ' @' . htmlspecialchars(substr($scheduletime, 0, 5), ENT_QUOTES, 'UTF-8') .'
                                         </td>
                                         
                                         <td style="text-align:center;">
-                                            '.$appodate.'
+                                            '. htmlspecialchars($appodate, ENT_QUOTES, 'UTF-8') .'
                                         </td>
 
                                         <td>
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <!--<a href="?action=view&id='.$appoid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <!--<a href="?action=view&id='.urlencode($appoid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;-->
-                                       <a href="?action=drop&id='.$appoid.'&name='.$pname.'&session='.$title.'&apponum='.$apponum.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
+                                       <a href="?action=drop&id='.urlencode($appoid).'&name='.urlencode($pname).'&session='.urlencode($title).'&apponum='.urlencode($apponum).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
                                        &nbsp;&nbsp;&nbsp;</div>
                                         </td>
                                           <td>
                                         <div style="display:flex;justify-content: center;">
-                                        <a href="?action=add-prescription&id='.$appoid.'&pid='.$pid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
+                                        <a href="?action=add-prescription&id='.urlencode($appoid).'&pid='.urlencode($pid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
                                        &nbsp;&nbsp;&nbsp;
                                         </div>
                                         </td>
@@ -347,8 +347,8 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id = htmlspecialchars($_GET["id"]);
+        $action = htmlspecialchars($_GET["action"]);
         if($action=='add-session'){
 
             echo '
@@ -400,8 +400,8 @@
         
                                         for ($y=0;$y<$list11->num_rows;$y++){
                                             $row00=$list11->fetch_assoc();
-                                            $sn=$row00["docname"];
-                                            $id00=$row00["docid"];
+                                            $sn=htmlspecialchars($row00["docname"]);
+                                            $id00=htmlspecialchars($row00["docid"]);
                                             echo "<option value=".$id00.">$sn</option><br/>";
                                         };
         
@@ -462,7 +462,7 @@
             </div>
             ';
         }elseif($action=='session-added'){
-            $titleget=$_GET["title"];
+            $titleget= htmlspecialchars($_GET["title"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -484,9 +484,9 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $nameget=$_GET["name"];
-            $session=$_GET["session"];
-            $apponum=$_GET["apponum"];
+            $nameget= htmlspecialchars($_GET["name"]);
+            $session= htmlspecialchars($_GET["session"]);
+            $apponum= htmlspecialchars($_GET["apponum"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -500,7 +500,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-appointment.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -512,14 +512,14 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name=htmlspecialchars($row["docname"]);
+            $email=htmlspecialchars($row["docemail"]);
+            $spe=htmlspecialchars($row["specialties"]);
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name=htmlspecialchars($spcil_array["sname"]);
+            $nic=htmlspecialchars($row['docnic']);
+            $tele=htmlspecialchars($row['doctel']);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -610,7 +610,7 @@
             </div>
             ';  
     }elseif($action=='add-prescription'){
-            $pidget = $_GET["pid"];
+            $pidget = htmlspecialchars($_GET["pid"]);
             echo '
                 <div id="popup1" class="overlay">
                 <div class="popup">

@@ -15,11 +15,11 @@
     if($_POST){
         //import database
         include("../connection.php");
-        $title=$_POST["title"];
-        $docid=$_POST["docid"];
-        $nop=$_POST["nop"];
-        $date=$_POST["date"];
-        $time=$_POST["time"];
+        $title=htmlspecialchars($_POST["title"]);
+        $docid=htmlspecialchars($_POST["docid"]);
+        $nop=htmlspecialchars($_POST["nop"]);
+        $date=htmlspecialchars($_POST["date"]);
+        $time=htmlspecialchars($_POST["time"]);
         $sql="insert into schedule (docid,title,scheduledate,scheduletime,nop) values ($docid,'$title','$date','$time',$nop);";
         $result= $database->query($sql);
         header("location: schedule.php?action=session-added&title=$title");
