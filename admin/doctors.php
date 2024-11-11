@@ -410,6 +410,7 @@
                     '2'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password Conformation Error! Reconform Password</label>',
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
+                    '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
                     '0'=>'',
 
                 );
@@ -583,9 +584,10 @@
             $error_1=$_GET["error"];
                 $errorlist= array(
                     '1'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>',
-                    '2'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password Conformation Error! Reconform Password</label>',
+                    '2'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password Confirmation Error! Reconfirm Password</label>',
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
+                    '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
                     '0'=>'',
 
                 );

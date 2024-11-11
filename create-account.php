@@ -56,7 +56,7 @@ if($_POST){
     $cpassword=$_POST['cpassword'];
 
     //ReGex Policy (1 digit,lowercase,uppercase and 8-64 length, any character non spaces.)
-    $passwordPolicy = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)[A-Za-z\d\W]{8,64}$/";
+    $passwordPolicy = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,64}$/";
 
     if (!preg_match($passwordPolicy, $newpassword)) {
         // Error Message for failed policy
