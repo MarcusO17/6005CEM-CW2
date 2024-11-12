@@ -19,7 +19,7 @@ function checkSessionExpiration() {
 
         session_unset();
         session_destroy();
-        header("Location: ../login.php?expired=true");
+        header("Location: ../login.php?timeout=true");
         exit();
     }
 

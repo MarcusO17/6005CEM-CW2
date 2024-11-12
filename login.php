@@ -207,13 +207,17 @@
 
 <script>
         <?php if (isset($_GET['expired']) && $_GET['expired'] == 'true'): ?>
-            alert('Your session has expired due to inactivity. Please log in again.');
+            alert('Your session has expired. Please log in again.');
+        <?php endif; ?>
+
+        <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 'true'): ?>
+            alert('Your session has timed out due to inactivity. Please log in again.');
         <?php endif; ?>
 
         <?php
         if (isset($_GET['error'])) {
             if ($_GET['error'] == 'session_hijacked') {
-                echo "alert('Your session was hijacked. Please log in again.');";
+                echo "alert('Potential session hijack detected. Please log in again.');";
             } 
         }
         ?>
