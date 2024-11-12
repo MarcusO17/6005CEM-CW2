@@ -63,7 +63,7 @@
                     $hashedpassword = password_hash($password, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
 
                     $sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$hashedpassword','$nic','$tele',$spec);";
-                    $sql2="insert into webuser values('$email','d')";
+                    $sql2="insert into webuser values('$email','d',0,NULL,NULL)";
                     $database->query($sql1);
                     $database->query($sql2);
 

@@ -78,7 +78,7 @@ if($_POST){
             $hashedpassword = password_hash($newpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
 
             $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$hashedpassword','$address','$nic','$dob','$tele');");
-            $database->query("insert into webuser values('$email','p')");
+            $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
 
             //print_r("insert into patient values($pid,'$email','$fname','$lname','$newpassword','$address','$nic','$dob','$tele');");
             $_SESSION["user"]=$email;
