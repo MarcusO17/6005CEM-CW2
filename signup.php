@@ -32,8 +32,6 @@ $_SESSION["date"]=$date;
 
 if($_POST){
 
-    
-
     $_SESSION["personal"]=array(
         'fname'=>$_POST['fname'],
         'lname'=>$_POST['lname'],
@@ -42,13 +40,8 @@ if($_POST){
         'dob'=>$_POST['dob']
     );
 
-
     print_r($_SESSION["personal"]);
     header("location: create-account.php");
-
-
-
-
 }
 
 ?>
@@ -124,8 +117,8 @@ if($_POST){
             <tr>
                 <td colspan="2">
                     <br>
-                    <label for="" class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
-                    <a href="login.php" class="hover-link1 non-style-link">Login</a>
+                    <label for="" class="sub-text" style="font-weight: 280; margin-right: 1rem;">Already have an account&#63; </label>
+                    <a href="login.php" class="hover-link1">Login</a>
                     <br><br><br>
                 </td>
             </tr>
@@ -133,7 +126,6 @@ if($_POST){
                     </form>
             </tr>
         </table>
-
     </div>
 </center>
 </body>
