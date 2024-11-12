@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="../css/add-prescription.css">
         
     <title>Patients</title>
     <style>
@@ -135,7 +134,7 @@
                                 // Default behavior if no option is selected
                                 $sqlmain = "SELECT * FROM appointment INNER JOIN patient ON patient.pid=appointment.pid INNER JOIN schedule ON schedule.scheduleid=appointment.scheduleid WHERE schedule.docid=$userid";
                                 $selecttype = "My";
-                                $current = "My atients Only";
+                                $current = "My Patients Only";
                             }
                         }
                     }else{
