@@ -36,7 +36,9 @@
         header("location: ../login.php");
     }
     
-    
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
 
     //import database
     include("../connection.php");

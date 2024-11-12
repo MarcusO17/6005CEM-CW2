@@ -14,10 +14,15 @@
     }
     
     
-    if($_GET){
+    if($_POST){
+
+        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+            die('CSRF token validation failed.');
+        }
+
         //import database
         include("../connection.php");
-        $id=$_GET["id"];
+        $id=$_POST["id"];
         //$result001= $database->query("select * from schedule where scheduleid=$id;");
         //$email=($result001->fetch_assoc())["docemail"];
         $sql= $database->query("delete from appointment where appoid='$id';");

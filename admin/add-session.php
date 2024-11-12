@@ -15,6 +15,9 @@
     
     
     if($_POST){
+        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+            die('CSRF token validation failed.');
+        }
         //import database
         include("../connection.php");
         $title=$_POST["title"];
