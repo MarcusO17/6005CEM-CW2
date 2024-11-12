@@ -75,7 +75,7 @@
                     </td>
                 </tr>
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-session">
+                    <td class="menu-btn menu-icon-session menu-icon-session-active menu-active">
                         <a href="prescriptions.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Prescriptions</p></a></div>
                     </td>
                 </tr>
