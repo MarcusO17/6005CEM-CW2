@@ -16,6 +16,9 @@
 <body>
     <?php
 
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', 1);
+
     //learn from w3schools.com
     //Unset all the server side variables
 
@@ -53,10 +56,15 @@
                 $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
                 if ($checker->num_rows==1){
 
+                    session_regenerate_id(true);
 
                     //   Patient dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='p';
+                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+                    include('session_handler.php');
                     
                     header('location: patient/index.php');
 
@@ -69,10 +77,15 @@
                 $checker = $database->query("select * from admin where aemail='$email' and apassword='$password'");
                 if ($checker->num_rows==1){
 
+                    session_regenerate_id(true);
 
                     //   Admin dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='a';
+                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+                    include('session_handler.php');
                     
                     header('location: admin/index.php');
 
@@ -86,10 +99,16 @@
                 $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
                 if ($checker->num_rows==1){
 
+                    session_regenerate_id(true);
 
                     //   doctor dashbord
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='d';
+                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+                    include('session_handler.php');
+
                     header('location: doctor/index.php');
 
                 }else{
@@ -185,5 +204,24 @@
 
     </div>
 </center>
+
+<script>
+        <?php if (isset($_GET['expired']) && $_GET['expired'] == 'true'): ?>
+            alert('Your session has expired. Please log in again.');
+        <?php endif; ?>
+
+        <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 'true'): ?>
+            alert('Your session has timed out due to inactivity. Please log in again.');
+        <?php endif; ?>
+
+        <?php
+        if (isset($_GET['error'])) {
+            if ($_GET['error'] == 'session_hijacked') {
+                echo "alert('Potential session hijack detected. Please log in again.');";
+            } 
+        }
+        ?>
+    </script>
+
 </body>
 </html>
