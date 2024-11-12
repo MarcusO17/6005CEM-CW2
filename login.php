@@ -32,6 +32,10 @@
 
     $_SESSION["user"]="";
     $_SESSION["usertype"]="";
+
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
     
     // Set the new timezone
     date_default_timezone_set('Asia/Kolkata');
@@ -48,6 +52,9 @@
 
 
     if($_POST){
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            die('CSRF token validation failed.');
+        }
 
         $email=$_POST['useremail'];
         $password=$_POST['userpassword'];
@@ -173,6 +180,7 @@
 
             <tr>
                 <td>
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                     <input type="submit" value="Login" class="login-btn btn-primary btn">
                 </td>
             </tr>
