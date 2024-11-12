@@ -39,6 +39,9 @@
     //import database
     include("../connection.php");
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
     
     ?>
     <div class="container">
@@ -545,8 +548,9 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

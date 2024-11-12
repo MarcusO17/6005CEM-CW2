@@ -39,13 +39,17 @@
     
     
 
-       //import database
-       include("../connection.php");
-       $userrow = $database->query("select * from doctor where docemail='$useremail'");
-       $userfetch=$userrow->fetch_assoc();
-       $userid= $userfetch["docid"];
-       $username=$userfetch["docname"];
-    //echo $userid;
+    //import database
+    include("../connection.php");
+    $userrow = $database->query("select * from doctor where docemail='$useremail'");
+    $userfetch=$userrow->fetch_assoc();
+    $userid= $userfetch["docid"];
+    $username=$userfetch["docname"];
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
     ?>
     <div class="container">
         <div class="menu">
@@ -518,7 +522,7 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
             echo '
             <div id="popup1" class="overlay">

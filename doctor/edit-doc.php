@@ -6,6 +6,9 @@
     //import database
     include("../connection.php");
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\encrypt;
 
 
     if($_POST){
@@ -39,9 +42,11 @@
                 //if($resultqq1->num_rows==1){
                     
             }else{
+                // Encrypt sensitive data
+                $encrypted_nic = encrypt($nic);
 
                 //$sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$password','$nic','$tele',$spec);";
-                $sql1="update doctor set docemail='$email',docname='$name',docpassword='$password',docnic='$nic',doctel='$tele',specialties=$spec where docid=$id ;";
+                $sql1="update doctor set docemail='$email',docname='$name',docpassword='$password',docnic='$encrypted_nic',doctel='$tele',specialties=$spec where docid=$id ;";
                 $database->query($sql1);
 
                 $sql1="update webuser set email='$email' where email='$oldemail' ;";

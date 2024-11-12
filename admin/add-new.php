@@ -36,6 +36,9 @@
     //import database
     include("../connection.php");
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\encrypt;
 
 
     if($_POST){
@@ -55,9 +58,11 @@
             if($result->num_rows==1){
                 $error='1';
             }else{
+                // Encrypt sensitive data
+                $encrypted_nic = encrypt($nic);
 
-                $sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$password','$nic','$tele',$spec);";
-                $sql2="insert into webuser values('$email','d')";
+                $sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$password','$encrypted_nic','$tele',$spec);";
+                $sql2="insert into webuser values('$email','d','0',NULL,NULL)";
                 $database->query($sql1);
                 $database->query($sql2);
 
