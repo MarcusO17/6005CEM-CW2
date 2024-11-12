@@ -40,10 +40,21 @@
 
     //import database
     include("../connection.php");
-    $userrow = $database->query("select * from doctor where docemail='$useremail'");
+
+    // Sanitize user email to prevent SQL injection
+    $useremail = mysqli_real_escape_string($database, $useremail);
+    
+    // Query to fetch doctor details with error handling
+    $userrow = $database->query("SELECT * FROM doctor WHERE docemail='$useremail'");
+    if (!$userrow) {
+        echo '<p class="error-message">An error occurred while retrieving data. Please try again later.</p>';
+        error_log("Database error: " . $database->error);
+        exit();
+    }
+
     $userfetch=$userrow->fetch_assoc();
     $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $username = htmlspecialchars($userfetch["docname"]);
  //echo $userid;
  ?>
  <div class="container">
@@ -120,7 +131,13 @@
                         $today = date('Y-m-d');
                         echo $today;
 
-                        $list110 = $database->query("select  * from  schedule where docid=$userid;");
+                        $sqlmain = "SELECT * FROM schedule WHERE docid=$userid";
+                        $list110 = $database->query($sqlmain);
+                        if (!$list110) {
+                            echo '<p class="error-message">An error occurred while retrieving sessions. Please try again later.</p>';
+                            error_log("Database error: " . $database->error);
+                            exit();
+                        }
 
                         ?>
                         </p>
@@ -155,7 +172,7 @@
                         <td width="30%">
                         <form action="" method="post">
                             
-                            <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
+                            <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;"min="1900-01-01" max="2099-12-31">
 
                         </td>
                         
@@ -179,7 +196,7 @@
                         //print_r($_POST);
                         $sqlpt1="";
                         if(!empty($_POST["sheduledate"])){
-                            $sheduledate=$_POST["sheduledate"];
+                            $sheduledate = mysqli_real_escape_string($database, $_POST["sheduledate"]);
                             $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
                         }
 
@@ -246,12 +263,11 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
-                                    $nop=$row["nop"];
+                                    $scheduleid = htmlspecialchars($row["scheduleid"]);
+                                    $title = htmlspecialchars($row["title"]);
+                                    $scheduledate = htmlspecialchars($row["scheduledate"]);
+                                    $scheduletime = htmlspecialchars($row["scheduletime"]);
+                                    $nop = htmlspecialchars($row["nop"]);
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($title,0,30)
@@ -295,10 +311,10 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id = mysqli_real_escape_string($database, $_GET["id"]);
+        $action = mysqli_real_escape_string($database, $_GET["action"]);
         if($action=='drop'){
-            $nameget=$_GET["name"];
+            $nameget = htmlspecialchars($_GET["name"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -322,11 +338,11 @@
             $sqlmain= "select schedule.scheduleid,schedule.title,doctor.docname,schedule.scheduledate,schedule.scheduletime,schedule.nop from schedule inner join doctor on schedule.docid=doctor.docid  where  schedule.scheduleid=$id";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $docname=$row["docname"];
-            $scheduleid=$row["scheduleid"];
-            $title=$row["title"];
-            $scheduledate=$row["scheduledate"];
-            $scheduletime=$row["scheduletime"];
+            $docname = htmlspecialchars($row["docname"]);
+            $title = htmlspecialchars($row["title"]);
+            $scheduledate = htmlspecialchars($row["scheduledate"]);
+            $scheduletime = htmlspecialchars($row["scheduletime"]);
+            $nop = htmlspecialchars($row['nop']);
             
            
             $nop=$row['nop'];
@@ -455,10 +471,10 @@
                                          else{
                                          for ( $x=0; $x<$result->num_rows;$x++){
                                              $row=$result->fetch_assoc();
-                                             $apponum=$row["apponum"];
-                                             $pid=$row["pid"];
-                                             $pname=$row["pname"];
-                                             $ptel=$row["ptel"];
+                                             $apponum=htmlspecialchars($row["apponum"]);
+                                             $pid= htmlspecialchars($row["pid"]);
+                                             $pname= htmlspecialchars($row["pname"]);
+                                             $ptel= htmlspecialchars($row["ptel"]);
                                              
                                              echo '<tr style="text-align:center;">
                                                 <td>
@@ -476,16 +492,11 @@
                                                  '.substr($ptel,0,25).'
                                                  </td>
                                                  
-                                                 
-                
-                                                 
                                              </tr>';
                                              
                                          }
                                      }
-                                          
-                                     
-                
+
                                     echo '</tbody>
                 
                                  </table>
