@@ -57,7 +57,7 @@
             }else{
 
                 $sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$password','$nic','$tele',$spec);";
-                $sql2="insert into webuser values('$email','d')";
+                $sql2="insert into webuser values('$email','d',0,NULL,NULL)";
                 $database->query($sql1);
                 $database->query($sql2);
 
