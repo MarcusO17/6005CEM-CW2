@@ -94,7 +94,7 @@ if($_POST){
             </tr>
             <tr>
                 <td class="label-td" colspan="2">
-                    <input type="text" name="nic" class="input-text" placeholder="NIC Number" required>
+                    <input type="text" name="nic" class="input-text" placeholder="NIC Number" maxlength="15" required>
                 </td>
             </tr>
             <tr>

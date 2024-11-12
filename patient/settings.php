@@ -55,6 +55,10 @@
     $userid= $userfetch["pid"];
     $username=$userfetch["pname"];
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
     ?>
     <div class="container">
         <div class="menu">
@@ -279,10 +283,10 @@
             $email=$row["pemail"];
             $address=$row["paddress"];
             
-           
             $dob=$row["pdob"];
-            $nic=$row['pnic'];
+            $nic=decrypt($row['pnic']);
             $tele=$row['ptel'];
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -393,10 +397,8 @@
             $name=$row["pname"];
             $email=$row["pemail"];
            
-            
-            
             $address=$row["paddress"];
-            $nic=$row['pnic'];
+            $nic=decrypt($row['pnic']);
             $tele=$row['ptel'];
 
             $error_1=$_GET["error"];
@@ -463,7 +465,7 @@
                                     </tr>
                                     <tr>
                                         <td class="label-td" colspan="2">
-                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" required><br>
+                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" maxlength="15" required><br>
                                         </td>
                                     </tr>
                                     <tr>

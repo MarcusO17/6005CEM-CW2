@@ -20,7 +20,6 @@
 
 //learn from w3schools.com
 //Unset all the server side variables
-
 session_start();
 
 $_SESSION["user"]="";
@@ -36,8 +35,9 @@ $_SESSION["date"]=$date;
 //import database
 include("connection.php");
 
-
-
+// import EncryptionUtil
+require "utils/encryption-util.php";
+use function Utils\encrypt;
 
 
 if($_POST){
@@ -55,20 +55,22 @@ if($_POST){
     $newpassword=$_POST['newpassword'];
     $cpassword=$_POST['cpassword'];
     
-    if ($newpassword==$cpassword){
+    if ($newpassword==$cpassword) {
         $sqlmain= "select * from webuser where email=?;";
         $stmt = $database->prepare($sqlmain);
         $stmt->bind_param("s",$email);
         $stmt->execute();
         $result = $stmt->get_result();
-        if($result->num_rows==1){
-            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>';
-        }else{
-            //TODO
-            $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$newpassword','$address','$nic','$dob','$tele');");
-            $database->query("insert into webuser values('$email','p')");
+        
+        // Encrypt sensitive data
+        $encrypted_nic = encrypt($nic);
 
-            //print_r("insert into patient values($pid,'$email','$fname','$lname','$newpassword','$address','$nic','$dob','$tele');");
+        if ($result->num_rows==1) {
+            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>';
+        } else {
+            $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$newpassword','$address','$encrypted_nic','$dob','$tele');");
+            $database->query("insert into webuser values('$email','p','0',NULL,NULL)");
+
             $_SESSION["user"]=$email;
             $_SESSION["usertype"]="p";
             $_SESSION["username"]=$fname;
@@ -76,14 +78,9 @@ if($_POST){
             header('Location: patient/index.php');
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>';
         }
-        
-    }else{
+    } else {
         $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password Conformation Error! Reconform Password</label>';
     }
-
-
-
-    
 }else{
     //header('location: signup.php');
     $error='<label for="promter" class="form-label"></label>';
