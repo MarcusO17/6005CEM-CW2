@@ -222,12 +222,6 @@
                                 Max num that can be booked
                                     
                                 </th>
-
-                                <th class="table-headin">
-                                    
-                                Session Details
-                                    
-                                </th>
                                 
                                 <th class="table-headin">
                                     
