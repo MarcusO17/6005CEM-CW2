@@ -69,31 +69,8 @@
                     $_SESSION['otp'] = $OTPSettings['otp']; 
                     $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
                     $_SESSION['user'] = $email;
-                    sendMail($email,$_SESSION['otp']);
 
-                    echo '<div id="popup1" class="overlay">
-                            <div class="popup">
-                                <div class="popup-content">
-                                    <div class="content-wrapper">
-                                        <div class="abc">
-                                            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
-                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>5 minutes</b></p>
-                                            <form action="verify_otp.php" method="POST" id="otpForm">
-                                                <div class="otp-input-group">
-                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="hidden" name="user_id" value="p">
-                                                </div>
-                                                <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                 </div>
-                            </div>';
+                    sendOTP($email);
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
@@ -120,11 +97,13 @@
                 $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
                 if ($checker->num_rows==1){
 
-
-                    //   doctor dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='d';
-                    header('location: doctor/index.php');
+                    $OTPSettings = getOTP();
+                    
+                    $_SESSION['otp'] = $OTPSettings['otp']; 
+                    $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
+                    $_SESSION['user'] = $email;
+                    
+                    sendOTP($email);
 
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
@@ -185,6 +164,33 @@ function getOTP(){
     return ['otp' => $otp, 'expiryTime' => $expiryTime];
 }
 
+function sendOTP($email){
+    sendMail($email,$_SESSION['otp']);
+
+                    echo '<div id="popup1" class="overlay">
+                            <div class="popup">
+                                <div class="popup-content">
+                                    <div class="content-wrapper">
+                                        <div class="abc">
+                                            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
+                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>5 minutes</b></p>
+                                            <form action="verify_otp.php" method="POST" id="otpForm">
+                                                <div class="otp-input-group">
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="hidden" name="user_id" value="p">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>';
+}
 
     ?>
 

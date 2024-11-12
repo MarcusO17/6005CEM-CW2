@@ -21,6 +21,10 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
         $_SESSION['usertype']='p';
         header('location: patient/index.php');
     }
+    if ($_POST['user_id']=='d'){
+        $_SESSION['usertype']='d';
+        header('location: doctor/index.php');
+    }
  
 } else {
     if ($currentTime > $expiryTime) {
