@@ -19,6 +19,15 @@
     //learn from w3schools.com
     //Unset all the server side variables
 
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ]);
+
+
     session_start();
 
     $_SESSION["user"]="";
