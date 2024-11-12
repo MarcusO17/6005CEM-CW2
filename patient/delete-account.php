@@ -28,14 +28,14 @@
     $username=$userfetch["pname"];
 
     
-    if($_GET){
+    if($_POST){
 
-        if (!isset($_GET['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_GET['csrf_token'])) {
+        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
             die('CSRF token validation failed.');
         }
         //import database
         include("../connection.php");
-        $id=$_GET["id"];
+        $id=$_POST["id"];
         $sqlmain= "select * from patient where pid=?";
         $stmt = $database->prepare($sqlmain);
         $stmt->bind_param("i",$id);
