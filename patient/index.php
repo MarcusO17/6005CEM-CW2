@@ -53,7 +53,7 @@
     $userfetch=$userrow->fetch_assoc();
 
     $userid= $userfetch["pid"];
-    $username=$userfetch["pname"];
+    $username = htmlspecialchars($userfetch["pname"]); // Encode to prevent XSS
 
 
     //echo $userid;
@@ -71,9 +71,8 @@
                                     <img src="../img/user.png" alt="" width="100%" style="border-radius:50%">
                                 </td>
                                 <td style="padding:0px;margin:0px;">
-                                    <p class="profile-title"><?php echo substr($username,0,13)  ?>..</p>
-                                    <p class="profile-subtitle"><?php echo substr($useremail,0,22)  ?></p>
-                                </td>
+                                    <p class="profile-title"><?= htmlspecialchars(substr($username, 0, 13)) ?>..</p>
+                                    <p class="profile-subtitle"><?= htmlspecialchars(substr($useremail, 0, 22)) ?></p>
                             </tr>
                             <tr>
                                 <td colspan="2">
@@ -163,7 +162,7 @@
                     <tr>
                         <td >
                             <h3>Welcome!</h3>
-                            <h1><?php echo $username  ?>.</h1>
+                            <h1><?= htmlspecialchars($username) ?>.</h1>
                             <p>Haven't any idea about doctors? no problem let's jumping to 
                                 <a href="doctors.php" class="non-style-link"><b>"All Doctors"</b></a> section or 
                                 <a href="schedule.php" class="non-style-link"><b>"Sessions"</b> </a><br>
@@ -176,19 +175,15 @@
                                 <input type="search" name="search" class="input-text " placeholder="Search Doctor and We will Find The Session Available" list="doctors" style="width:45%;">&nbsp;&nbsp;
                                 
                                 <?php
-                                    echo '<datalist id="doctors">';
-                                    $list11 = $database->query("select  docname,docemail from  doctor;");
-    
-                                    for ($y=0;$y<$list11->num_rows;$y++){
-                                        $row00=$list11->fetch_assoc();
-                                        $d=$row00["docname"];
-                                        
-                                        echo "<option value='$d'><br/>";
-                                        
-                                    };
-    
-                                echo ' </datalist>';
-    ?>
+                                     echo '<datalist id="doctors">';
+                                     $list11 = $database->query("select docname,docemail from doctor");
+                                     for ($y = 0; $y < $list11->num_rows; $y++) {
+                                         $row00 = $list11->fetch_assoc();
+                                         $d = htmlspecialchars($row00["docname"]);
+                                         echo "<option value='$d'><br/>";
+                                     }
+                                     echo ' </datalist>';
+?>
                                 
                            
                                 <input type="Submit" value="Search" class="login-btn btn-primary btn" style="padding-left: 25px;padding-right: 25px;padding-top: 10px;padding-bottom: 10px;">
@@ -226,7 +221,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex">
                                                         <div>
                                                                 <div class="h1-dashboard">
-                                                                    <?php    echo $doctorrow->num_rows  ?>
+                                                                  <?= htmlspecialchars($doctorrow->num_rows) ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard">
                                                                     All Doctors &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -239,7 +234,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                                         <div>
                                                                 <div class="h1-dashboard">
-                                                                    <?php    echo $patientrow->num_rows  ?>
+                                                                <?= htmlspecialchars($patientrow->num_rows) ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard">
                                                                     All Patients &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -254,7 +249,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex; ">
                                                         <div>
                                                                 <div class="h1-dashboard" >
-                                                                    <?php    echo $appointmentrow ->num_rows  ?>
+                                                                <?= htmlspecialchars($appointmentrow->num_rows) ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard" >
                                                                     NewBooking &nbsp;&nbsp;
@@ -269,7 +264,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex;padding-top:21px;padding-bottom:21px;">
                                                         <div>
                                                                 <div class="h1-dashboard">
-                                                                    <?php    echo $schedulerow ->num_rows  ?>
+                                                                <?= htmlspecialchars($schedulerow->num_rows) ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard" style="font-size: 15px">
                                                                     Today Sessions
@@ -330,9 +325,19 @@
                                         
                                             <?php
                                             $nextweek=date("Y-m-d",strtotime("+1 week"));
-                                                $sqlmain= "select * from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  patient.pid=$userid  and schedule.scheduledate>='$today' order by schedule.scheduledate asc";
-                                                //echo $sqlmain;
-                                                $result= $database->query($sqlmain);
+                                               // Prepared statement to fetch the schedule details for the current user and today's date
+                                                $sqlmain = "SELECT * FROM schedule 
+                                                INNER JOIN appointment ON schedule.scheduleid = appointment.scheduleid 
+                                                INNER JOIN patient ON patient.pid = appointment.pid 
+                                                INNER JOIN doctor ON schedule.docid = doctor.docid  
+                                                WHERE patient.pid = ? AND schedule.scheduledate >= ? 
+                                                ORDER BY schedule.scheduledate ASC";
+
+
+                                                $stmt = $database->prepare($sqlmain);
+                                                $stmt->bind_param("is", $userid, $today);
+                                                $stmt->execute();
+                                                $result = $stmt->get_result();
                 
                                                 if($result->num_rows==0){
                                                     echo '<tr>
@@ -351,15 +356,17 @@
                                                     </tr>';
                                                     
                                                 }
+
+                                                
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $apponum=$row["apponum"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
+                                                    $scheduleid = htmlspecialchars($row["scheduleid"]);
+                                                    $title = htmlspecialchars($row["title"]);
+                                                    $apponum = htmlspecialchars($row["apponum"]);
+                                                    $docname = htmlspecialchars($row["docname"]);
+                                                    $scheduledate = htmlspecialchars($row["scheduledate"]);
+                                                    $scheduletime = htmlspecialchars($row["scheduletime"]);
                                                    
                                                     echo '<tr>
                                                         <td style="padding:30px;font-size:25px;font-weight:700;"> &nbsp;'.
