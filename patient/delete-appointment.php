@@ -14,6 +14,9 @@
     
     
     if($_GET){
+        if (!isset($_GET['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_GET['csrf_token'])) {
+            die('CSRF token validation failed.');
+        }
         //import database
         include("../connection.php");
         $id=$_GET["id"];

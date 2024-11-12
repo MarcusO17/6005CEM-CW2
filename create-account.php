@@ -32,6 +32,9 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 //import database
 include("connection.php");
@@ -41,6 +44,10 @@ include("connection.php");
 
 
 if($_POST){
+
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('CSRF token validation failed.');
+    }
 
     $result= $database->query("select * from webuser");
 
@@ -103,6 +110,7 @@ if($_POST){
             </tr>
             <tr>
                 <form action="" method="POST" >
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <td class="label-td" colspan="2">
                     <label for="newemail" class="form-label">Email: </label>
                 </td>

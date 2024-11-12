@@ -28,11 +28,15 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
-
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 if($_POST){
 
-    
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('CSRF token validation failed.');
+    }
 
     $_SESSION["personal"]=array(
         'fname'=>$_POST['fname'],
@@ -65,6 +69,8 @@ if($_POST){
             </tr>
             <tr>
                 <form action="" method="POST" >
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
                 <td class="label-td" colspan="2">
                     <label for="name" class="form-label">Name: </label>
                 </td>

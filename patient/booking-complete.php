@@ -31,6 +31,9 @@
 
 
     if($_POST){
+        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+            die('CSRF token validation failed.');
+        }
         if(isset($_POST["booknow"])){
             $apponum=$_POST["apponum"];
             $scheduleid=$_POST["scheduleid"];
