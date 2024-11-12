@@ -34,8 +34,6 @@
     //import database
     include("connection.php");
 
-    
-
 
 
     if($_POST){
@@ -57,7 +55,7 @@
 
                     $_SESSION['otp'] = $OTPSettings['otp']; 
                     $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
-                    
+                    $_SESSION['user'] = $email;
 
                     echo '<div id="popup1" class="overlay">
                             <div class="popup">
@@ -74,23 +72,14 @@
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
-                                                    <input type="hidden" name="full_otp" id="fullOtp">
+                                                    <input type="hidden" name="user_id" value="p">
                                                 </div>
                                                 <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Verify OTP</button>
                                             </form>
                                         </div>
-                                    </div>';
-                    echo '<p>' . htmlspecialchars($_SESSION['otp']) . '</p>';
-                    echo           '</div>
+                                    </div>
+                    e          </div>
                             </div>';
-
-
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='p';
-                        
-                    //header('location: patient/index.php');
-
-
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }

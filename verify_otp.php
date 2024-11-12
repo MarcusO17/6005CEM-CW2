@@ -1,11 +1,10 @@
 <?php
 
 session_start();
-
 $otp = implode('', $_POST['otp']);
 
 if ($_SESSION['otp'] == NULL) {
-    die("OTP not generated.");
+    echo("OTP not generated.");
 }
 
 $generatedOtp = $_SESSION['otp'];
@@ -17,6 +16,11 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
    
     unset($_SESSION['otp']);
     unset($_SESSION['expiryTime']);
+    if ($_POST['user_id']=='p'){
+        $_SESSION['usertype']='p';
+            
+        header('location: patient/index.php');
+    }
  
 } else {
     if ($currentTime > $expiryTime) {
@@ -28,6 +32,7 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
     } else {
         echo "Invalid OTP. Please try again.";
     }
+
 }
 
 ?>
