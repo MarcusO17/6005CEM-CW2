@@ -45,6 +45,9 @@
         header("location: ../login.php");
     }
     
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
 
     //import database
     include("../connection.php");
@@ -417,6 +420,7 @@
                                             <form action="edit-doc.php" method="POST" class="add-new-form">
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
+                                            <input type="hidden" name="csrf_token" value="' . $_SESSION['csrf_token'] . '">
                                         </td>
                                     </tr>
                                     <tr>
