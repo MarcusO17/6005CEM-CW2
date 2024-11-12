@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/animations.css">  
     <link rel="stylesheet" href="css/main.css">  
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/otp.css">
         
     <title>Login</title>
 
@@ -51,24 +52,44 @@
                 //TODO
                 $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
                 if ($checker->num_rows==1){
+
                     $OTPSettings = getOTP();
+
                     $_SESSION['otp'] = $OTPSettings['otp']; 
                     $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
                     
 
-                    echo '<script>
-                        const userOtp = prompt("Enter the OTP sent to your email:");
-                        if (userOtp !== null) {
-                            window.location.href = "verify_otp.php?otp=" + userOtp;
-                        }
-                    </script>';
-                    sendMail($email,$_SESSION['otp']);
+                    echo '<div id="popup1" class="overlay">
+                            <div class="popup">
+                                <div class="popup-content">
+                                    <div class="content-wrapper">
+                                        <div class="abc">
+                                            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
+                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your device</p>
+                                            <form action="verify_otp.php" method="POST" id="otpForm">
+                                                <div class="otp-input-group">
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="hidden" name="full_otp" id="fullOtp">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Verify OTP</button>
+                                            </form>
+                                        </div>
+                                    </div>';
+                    echo '<p>' . htmlspecialchars($_SESSION['otp']) . '</p>';
+                    echo           '</div>
+                            </div>';
 
-                    //   Patient dashbord
+
                     $_SESSION['user']=$email;
                     $_SESSION['usertype']='p';
-                    
+                        
                     //header('location: patient/index.php');
+
 
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
@@ -137,7 +158,7 @@ function sendMail($email,$otp){
                 ]
             ],
             'Subject' => "Your OTP for Edoc Services",
-            'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b></h3><br />"
+            'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b>, Your OTP expires in 5 Minutes.</h3><br />"
             ]
         ]
     ];
@@ -157,27 +178,11 @@ function sendMail($email,$otp){
 
 function getOTP(){
     $otp = rand(100000,999999);
-    $expiryTime = time() + 60;
-    return ['otp' => $otp, 'expires_at' => $expiryTime];
+    $expiryTime = time() + 300;
+    return ['otp' => $otp, 'expiryTime' => $expiryTime];
 }
 
-function verifyOTP($input) {
-    if (!isset($_SESSION['otp'], $_SESSION['otp_expiryTime'])) {
-        return "OTP not generated";
-    }
 
-    if (time() > $_SESSION['otp_expiryTime']) {
-        unset($_SESSION['otp'], $_SESSION['otp_expiryTime']); // Clear expired OTP
-        return 1;
-    }
-
-    if ($input== $_SESSION['otp']) {
-        unset($_SESSION['otp'], $_SESSION['otp_expiryTime']); // Clear OTP after verification
-        return true;
-    } else {
-        return false;
-    }
-}
     ?>
 
 

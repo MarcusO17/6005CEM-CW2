@@ -1,0 +1,29 @@
+.otp-input-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.otp-input {
+    width: 40px !important;
+    height: 40px;
+    padding: 5px !important;
+    text-align: center;
+    font-size: 16px;
+}
+
+.popup {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    margin: 70px auto;
+}
+
+.content-wrapper {
+    text-align: left;
+    padding: 10px;
+}
