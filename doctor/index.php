@@ -47,10 +47,15 @@
 
     //import database
     include("../connection.php");
+
+
+    // Sanitize the email input to prevent SQL Injection and XSS
+    $useremail = $database->real_escape_string($useremail);
+
     $userrow = $database->query("select * from doctor where docemail='$useremail'");
     $userfetch=$userrow->fetch_assoc();
     $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
 
 
     //echo $userid;
@@ -315,8 +320,8 @@
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
                                                     $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
+                                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8'); // Sanitize title
+                                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8'); // Sanitize doctor name
                                                     $scheduledate=$row["scheduledate"];
                                                     $scheduletime=$row["scheduletime"];
                                                     $nop=$row["nop"];
