@@ -87,7 +87,7 @@
                 //TODO
                 $checker = $database->query("select docpassword from doctor where docemail='$email'");
                 if ($checker->num_rows==1){
-                    $hashedpassword = $checker->fetch_assoc()['ppassword'];
+                    $hashedpassword = $checker->fetch_assoc()['docpassword'];
                     if(password_verify($password,$hashedpassword)){
                         //   doctor dashbord
                         $_SESSION['user']=$email;
