@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="../css/add-prescription.css"> 
+
         
     <title>Appointments</title>
     <style>
@@ -41,15 +41,23 @@
 
        //import database
        include("../connection.php");
-       $userrow = $database->query("select * from doctor where docemail='$useremail'");
-       $userfetch=$userrow->fetch_assoc();
-       $userid= $userfetch["docid"];
-       $username=$userfetch["docname"];
+
+
+       // Fetch doctor's data using prepared statement
+        $sqlmain = "SELECT * FROM doctor WHERE docemail = ?";
+        $stmt = $database->prepare($sqlmain);
+        $stmt->bind_param("s", $useremail);
+        $stmt->execute();
+        $userrow = $stmt->get_result();
+        $userfetch = $userrow->fetch_assoc();
+        $userid = $userfetch["docid"];
+        $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');  // Sanitize output
+
     //echo $userid;
     ?>
     <div class="container">
-        <div class="menu">
-        <table class="menu-container" border="0">
+    <div class="menu">
+            <table class="menu-container" border="0">
                 <tr>
                     <td style="padding:10px" colspan="2">
                         <table border="0" class="profile-container">
@@ -71,12 +79,12 @@
                     </td>
                 </tr>
                 <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-dashbord " >
-                        <a href="index.php" class="non-style-link-menu "><div><p class="menu-text">Dashboard</p></a></div></a>
+                    <td class="menu-btn menu-icon-dashbord" >
+                        <a href="index.php" class="non-style-link-menu"><div><p class="menu-text">Dashboard</p></a></div></a>
                     </td>
                 </tr>
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-appoinment  menu-active menu-icon-appoinment-active">
+                    <td class="menu-btn menu-icon-appoinment menu-icon-appoinment-active menu-active">
                         <a href="appointment.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Appointments</p></a></div>
                     </td>
                 </tr>
@@ -192,8 +200,8 @@
 
                         
                         if(!empty($_POST["sheduledate"])){
-                            $sheduledate=$_POST["sheduledate"];
-                            $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
+                            $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
+                            $sqlmain .= " AND schedule.scheduledate = ?";
                         };
 
                         
@@ -280,16 +288,16 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $appoid=$row["appoid"];
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
-                                    $pid =$row["pid"];
-                                    $pname=$row["pname"];
-                                    $apponum=$row["apponum"];
-                                    $appodate=$row["appodate"];
+                                    $appoid = $row["appoid"];
+                                    $scheduleid = $row["scheduleid"];
+                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                    $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                    $scheduletime = htmlspecialchars($row["scheduletime"], ENT_QUOTES, 'UTF-8');
+                                    $pid = $row["pid"];
+                                    $pname = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+                                    $apponum = htmlspecialchars($row["apponum"], ENT_QUOTES, 'UTF-8');
+                                    $appodate = htmlspecialchars($row["appodate"], ENT_QUOTES, 'UTF-8');
                                     echo '<tr >
                                         <td style="font-weight:600;"> &nbsp;'.
                                         
@@ -347,8 +355,9 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id = isset($_GET["id"]) ? filter_var($_GET["id"], FILTER_VALIDATE_INT) : null;
+        $action = isset($_GET["action"]) ? htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8') : '';
+        
         if($action=='add-session'){
 
             echo '
@@ -402,7 +411,7 @@
                                             $row00=$list11->fetch_assoc();
                                             $sn=$row00["docname"];
                                             $id00=$row00["docid"];
-                                            echo "<option value=".$id00.">$sn</option><br/>";
+                                            echo "<option value=". htmlspecialchars($id00, ENT_QUOTES, 'UTF-8') . ">". htmlspecialchars($sn, ENT_QUOTES, 'UTF-8') ."</option><br/>";
                                         };
         
         
@@ -462,7 +471,7 @@
             </div>
             ';
         }elseif($action=='session-added'){
-            $titleget=$_GET["title"];
+            $titleget = isset($_GET["title"]) ? htmlspecialchars($_GET["title"], ENT_QUOTES, 'UTF-8') : '';
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -484,9 +493,9 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $nameget=$_GET["name"];
-            $session=$_GET["session"];
-            $apponum=$_GET["apponum"];
+            $nameget = isset($_GET["name"]) ? htmlspecialchars($_GET["name"], ENT_QUOTES, 'UTF-8') : '';
+            $session = isset($_GET["session"]) ? htmlspecialchars($_GET["session"], ENT_QUOTES, 'UTF-8') : '';
+            $apponum = isset($_GET["apponum"]) ? htmlspecialchars($_GET["apponum"], ENT_QUOTES, 'UTF-8') : '';
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -512,14 +521,14 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars($row['docnic'], ENT_QUOTES, 'UTF-8');
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
