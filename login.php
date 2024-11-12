@@ -16,6 +16,7 @@
 </head>
 <body>
     <?php
+    define("OTP_EXPIRY",300);
     //learn from w3schools.com
     //Unset all the server side variables
 
@@ -29,7 +30,19 @@
     $date = date('Y-m-d');
 
     $_SESSION["date"]=$date;
-    
+    if(isset($_SESSION["otp_error_message"])){
+       echo" <input type='checkbox' id='popup-toggle'>
+        <div class='overlay'>
+            <div class='popup'>
+                <a href='login.php' class='close'>&times;</a>
+                <div class='error-message'>";
+                        echo $_SESSION['otp_error_message'];
+                        unset($_SESSION['otp_error_message']);
+                echo'
+                </div>
+            </div>
+        </div>';
+    }
 
     //import database
     include("connection.php");
@@ -52,10 +65,11 @@
                 if ($checker->num_rows==1){
 
                     $OTPSettings = getOTP();
-
+                    
                     $_SESSION['otp'] = $OTPSettings['otp']; 
                     $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
                     $_SESSION['user'] = $email;
+                    sendMail($email,$_SESSION['otp']);
 
                     echo '<div id="popup1" class="overlay">
                             <div class="popup">
@@ -63,7 +77,7 @@
                                     <div class="content-wrapper">
                                         <div class="abc">
                                             <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
-                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your device</p>
+                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>5 minutes</b></p>
                                             <form action="verify_otp.php" method="POST" id="otpForm">
                                                 <div class="otp-input-group">
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
@@ -74,11 +88,11 @@
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
                                                     <input type="hidden" name="user_id" value="p">
                                                 </div>
-                                                <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Verify OTP</button>
+                                                <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
                                             </form>
                                         </div>
                                     </div>
-                    e          </div>
+                                 </div>
                             </div>';
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
@@ -167,7 +181,7 @@ function sendMail($email,$otp){
 
 function getOTP(){
     $otp = rand(100000,999999);
-    $expiryTime = time() + 300;
+    $expiryTime = time() + OTP_EXPIRY;
     return ['otp' => $otp, 'expiryTime' => $expiryTime];
 }
 

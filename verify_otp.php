@@ -16,21 +16,22 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
    
     unset($_SESSION['otp']);
     unset($_SESSION['expiryTime']);
+    unset($_SESSION['otp_error_message']);
     if ($_POST['user_id']=='p'){
         $_SESSION['usertype']='p';
-            
         header('location: patient/index.php');
     }
  
 } else {
     if ($currentTime > $expiryTime) {
-        echo "OTP expired. Please request a new one.";
-        
         unset($_SESSION['otp']);
         unset($_SESSION['expiryTime']);
+        $_SESSION['otp_error_message'] = "OTP expired. Please request a new one.";
+        header('location: login.php');
         
     } else {
-        echo "Invalid OTP. Please try again.";
+        $_SESSION['otp_error_message'] = "Invalid OTP. Please try again.";
+        header('location: login.php');
     }
 
 }
