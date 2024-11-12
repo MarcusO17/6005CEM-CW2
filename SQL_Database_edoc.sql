@@ -249,12 +249,15 @@ CREATE TABLE IF NOT EXISTS `prescription` (
 --
 
 DROP TABLE IF EXISTS `webuser`;
+
 CREATE TABLE IF NOT EXISTS `webuser` (
-  `email` varchar(255) NOT NULL,
-  `usertype` char(1) DEFAULT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `usertype` CHAR(1) DEFAULT NULL,
+  `attempts` INT DEFAULT NULL 0,
+  `last_recorded_attempt` TIMESTAMP NULL DEFAULT NULL,
+  `end_lockout` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
 --
 -- Dumping data for table `webuser`
 --
