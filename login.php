@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/animations.css">  
     <link rel="stylesheet" href="css/main.css">  
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/otp.css">
         
     <title>Login</title>
 
@@ -22,8 +23,7 @@
     define('LOCKOUT_DURATION','+60 seconds');
     ini_set('session.cookie_httponly', 1);
     ini_set('session.cookie_secure', 1);
-
-
+    define("OTP_EXPIRY",30);
     //learn from w3schools.com
     //Unset all the server side variables
 
@@ -47,9 +47,21 @@
     $date = date('Y-m-d');
 
     $_SESSION["date"]=$date;
-
     include("csrf_helper.php");
     
+    if(isset($_SESSION["otp_error_message"])){
+       echo" <input type='checkbox' id='popup-toggle'>
+        <div class='overlay'>
+            <div class='popup'>
+                <a href='login.php' class='close'>&times;</a>
+                <div class='error-message'>";
+                        echo $_SESSION['otp_error_message'];
+                        unset($_SESSION['otp_error_message']);
+                echo'
+                </div>
+            </div>
+        </div>';
+    }
 
     //import database
     include("connection.php");
@@ -74,32 +86,24 @@
                 $utype = $row['usertype'];
                 if ($utype=='p'){
                     //TODO
-                    $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
+                    $checker = $database->query("select * from patient where pemail='$email'");
                     if ($checker->num_rows==1){
-                      
-                      $hashedpassword = $checker->fetch_assoc()['ppassword'];
-                      if(password_verify($password,$hashedpassword)){
+                        $hashedpassword = $checker->fetch_assoc()['ppassword'];
+                        if(password_verify($password,$hashedpassword)){
+                            $OTPSettings = getOTP();
+                            
+                            $_SESSION['otp'] = $OTPSettings['otp']; 
+                            $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
+                            $_SESSION['user'] = $email;
 
-                          session_regenerate_id(true);
-
-                          //   Patient dashbord
-                          $_SESSION['user']=$email;
-                          $_SESSION['usertype']='p';
-                          $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-                          $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-                        
-                          include('session_handler.php');
-                          resetAccountLock($database,$email);
-                          header('location: patient/index.php');
-                        
-                        
+                            sendOTP($email);
                         }else{
-                          recordFailedLogin($database,$email);
-                          $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                            recordFailedLogin($database,$email);
+                            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                         }
                     }else{
                         recordFailedLogin($database,$email);
-                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
+                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials111: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
                     }
 
                 }elseif($utype=='a'){
@@ -132,36 +136,32 @@
 
                 }elseif($utype=='d'){
                     //TODO
-                    $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
+                    $checker = $database->query("select * from doctor where docemail='$email'");
                     if ($checker->num_rows==1){
                           $hashedpassword = $checker->fetch_assoc()['docpassword'];
                           if(password_verify($password,$hashedpassword)){
 
-                                session_regenerate_id(true);
+                            $OTPSettings = getOTP();
+                    
+                            $_SESSION['otp'] = $OTPSettings['otp']; 
+                            $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
+                            $_SESSION['user'] = $email;
+                            
+                            sendOTP($email);
 
-                                //   doctor dashbord
-                                $_SESSION['user']=$email;
-                                $_SESSION['usertype']='d';
-                                $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-                                $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-
-                                include('session_handler.php');
-                                resetAccountLock($database,$email);
-                                header('location: doctor/index.php');            
-                          }else{
+                        }else{
                             recordFailedLogin($database,$email);
-                            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . '  attempt(s) left.</label>';
                           }
                     }else{
                         recordFailedLogin($database,$email);
                         $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . '  attempt(s) left. </label>';
                     }
-
-
                 }
             }else{
                 $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Your account is locked till '. $row['end_lockout'].'</label>';
             }
+            
         }else{
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any account for this email.</label>';
         }
@@ -169,58 +169,121 @@
     }else{
         $error='<label for="promter" class="form-label">&nbsp;</label>';
     }
-    
 
-function recordFailedLogin($database,$email){
 
-    $result= $database->query("select * from webuser where email='$email'");
-    if ($result->num_rows== 1){
-        $row = $result->fetch_assoc();
-        if($row != NULL){
-            $attempt = $row["attempts"];
-            $lastfailedattempt = $row["last_recorded_attempt"];
-            if ($lastfailedattempt != NULL){
-                $lastfailedattempt = strtotime($lastfailedattempt);
+
+    function recordFailedLogin($database,$email){
+
+        $result= $database->query("select * from webuser where email='$email'");
+        if ($result->num_rows== 1){
+            $row = $result->fetch_assoc();
+            if($row != NULL){
+                $attempt = $row["attempts"];
+                $lastfailedattempt = $row["last_recorded_attempt"];
+                if ($lastfailedattempt != NULL){
+                    $lastfailedattempt = strtotime($lastfailedattempt);
+                }
+                $failedAttempts = $attempt+1;
             }
-            $failedAttempts = $attempt+1;
-        }
-      
-        if($failedAttempts >= MAX_ATTEMPTS){
-            $endDate= date('Y-m-d H:i:s', strtotime(LOCKOUT_DURATION, $lastfailedattempt));
-            $sql1="UPDATE webuser SET end_lockout='$endDate' where email='$email';";
-            $database->query($sql1);
-        }else{
-            $now = date('Y-m-d H:i:s');
-            $sql1=  " UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt='$now' where email='$email';";
-            $database->query($sql1);
-        }
-    } 
-
-}
-
-function testAccountLock($lockout,$database,$email) {
-    if ($lockout == NULL) {
-        return false;  
+          
+            if($failedAttempts >= MAX_ATTEMPTS){
+                $endDate= date('Y-m-d H:i:s', strtotime(LOCKOUT_DURATION, $lastfailedattempt));
+                $sql1="UPDATE webuser SET end_lockout='$endDate' where email='$email';";
+                $database->query($sql1);
+            }else{
+                $now = date('Y-m-d H:i:s');
+                $sql1=  " UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt='$now' where email='$email';";
+                $database->query($sql1);
+            }
+        } 
+    
     }
-    $now = time();
-    $lockoutTime = strtotime($lockout);
-
-    if ($lockoutTime <= $now) {
-        resetAccountLock($database, $email);  // Reset attempts and lockout data
-        return false;  
+    
+    function testAccountLock($lockout,$database,$email) {
+        if ($lockout == NULL) {
+            return false;  
+        }
+        $now = time();
+        $lockoutTime = strtotime($lockout);
+    
+        if ($lockoutTime <= $now) {
+            resetAccountLock($database, $email);  // Reset attempts and lockout data
+            return false;  
+        }
+        return true;  
     }
-    return true;  
+    function resetAccountLock($database,$email){
+        $sql1=  " UPDATE webuser SET attempts=NULL, last_recorded_attempt=NULL, end_lockout=NULL where email='$email';";
+        $database->query($sql1);
+    }
+
+
+    function sendMail($email,$otp){
+        $data = [
+            'Messages' => [
+                [
+                'From' => [
+                    'Email' => getenv("SenderEmail"),
+                    'Name' => "EDoc Services"
+                ],
+                'To' => [
+                    [
+                        'Email' => $email,
+                        'Name' => ""
+                    ]
+                ],
+                'Subject' => "Your OTP for Edoc Services",
+                'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b>, Your OTP expires in 30 seconds.</h3><br />"
+                ]
+            ]
+        ];
+        
+        $ch = curl_init();
+        
+        curl_setopt($ch, CURLOPT_URL, "https://api.mailjet.com/v3.1/send");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_USERPWD, getenv("MJPublicKey") . ":" . getenv("MJSecretKey"));
+        curl_exec($ch);
+        curl_close ($ch);
+        
+    }
+
+    function getOTP(){
+        $otp = rand(100000,999999);
+        $expiryTime = time() + OTP_EXPIRY;
+        return ['otp' => $otp, 'expiryTime' => $expiryTime];
+    }
+
+    function sendOTP($email){
+        sendMail($email,$_SESSION['otp']);
+
+                        echo '<div id="popup1" class="overlay">
+                                <div class="popup">
+                                    <div class="popup-content">
+                                        <div class="content-wrapper">
+                                            <div class="abc">
+                                                <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
+                                                <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>30 seconds.</b></p>
+                                                <form action="verify_otp.php" method="POST" id="otpForm">
+                                                    <div class="otp-input-group">
+                                                        <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                        <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                        <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                        <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                        <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                        <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                        <input type="hidden" name="user_id" value="p">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>';
 }
-function resetAccountLock($database,$email){
-    $sql1=  " UPDATE webuser SET attempts=NULL, last_recorded_attempt=NULL, end_lockout=NULL where email='$email';";
-    $database->query($sql1);
-}
-
-
-
-
-
-
     ?>
 
 
