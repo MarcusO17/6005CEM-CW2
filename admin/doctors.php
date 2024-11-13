@@ -297,7 +297,7 @@
                         <div style="display: flex;justify-content: center;">
                         <form action="delete-doctor.php" method="POST" style="display: inline;">
                             <input type="hidden" name="id" value="' . $id . '">
-                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                             <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
                                 <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
                             </button>
@@ -444,7 +444,7 @@
                             
                             <tr>
                                 <form action="add-new.php" method="POST" class="add-new-form">
-                                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                 <td class="label-td" colspan="2">
                                     <label for="name" class="form-label">Name: </label>
                                 </td>
@@ -626,7 +626,7 @@
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
                                             <input type="hidden" name="oldemail" value="'.$email.'" >
-                                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                         </td>
                                     </tr>
                                     <tr>

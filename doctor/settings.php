@@ -418,7 +418,7 @@
                                             <form action="edit-doc.php" method="POST" class="add-new-form">
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
-                                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                         </td>
                                     </tr>
                                     <tr>
