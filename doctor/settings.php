@@ -32,6 +32,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -43,6 +45,7 @@
         header("location: ../login.php");
     }
     
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
@@ -416,6 +419,7 @@
                                             <form action="edit-doc.php" method="POST" class="add-new-form">
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                         </td>
                                     </tr>
                                     <tr>

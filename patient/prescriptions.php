@@ -22,6 +22,8 @@
     <?php
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])) {
         if(($_SESSION["user"]) == "" || $_SESSION['usertype'] != 'p') {
             header("location: ../login.php");
@@ -140,11 +142,6 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="4" style="padding-top:10px;">
-                        <p class="heading-main12" style="margin-left: 45px;font-size:18px;color:rgb(49, 49, 49)">My Prescriptions (<?php echo $list11->num_rows; ?>)</p>
-                    </td>
-                </tr>
                 <?php
                     $keyword = $_POST["search"] ?? '';
                     $sqlmain = $keyword ? 
@@ -153,6 +150,12 @@
                     
                     $result = $database->query($sqlmain);
                 ?>
+                <tr>
+                    <td colspan="4" style="padding-top:10px;">
+                        <p class="heading-main12" style="margin-left: 45px;font-size:18px;color:rgb(49, 49, 49)">My Prescriptions (<?php echo $result->num_rows; ?>)</p>
+                    </td>
+                </tr>
+
                 <tr>
                    <td colspan="4">
                        <center>

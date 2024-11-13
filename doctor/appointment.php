@@ -26,6 +26,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -36,9 +38,9 @@
     }else{
         header("location: ../login.php");
     }
-    
-    
 
+    include('../csrf_helper.php');
+    
        //import database
        include("../connection.php");
        $userrow = $database->query("select * from doctor where docemail='$useremail'");
@@ -500,7 +502,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-appointment.php" method="POST" class="non-style-link">
+                            <input type="hidden" name="id" value="' . $id . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -621,6 +629,7 @@
                             <form action="submit_prescription.php" method="POST" class="sub-table scrolldown add-doc-form-container">
                                 <input type="hidden" name="appointment_id" value="' . $id . '">
                                 <input type="hidden" name="pid" value="' . $pidget . '">
+                                <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                 
                                 <div class="form-group">
                                     <label for="medication" class="form-label">Medication:</label>

@@ -4,6 +4,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
             header("location: ../login.php");
@@ -14,8 +16,9 @@
     }else{
         header("location: ../login.php");
     }
-    
 
+    include('../csrf_helper.php');
+    
     //import database
     include("../connection.php");
     $sqlmain= "select * from patient where pemail=?";
@@ -29,6 +32,10 @@
 
 
     if($_POST){
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
         if(isset($_POST["booknow"])){
             $apponum=$_POST["apponum"];
             $scheduleid=$_POST["scheduleid"];

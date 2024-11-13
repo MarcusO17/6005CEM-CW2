@@ -25,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
             header("location: ../login.php");
@@ -35,8 +37,9 @@
     }else{
         header("location: ../login.php");
     }
-    
 
+    include('../csrf_helper.php');
+    
     //import database
     include("../connection.php");
 
@@ -127,6 +130,7 @@
                     </td>
                     <td >
                             <form action="schedule.php" method="post" class="header-search">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
 
                                         <input type="search" name="search" class="input-text header-searchbar" placeholder="Search Doctor name or Email or Date (YYYY-MM-DD)" list="doctors" >&nbsp;&nbsp;
                                         
@@ -236,6 +240,7 @@
                                             <input type="hidden" name="scheduleid" value="'.$scheduleid.'" >
                                             <input type="hidden" name="apponum" value="'.$apponum.'" >
                                             <input type="hidden" name="date" value="'.$today.'" >
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
 
                                         
                                     

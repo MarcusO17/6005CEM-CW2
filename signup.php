@@ -28,11 +28,14 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
-
+include("csrf_helper.php");
 
 if($_POST){
 
-    
+    if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+        header('Location: ../login.php?csrf=true');
+        exit();
+    }
 
     $_SESSION["personal"]=array(
         'fname'=>$_POST['fname'],
@@ -42,13 +45,8 @@ if($_POST){
         'dob'=>$_POST['dob']
     );
 
-
     print_r($_SESSION["personal"]);
     header("location: create-account.php");
-
-
-
-
 }
 
 ?>
@@ -65,6 +63,8 @@ if($_POST){
             </tr>
             <tr>
                 <form action="" method="POST" >
+                <input type="hidden" name="csrf_token" value="<?= generateCsrfToken(); ?>">
+
                 <td class="label-td" colspan="2">
                     <label for="name" class="form-label">Name: </label>
                 </td>
@@ -124,8 +124,8 @@ if($_POST){
             <tr>
                 <td colspan="2">
                     <br>
-                    <label for="" class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
-                    <a href="login.php" class="hover-link1 non-style-link">Login</a>
+                    <label for="" class="sub-text" style="font-weight: 280; margin-right: 1rem;">Already have an account&#63; </label>
+                    <a href="login.php" class="hover-link1">Login</a>
                     <br><br><br>
                 </td>
             </tr>
@@ -133,7 +133,6 @@ if($_POST){
                     </form>
             </tr>
         </table>
-
     </div>
 </center>
 </body>
