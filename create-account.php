@@ -91,7 +91,8 @@ if($_POST){
             header('Location: patient/index.php');
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>';
         }
-        
+    }
+    
 }else{
     //header('location: signup.php');
     $error='<label for="promter" class="form-label"></label>';
