@@ -52,8 +52,8 @@
     $userrow = $stmt->get_result();
     $userfetch=$userrow->fetch_assoc();
 
-    $userid= $userfetch["pid"];
-    $username = htmlspecialchars($userfetch["pname"]); // Encode to prevent XSS
+    $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
 
 
     //echo $userid;
@@ -221,7 +221,8 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex">
                                                         <div>
                                                                 <div class="h1-dashboard">
-                                                                  <?= htmlspecialchars($doctorrow->num_rows) ?>
+                                                                <?= htmlspecialchars($doctorrow->num_rows, ENT_QUOTES, 'UTF-8') ?>
+
                                                                 </div><br>
                                                                 <div class="h3-dashboard">
                                                                     All Doctors &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -234,7 +235,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                                         <div>
                                                                 <div class="h1-dashboard">
-                                                                <?= htmlspecialchars($patientrow->num_rows) ?>
+                                                                <?= htmlspecialchars($patientrow->num_rows, ENT_QUOTES, 'UTF-8') ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard">
                                                                     All Patients &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -249,7 +250,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex; ">
                                                         <div>
                                                                 <div class="h1-dashboard" >
-                                                                <?= htmlspecialchars($appointmentrow->num_rows) ?>
+                                                                <?= htmlspecialchars($appointmentrow->num_rows, ENT_QUOTES, 'UTF-8') ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard" >
                                                                     NewBooking &nbsp;&nbsp;
@@ -264,7 +265,7 @@
                                                     <div  class="dashboard-items"  style="padding:20px;margin:auto;width:95%;display: flex;padding-top:21px;padding-bottom:21px;">
                                                         <div>
                                                                 <div class="h1-dashboard">
-                                                                <?= htmlspecialchars($schedulerow->num_rows) ?>
+                                                                <?= htmlspecialchars($schedulerow->num_rows, ENT_QUOTES, 'UTF-8') ?>
                                                                 </div><br>
                                                                 <div class="h3-dashboard" style="font-size: 15px">
                                                                     Today Sessions
