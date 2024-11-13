@@ -48,29 +48,37 @@
         $tele=$_POST['Tele'];
         $password=$_POST['password'];
         $cpassword=$_POST['cpassword'];
-        
-        if ($password==$cpassword){
-            $error='3';
-            $result= $database->query("select * from webuser where email='$email';");
-            if($result->num_rows==1){
-                $error='1';
-            }else{
 
-                $sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$password','$nic','$tele',$spec);";
-                $sql2="insert into webuser values('$email','d',0,NULL,NULL)";
-                $database->query($sql1);
-                $database->query($sql2);
+        //ReGex Policy (1 digit,lowercase,uppercase and 8-64 length, any character non spaces.)
+        $passwordPolicy = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,64}$/";
 
-                //echo $sql1;
-                //echo $sql2;
-                $error= '4';
+        if (preg_match($passwordPolicy, $password)){
+            if ($password==$cpassword){
+                $error='3';
+                $result= $database->query("select * from webuser where email='$email';");
+                if($result->num_rows==1){
+                    $error='1';
+                }else{
+                    //Password Hashing
+                    $hashedpassword = password_hash($password, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
+
+                    $sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$hashedpassword','$nic','$tele',$spec);";
+                    $sql2="insert into webuser values('$email','d',0,NULL,NULL)";
+                    $database->query($sql1);
+                    $database->query($sql2);
+
+                    //echo $sql1;
+                    //echo $sql2;
+                    $error= '4';
+                    
+                }
                 
+            }else{
+                $error='2';
             }
-            
         }else{
-            $error='2';
+            $error='5';
         }
-    
     
         
         

@@ -49,23 +49,25 @@
         if($result->num_rows==1){
             $utype=$result->fetch_assoc()['usertype'];
             if ($utype=='p'){
-                //TODO
-                $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
+                $checker = $database->query("select * from patient where pemail='$email'");
                 if ($checker->num_rows==1){
-
-
-                    //   Patient dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='p';
-                    
-                    header('location: patient/index.php');
-
+                    //Patient Auth
+                    $hashedpassword = $checker->fetch_assoc()['ppassword'];
+                    if(password_verify($password,$hashedpassword)){
+                        //   Patient dashboard
+                        $_SESSION['user']=$email;
+                        $_SESSION['usertype']='p';
+                        
+                        header('location: patient/index.php');
+                    }else{
+                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                    }
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
 
             }elseif($utype=='a'){
-                //TODO
+                //Admin Auth (AWAIT SUPER ADMIN)
                 $checker = $database->query("select * from admin where aemail='$email' and apassword='$password'");
                 if ($checker->num_rows==1){
 
@@ -83,15 +85,17 @@
 
             }elseif($utype=='d'){
                 //TODO
-                $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
+                $checker = $database->query("select docpassword from doctor where docemail='$email'");
                 if ($checker->num_rows==1){
-
-
-                    //   doctor dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='d';
-                    header('location: doctor/index.php');
-
+                    $hashedpassword = $checker->fetch_assoc()['docpassword'];
+                    if(password_verify($password,$hashedpassword)){
+                        //   doctor dashbord
+                        $_SESSION['user']=$email;
+                        $_SESSION['usertype']='d';
+                        header('location: doctor/index.php');
+                    }else{
+                        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                    }
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
@@ -99,7 +103,7 @@
             }
             
         }else{
-            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any acount for this email.</label>';
+            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any account for this email.</label>';
         }
 
 

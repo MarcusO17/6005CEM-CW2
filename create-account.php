@@ -33,7 +33,7 @@ $date = date('Y-m-d');
 $_SESSION["date"]=$date;
 
 
-//import database
+//import database 
 include("connection.php");
 
 
@@ -54,8 +54,17 @@ if($_POST){
     $tele=$_POST['tele'];
     $newpassword=$_POST['newpassword'];
     $cpassword=$_POST['cpassword'];
-    
-    if ($newpassword==$cpassword){
+
+    //ReGex Policy (1 digit,lowercase,uppercase and 8-64 length, any character non spaces.)
+    $passwordPolicy = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,64}$/";
+
+    if (!preg_match($passwordPolicy, $newpassword)) {
+        // Error Message for failed policy
+        $error = '<label for="password" style="color:rgb(255, 62, 62);text-align:center;" class="form-label">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>';
+    } elseif ($newpassword !== $cpassword) {
+        // Error Messge for confirm mismatch
+        $error = '<label for="password" style="color:rgb(255, 62, 62);text-align:center;" class="form-label">Password confirmation does not match. Please re-enter the passwords.</label>';
+    } else { 
         $sqlmain= "select * from webuser where email=?;";
         $stmt = $database->prepare($sqlmain);
         $stmt->bind_param("s",$email);
@@ -65,7 +74,10 @@ if($_POST){
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>';
         }else{
             //TODO
-            $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$newpassword','$address','$nic','$dob','$tele');");
+            //Password Hashing
+            $hashedpassword = password_hash($newpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
+
+            $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$hashedpassword','$address','$nic','$dob','$tele');");
             $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
 
             //print_r("insert into patient values($pid,'$email','$fname','$lname','$newpassword','$address','$nic','$dob','$tele');");
@@ -77,10 +89,7 @@ if($_POST){
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>';
         }
         
-    }else{
-        $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password Conformation Error! Reconform Password</label>';
     }
-
 
 
     
