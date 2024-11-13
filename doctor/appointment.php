@@ -41,13 +41,17 @@
 
     include('../csrf_helper.php');
     
-       //import database
-       include("../connection.php");
-       $userrow = $database->query("select * from doctor where docemail='$useremail'");
-       $userfetch=$userrow->fetch_assoc();
-       $userid= $userfetch["docid"];
-       $username=$userfetch["docname"];
-    //echo $userid;
+    //import database
+    include("../connection.php");
+    $userrow = $database->query("select * from doctor where docemail='$useremail'");
+    $userfetch=$userrow->fetch_assoc();
+    $userid= $userfetch["docid"];
+    $username=$userfetch["docname"];
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
     ?>
     <div class="container">
         <div class="menu">
@@ -526,7 +530,7 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
             echo '
             <div id="popup1" class="overlay">
@@ -633,17 +637,17 @@
                                 
                                 <div class="form-group">
                                     <label for="medication" class="form-label">Medication:</label>
-                                    <input type="text" id="medication" name="medication" required class="form-input">
+                                    <input type="text" id="medication" name="medication" maxlength="255" required class="form-input">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="dosage" class="form-label">Dosage:</label>
-                                    <input type="text" id="dosage" name="dosage" required class="form-input">
+                                    <input type="text" id="dosage" name="dosage" maxlength="100" required class="form-input">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="frequency" class="form-label">Frequency:</label>
-                                    <input type="text" id="frequency" name="frequency" required class="form-input">
+                                    <input type="text" id="frequency" name="frequency" maxlength="100" required class="form-input">
                                 </div>
 
                                 <div class="form-group">

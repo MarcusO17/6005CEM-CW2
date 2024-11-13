@@ -20,7 +20,6 @@
 
 //learn from w3schools.com
 //Unset all the server side variables
-
 session_start();
 
 $_SESSION["user"]="";
@@ -32,9 +31,13 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
-include("csrf_helper.php");
-include "connection.php";
 
+//import database
+include("connection.php");
+include("csrf_helper.php");
+// import EncryptionUtil
+require "utils/encryption-util.php";
+use function Utils\encrypt;
 
 
 if($_POST){
@@ -72,8 +75,11 @@ if($_POST){
         $stmt->bind_param("s",$email);
         $stmt->execute();
         $result = $stmt->get_result();
+        
+        // Encrypt sensitive data
+        $encrypted_nic = encrypt($nic);
 
-        if($result->num_rows==1){
+        if ($result->num_rows==1) {
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>';
         }else{
             //TODO

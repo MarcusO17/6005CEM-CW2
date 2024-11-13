@@ -50,6 +50,10 @@
     $userid= $userfetch["docid"];
     $username=$userfetch["docname"];
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
 
     //echo $userid;
     //echo $username;
@@ -302,7 +306,7 @@
                                     $pid=$row["pid"];
                                     $name=$row["pname"];
                                     $email=$row["pemail"];
-                                    $nic=$row["pnic"];
+                                    $nic=decrypt($row["pnic"]);
                                     $dob=$row["pdob"];
                                     $tel=$row["ptel"];
                                     
@@ -362,10 +366,11 @@
             $row=$result->fetch_assoc();
             $name=$row["pname"];
             $email=$row["pemail"];
-            $nic=$row["pnic"];
+            $nic=decrypt($row["pnic"]);
             $dob=$row["pdob"];
             $tele=$row["ptel"];
             $address=$row["paddress"];
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

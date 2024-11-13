@@ -50,6 +50,10 @@
     $userid= $userfetch["pid"];
     $username=$userfetch["pname"];
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
 
     //echo $userid;
     //echo $username;
@@ -439,7 +443,7 @@
             $spcil_res = $stmt->get_result();
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
             echo '
             <div id="popup1" class="overlay">

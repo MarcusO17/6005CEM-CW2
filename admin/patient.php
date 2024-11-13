@@ -41,6 +41,10 @@
     //import database
     include("../connection.php");
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
     
     ?>
     <div class="container">
@@ -239,7 +243,7 @@
                                     $pid=$row["pid"];
                                     $name=$row["pname"];
                                     $email=$row["pemail"];
-                                    $nic=$row["pnic"];
+                                    $nic=decrypt($row["pnic"]);
                                     $dob=$row["pdob"];
                                     $tel=$row["ptel"];
                                     
@@ -296,7 +300,7 @@
             $row=$result->fetch_assoc();
             $name=$row["pname"];
             $email=$row["pemail"];
-            $nic=$row["pnic"];
+            $nic=decrypt($row["pnic"]);
             $dob=$row["pdob"];
             $tele=$row["ptel"];
             $address=$row["paddress"];

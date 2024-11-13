@@ -7,7 +7,10 @@
     //import database
     include("../connection.php");
 
+    // import EncryptionUtil
+    require "utils/encryption-util.php";
     include('../csrf_helper.php');
+    use function Utils\encrypt;    
 
     if($_POST){
 
@@ -48,28 +51,28 @@
                 }
                 
 
-                if($id2!=$id){
-                    $error='1';
-                    //$resultqq1= $database->query("select * from doctor where docemail='$email';");
-                    //$did= $resultqq1->fetch_assoc()["docid"];
-                    //if($resultqq1->num_rows==1){
-                        
-                }else{
+            if ($id2 != $id) {
+                $error='1';
+                //$resultqq1= $database->query("select * from doctor where docemail='$email';");
+                //$did= $resultqq1->fetch_assoc()["docid"];
+                //if($resultqq1->num_rows==1){
+            } else {
+                // Encrypt sensitive data
+                $encrypted_nic = encrypt($nic);
 
                     $hashedpassword = password_hash($password, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
                     //$sql1="insert into doctor(docemail,docname,docpassword,docnic,doctel,specialties) values('$email','$name','$password','$nic','$tele',$spec);";
-                    $sql1="update patient set pemail='$email',pname='$name',ppassword='$hashedpassword',pnic='$nic',ptel='$tele',paddress='$address' where pid=$id ;";
+                    $sql1="update patient set pemail='$email',pname='$name',ppassword='$hashedpassword',pnic='$encrypted_nic',ptel='$tele',paddress='$address' where pid=$id ;";
                     $database->query($sql1);
                     echo $sql1;
                     $sql1="update webuser set email='$email' where email='$oldemail' ;";
                     $database->query($sql1);
                     echo $sql1;
                     
-                    $error= '4';
-                    
-                }
+                    $error= '4'; 
+                    }
                 
-            }else{
+            } else {
                 $error='2';
             }
         
