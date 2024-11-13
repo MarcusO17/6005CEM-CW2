@@ -16,7 +16,7 @@
 </head>
 <body>
     <?php
-    define("OTP_EXPIRY",300);
+    define("OTP_EXPIRY",30);
     //learn from w3schools.com
     //Unset all the server side variables
 
@@ -70,7 +70,7 @@
                     $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
                     $_SESSION['user'] = $email;
 
-                    sendOTP($email);
+                    //sendOTP($email);
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
@@ -136,11 +136,11 @@ function sendMail($email,$otp){
             'To' => [
                 [
                     'Email' => $email,
-                    'Name' => "RECIPIENT_NAME"
+                    'Name' => ""
                 ]
             ],
             'Subject' => "Your OTP for Edoc Services",
-            'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b>, Your OTP expires in 5 Minutes.</h3><br />"
+            'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b>, Your OTP expires in 30 seconds.</h3><br />"
             ]
         ]
     ];
@@ -173,7 +173,7 @@ function sendOTP($email){
                                     <div class="content-wrapper">
                                         <div class="abc">
                                             <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
-                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>5 minutes</b></p>
+                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in the next <b>30 seconds</b></p>
                                             <form action="verify_otp.php" method="POST" id="otpForm">
                                                 <div class="otp-input-group">
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
