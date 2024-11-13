@@ -53,8 +53,8 @@
     }
 
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username = htmlspecialchars($userfetch["docname"]);
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
  //echo $userid;
  ?>
  <div class="container">
@@ -283,9 +283,9 @@
                                         <td>
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <a href="?action=view&id='.$scheduleid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <a href="?action=view&id='.urlencode($scheduleid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;
-                                       <a href="?action=drop&id='.$scheduleid.'&name='.$title.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel Session</font></button></a>
+                                       <a href="?action=drop&id='.urlencode($scheduleid).'&name='.urlencode($title).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel Session</font></button></a>
                                         </div>
                                         </td>
                                     </tr>';
@@ -311,8 +311,8 @@
     <?php
     
     if($_GET){
-        $id = mysqli_real_escape_string($database, $_GET["id"]);
-        $action = mysqli_real_escape_string($database, $_GET["action"]);
+        $id = htmlspecialchars($_GET["id"], ENT_QUOTES, 'UTF-8');
+        $action = htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8');
         if($action=='drop'){
             $nameget = htmlspecialchars($_GET["name"]);
             echo '
@@ -326,7 +326,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-session.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-session.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="schedule.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
