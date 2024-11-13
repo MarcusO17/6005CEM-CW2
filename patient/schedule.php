@@ -156,28 +156,22 @@
                                         
                                         <?php
                                             echo '<datalist id="doctors">';
-                                            $list11 = $database->query("select DISTINCT * from  doctor;");
-                                            $list12 = $database->query("select DISTINCT * from  schedule GROUP BY title;");
+                                            $list11 = $database->query("select DISTINCT * from doctor;");
+                                            $list12 = $database->query("select DISTINCT * from schedule;");
                                             
-
-                                            
-
-
-                                            for ($y=0;$y<$list11->num_rows;$y++){
+                                            for ($y=0;$y<$list11->num_rows;$y++) {
                                                 $row00=$list11->fetch_assoc();
                                                 $d=$row00["docname"];
                                                
                                                 echo "<option value='$d'><br/>";
-                                               
                                             };
 
-
-                                            for ($y=0;$y<$list12->num_rows;$y++){
+                                            for ($y=0;$y<$list12->num_rows;$y++) {
                                                 $row00=$list12->fetch_assoc();
                                                 $d=$row00["title"];
                                                
                                                 echo "<option value='$d'><br/>";
-                                                                                         };
+                                            };
 
                                         echo ' </datalist>';
             ?>
@@ -274,7 +268,7 @@
                                                 
                                                     <div style="width:100%">
                                                             <div class="h1-search">
-                                                                '.substr($title,0,21).'
+                                                                '.substr($title,0,30).'
                                                             </div><br>
                                                             <div class="h3-search">
                                                                 '.substr($docname,0,30).'

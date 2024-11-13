@@ -523,10 +523,10 @@ if ($_GET) {
                 echo '
                     <tr>
                         <td>' . htmlspecialchars($prescription["appointment_id"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["medication"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["dosage"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["frequency"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["additional_notes"]) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["medication"])) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["dosage"])) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["frequency"])) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["additional_notes"])) . '</td>
                     </tr>';
             }
             

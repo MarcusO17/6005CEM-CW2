@@ -628,17 +628,17 @@
                                 
                                 <div class="form-group">
                                     <label for="medication" class="form-label">Medication:</label>
-                                    <input type="text" id="medication" name="medication" required class="form-input">
+                                    <input type="text" id="medication" name="medication" maxlength="255" required class="form-input">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="dosage" class="form-label">Dosage:</label>
-                                    <input type="text" id="dosage" name="dosage" required class="form-input">
+                                    <input type="text" id="dosage" name="dosage" maxlength="100" required class="form-input">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="frequency" class="form-label">Frequency:</label>
-                                    <input type="text" id="frequency" name="frequency" required class="form-input">
+                                    <input type="text" id="frequency" name="frequency" maxlength="100" required class="form-input">
                                 </div>
 
                                 <div class="form-group">
