@@ -39,6 +39,12 @@
     $userfetch = $userrow->fetch_assoc();
     $userid = $userfetch["pid"];
     $username = $userfetch["pname"];
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
+
+
     ?>
     
     <div class="container">
@@ -108,13 +114,13 @@
                             <input type="search" name="search" class="input-text header-searchbar" placeholder="Search Medication" list="prescriptions">&nbsp;&nbsp;
                             <?php
                                 echo '<datalist id="prescriptions">';
-                                $list11 = $database->query("SELECT appointment_id, medication, dosage, frequency, additional_notes FROM prescription;");
+                                $list11 = $database->query("SELECT appointment_id, pid, medication, dosage, frequency, additional_notes FROM prescription WHERE pid = $userid;");
 
                                 while ($row00 = $list11->fetch_assoc()) {
-                                    $medication = $row00["medication"];
-                                    $dosage = $row00["dosage"];
-                                    $frequency = $row00["frequency"];
-                                    $additional_notes = $row00["additional_notes"];
+                                    $medication = decrypt($row00["medication"]);
+                                    $dosage = decrypt($row00["dosage"]);
+                                    $frequency = decrypt($row00["frequency"]);
+                                    $additional_notes = decrypt($row00["additional_notes"]);
                                     
                                     $option_value = "$medication - $dosage - $frequency - $additional_notes";
                                     echo "<option value='$option_value'>";
@@ -179,10 +185,10 @@
                                           </tr>';
                                 } else {
                                     while ($row = $result->fetch_assoc()) {
-                                        $medication = $row["medication"];
-                                        $dosage = $row["dosage"];
-                                        $frequency = $row["frequency"];
-                                        $additional_notes = $row["additional_notes"];
+                                        $medication = decrypt($row["medication"]);
+                                        $dosage = decrypt($row["dosage"]);
+                                        $frequency = decrypt($row["frequency"]);
+                                        $additional_notes = decrypt($row["additional_notes"]);
                                         
                                         echo "<tr>
                                                     <td>&nbsp;" . substr($medication, 0, 30) . "</td>
