@@ -10,16 +10,15 @@
 
     if($_POST){
         //print_r($_POST);
-        $result= $database->query("select * from webuser");
-        $name=$_POST['name'];
-        $nic=$_POST['nic'];
-        $oldemail=$_POST["oldemail"];
-        $spec=$_POST['spec'];
-        $email=$_POST['email'];
-        $tele=$_POST['Tele'];
-        $password=$_POST['password'];
-        $cpassword=$_POST['cpassword'];
-        $id=$_POST['id00'];
+        $name = htmlspecialchars(trim($_POST['name']), ENT_QUOTES, 'UTF-8');
+        $nic = htmlspecialchars(trim($_POST['nic']), ENT_QUOTES, 'UTF-8');
+        $oldemail = filter_input(INPUT_POST, 'oldemail', FILTER_SANITIZE_EMAIL);
+        $spec = filter_input(INPUT_POST, 'spec', FILTER_VALIDATE_INT); // Assuming spec is an integer ID
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $tele = htmlspecialchars(trim($_POST['Tele']), ENT_QUOTES, 'UTF-8');
+        $password = $_POST['password'];
+        $cpassword = $_POST['cpassword'];
+        $id = filter_input(INPUT_POST, 'id00', FILTER_VALIDATE_INT); // Validate ID as integer
         
         if ($password==$cpassword){
             $error='3';
@@ -65,7 +64,7 @@
     }
     
 
-    header("location: doctors.php?action=edit&error=".$error."&id=".$id);
+    header("location: doctors.php?action=edit&error=". urlencode($error) ."&id=".urlencode($id));
     ?>
     
    
