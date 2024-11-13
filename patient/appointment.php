@@ -45,8 +45,8 @@
     $stmt->execute();
     $userrow = $stmt->get_result();
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["pid"];
-    $username=$userfetch["pname"];
+    $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
 
 
     //echo $userid;
@@ -55,12 +55,12 @@
 
     //TODO
     $sqlmain = "SELECT appointment.appoid, schedule.scheduleid, schedule.title, doctor.docname, patient.pname, 
-    schedule.scheduledate, schedule.scheduletime, appointment.apponum, appointment.appodate 
-FROM schedule 
-INNER JOIN appointment ON schedule.scheduleid = appointment.scheduleid 
-INNER JOIN patient ON patient.pid = appointment.pid 
-INNER JOIN doctor ON schedule.docid = doctor.docid 
-WHERE patient.pid = ?";
+                schedule.scheduledate, schedule.scheduletime, appointment.apponum, appointment.appodate 
+                FROM schedule 
+                INNER JOIN appointment ON schedule.scheduleid = appointment.scheduleid 
+                INNER JOIN patient ON patient.pid = appointment.pid 
+                INNER JOIN doctor ON schedule.docid = doctor.docid 
+                WHERE patient.pid = ?";
 
 // Check if a scheduled date is provided and modify the query accordingly
 if (!empty($_POST["sheduledate"])) {
@@ -304,7 +304,7 @@ $result = $stmt->get_result();
                                                                     Scheduled Date: '.$scheduledate.'<br>Starts: <b>@'.substr($scheduletime,0,5).'</b> (24h)
                                                                 </div>
                                                                 <br>
-                                                                <a href="?action=drop&id='.$appoid.'&title='.$title.'&doc='.$docname.'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Cancel Booking</font></button></a>
+                                                                <a href="?action=drop&id=' . urlencode($appoid) . '&title=' . urlencode($title) . '&doc=' . urlencode($docname) . '"><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Cancel Booking</font></button></a>
                                                         </div>
                                                                 
                                                     </div>
