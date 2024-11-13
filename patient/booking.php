@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <?php
+<?php
     session_start();
 
     include('../session_handler.php');

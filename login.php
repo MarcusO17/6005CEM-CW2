@@ -258,7 +258,7 @@
     }
 
     function sendOTP($email){
-        sendMail($email,$_SESSION['otp']);
+        //sendMail($email,$_SESSION['otp']);
 
                         echo '<div id="popup1" class="overlay">
                                 <div class="popup">
@@ -278,8 +278,9 @@
                                                         <input type="hidden" name="user_id" value="p">
                                                     </div>
                                                     <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
-                                                </form>
-                                            </div>
+                                                </form>';
+                                                echo "<p>{$_SESSION['otp']}</p>";
+                                          echo  '</div>
                                         </div>
                                     </div>
                                 </div>';

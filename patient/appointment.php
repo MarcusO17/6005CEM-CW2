@@ -68,10 +68,6 @@
                 INNER JOIN doctor ON schedule.docid = doctor.docid 
                 WHERE patient.pid = ?";
                 
-        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
-            header('Location: ../login.php?csrf=true');
-            exit();
-        }
         // Check if a scheduled date is provided and modify the query accordingly
         if (!empty($_POST["sheduledate"])) {
         $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8'); // Sanitize the date input
