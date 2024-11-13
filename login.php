@@ -70,7 +70,7 @@
                     $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
                     $_SESSION['user'] = $email;
 
-                    //sendOTP($email);
+                    sendOTP($email);
                 }else{
                     $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                 }
@@ -173,7 +173,7 @@ function sendOTP($email){
                                     <div class="content-wrapper">
                                         <div class="abc">
                                             <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
-                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in the next <b>30 seconds</b></p>
+                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>30 seconds.</b></p>
                                             <form action="verify_otp.php" method="POST" id="otpForm">
                                                 <div class="otp-input-group">
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
