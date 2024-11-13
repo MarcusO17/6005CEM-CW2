@@ -111,8 +111,8 @@
 
                                 for ($y=0;$y<$list11->num_rows;$y++){
                                     $row00=$list11->fetch_assoc();
-                                    $d=$row00["docname"];
-                                    $c=$row00["docemail"];
+                                    $d = htmlspecialchars($row00["docname"], ENT_QUOTES, 'UTF-8');
+                                    $c = htmlspecialchars($row00["docemail"], ENT_QUOTES, 'UTF-8');
                                     echo "<option value='$d'><br/>";
                                     echo "<option value='$c'><br/>";
                                 };
@@ -162,7 +162,7 @@
                 </tr>
                 <?php
                     if($_POST){
-                        $keyword=$_POST["search"];
+                        $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
                         
                         $sqlmain= "select * from doctor where docemail='$keyword' or docname='$keyword' or docname like '$keyword%' or docname like '%$keyword' or docname like '%$keyword%'";
                     }else{
@@ -228,19 +228,19 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $docid=$row["docid"];
-                                    $name=$row["docname"];
-                                    $email=$row["docemail"];
-                                    $spe=$row["specialties"];
+                                    $docid = htmlspecialchars($row["docid"], ENT_QUOTES, 'UTF-8');
+                                    $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                    $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+                                    $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
                                     $spcil_res= $database->query("select sname from specialties where id='$spe'");
                                     $spcil_array= $spcil_res->fetch_assoc();
-                                    $spcil_name=$spcil_array["sname"];
+                                    $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($name,0,30)
                                         .'</td>
                                         <td>
-                                        '.substr($email,0,20).'
+                                        '.substr($email,0,30).'
                                         </td>
                                         <td>
                                             '.substr($spcil_name,0,20).'
@@ -248,11 +248,11 @@
 
                                         <td>
                                         <div style="display:flex;justify-content: center;">
-                                        <a href="?action=edit&id='.$docid.'&error=0" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Edit</font></button></a>
+                                        <a href="?action=edit&id='.urlencode($docid).'&error=0" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Edit</font></button></a>
                                         &nbsp;&nbsp;&nbsp;
-                                        <a href="?action=view&id='.$docid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <a href="?action=view&id='.urlencode($docid).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;
-                                       <a href="?action=drop&id='.$docid.'&name='.$name.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Remove</font></button></a>
+                                       <a href="?action=drop&id='.urlencode($docid).'&name='.urlencode($name).'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Remove</font></button></a>
                                         </div>
                                         </td>
                                     </tr>';
@@ -278,8 +278,8 @@
     <?php 
     if($_GET){
         
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id = htmlspecialchars($_GET["id"], ENT_QUOTES, 'UTF-8'); // Ensure it's an integer
+        $action = htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8'); // Sanitize and encode for HTML output
         if($action=='drop'){
             $nameget=$_GET["name"];
             echo '
@@ -293,7 +293,7 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-doctor.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <a href="delete-doctor.php?id='.urlencode($id).'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
                         <a href="doctors.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -305,15 +305,15 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
             
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars($row['docnic'], ENT_QUOTES, 'UTF-8');
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -491,8 +491,8 @@
         
                                         for ($y=0;$y<$list11->num_rows;$y++){
                                             $row00=$list11->fetch_assoc();
-                                            $sn=$row00["sname"];
-                                            $id00=$row00["id"];
+                                            $sn = htmlspecialchars($row00["sname"], ENT_QUOTES, 'UTF-8');
+                                            $id00 = htmlspecialchars($row00["id"], ENT_QUOTES, 'UTF-8');
                                             echo "<option value=".$id00.">$sn</option><br/>";
                                         };
         
@@ -570,15 +570,15 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
             
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars($row['docnic'], ENT_QUOTES, 'UTF-8');
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
 
             $error_1=$_GET["error"];
                 $errorlist= array(
@@ -672,8 +672,8 @@
                 
                                                 for ($y=0;$y<$list11->num_rows;$y++){
                                                     $row00=$list11->fetch_assoc();
-                                                    $sn=$row00["sname"];
-                                                    $id00=$row00["id"];
+                                                    $sn = htmlspecialchars($row00["sname"], ENT_QUOTES, 'UTF-8');
+                                                    $id00 = htmlspecialchars($row00["id"], ENT_QUOTES, 'UTF-8');
                                                     echo "<option value=".$id00.">$sn</option><br/>";
                                                 };
                 
