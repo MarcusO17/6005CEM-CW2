@@ -343,7 +343,7 @@
                 $errorlist = array(
                     '1' => "<label for='promter' class='form-label' style='color:rgb(255,62,62);text-align:center;'>Already have an account for this Email address.</label>",
                     '2' => "<label for='promter' class='form-label' style='color:rgb(255,62,62);text-align:center;'>Password Confirmation Error! Please re-confirm Password.</label>",
-                    '3' => '',
+                    '3' => '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4' => '',
                     '0' => '',
                 );
