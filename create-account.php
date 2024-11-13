@@ -32,9 +32,7 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+include("csrf_helper.php");
 
 //import database
 include("connection.php");
@@ -45,8 +43,9 @@ include("connection.php");
 
 if($_POST){
 
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        die('CSRF token validation failed.');
+    if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+        header('Location: ../login.php?csrf=true');
+        exit();
     }
 
     $result= $database->query("select * from webuser");

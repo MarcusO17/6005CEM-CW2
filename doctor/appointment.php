@@ -39,9 +39,7 @@
         header("location: ../login.php");
     }
 
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
+    include('../csrf_helper.php');
     
        //import database
        include("../connection.php");
@@ -506,7 +504,7 @@
                         <div style="display: flex;justify-content: center;">
                         <form action="delete-appointment.php" method="POST" class="non-style-link">
                             <input type="hidden" name="id" value="<?php echo $id; ?>">
-                            <input type="hidden" name="csrf_token" value="' . $_SESSION['csrf_token'] . '">
+                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                             <button type="submit" class="btn-primary btn" style="margin: 10px; padding: 10px;">
                                 <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
                             </button>
@@ -631,7 +629,7 @@
                             <form action="submit_prescription.php" method="POST" class="sub-table scrolldown add-doc-form-container">
                                 <input type="hidden" name="appointment_id" value="' . $id . '">
                                 <input type="hidden" name="pid" value="' . $pidget . '">
-                                <input type="hidden" name="csrf_token" value="' . $_SESSION['csrf_token'] . '">
+                                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                                 
                                 <div class="form-group">
                                     <label for="medication" class="form-label">Medication:</label>

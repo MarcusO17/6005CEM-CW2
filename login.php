@@ -36,15 +36,14 @@
     $_SESSION["user"]="";
     $_SESSION["usertype"]="";
 
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
     
     // Set the new timezone
     date_default_timezone_set('Asia/Kolkata');
     $date = date('Y-m-d');
 
     $_SESSION["date"]=$date;
+
+    include("csrf_helper.php");
     
 
     //import database
@@ -52,8 +51,9 @@
 
 
     if($_POST){
-        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-            die('CSRF token validation failed.');
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
         }
 
         $email=$_POST['useremail'];
@@ -196,7 +196,7 @@
 
             <tr>
                 <td>
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                    <input type="hidden" name="csrf_token" value="<?= generateCsrfToken(); ?>">
                     <input type="submit" value="Login" class="login-btn btn-primary btn">
                 </td>
             </tr>
@@ -226,6 +226,10 @@
 
         <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 'true'): ?>
             alert('Your session has timed out due to inactivity. Please log in again.');
+        <?php endif; ?>
+
+        <?php if (isset($_GET['csrf']) && $_GET['csrf'] == 'true'): ?>
+            alert('Your session terminated due to csrf. Please log in again.');
         <?php endif; ?>
 
         <?php

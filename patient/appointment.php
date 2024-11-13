@@ -26,6 +26,7 @@
     session_start();
 
     include('../session_handler.php');
+    include('../csrf_helper.php');
 
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
@@ -37,11 +38,6 @@
     }else{
         header("location: ../login.php");
     }
-
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-
 
     //import database
     include("../connection.php");
@@ -66,8 +62,9 @@
         //print_r($_POST);
         
 
-        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-            die('CSRF token validation failed.');
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
         }
         
         if(!empty($_POST["sheduledate"])){
@@ -202,7 +199,7 @@
                         </td>
                         <td width="30%">
                         <form action="" method="post">
-                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                             <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
 
                         </td>
@@ -412,7 +409,7 @@
                         <div style="display: flex;justify-content: center;">
                         <form action="delete-appointment.php" method="POST" style="display: inline;">
                             <input type="hidden" name="id" value="' . $appoid . '">
-                            <input type="hidden" name="csrf_token" value="' . $_SESSION['csrf_token'] . '">
+                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                             <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
                                 <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
                             </button>

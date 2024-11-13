@@ -38,9 +38,7 @@
         header("location: ../login.php");
     }
 
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
+    include('../csrf_helper.php');
     
     //import database
     include("../connection.php");
@@ -132,7 +130,7 @@
                     </td>
                     <td >
                             <form action="schedule.php" method="post" class="header-search">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
 
                                         <input type="search" name="search" class="input-text header-searchbar" placeholder="Search Doctor name or Email or Date (YYYY-MM-DD)" list="doctors" >&nbsp;&nbsp;
                                         
@@ -242,7 +240,7 @@
                                             <input type="hidden" name="scheduleid" value="'.$scheduleid.'" >
                                             <input type="hidden" name="apponum" value="'.$apponum.'" >
                                             <input type="hidden" name="date" value="'.$today.'" >
-                                            <input type="hidden" name="csrf_token" value="' . $_SESSION['csrf_token'] . '" >
+                                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
 
                                         
                                     
