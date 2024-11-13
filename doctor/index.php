@@ -33,6 +33,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -47,10 +49,15 @@
 
     //import database
     include("../connection.php");
+
+
+    // Sanitize the email input to prevent SQL Injection and XSS
+    $useremail = $database->real_escape_string($useremail);
+
     $userrow = $database->query("select * from doctor where docemail='$useremail'");
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
 
 
     //echo $userid;
@@ -315,11 +322,11 @@
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
                                                     $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
-                                                    $nop=$row["nop"];
+                                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8'); // Sanitize title
+                                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8'); // Sanitize doctor name
+                                                    $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                                    $scheduletime = htmlspecialchars($row["scheduletime"], ENT_QUOTES, 'UTF-8');
+                                                    $nop = htmlspecialchars($row["nop"], ENT_QUOTES, 'UTF-8');
                                                     echo '<tr>
                                                         <td style="padding:20px;"> &nbsp;'.
                                                         substr($title,0,30)

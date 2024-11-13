@@ -25,6 +25,9 @@
 
     session_start();
 
+    include('../session_handler.php');
+    include('../csrf_helper.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
             header("location: ../login.php");
@@ -35,7 +38,6 @@
     }else{
         header("location: ../login.php");
     }
-    
 
     //import database
     include("../connection.php");
@@ -45,8 +47,12 @@
     $stmt->execute();
     $userrow = $stmt->get_result();
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["pid"];
-    $username=$userfetch["pname"];
+    $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
 
 
     //echo $userid;
@@ -54,27 +60,41 @@
 
 
     //TODO
-    $sqlmain= "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  patient.pid=$userid ";
+    $sqlmain = "SELECT appointment.appoid, schedule.scheduleid, schedule.title, doctor.docname, patient.pname, 
+                schedule.scheduledate, schedule.scheduletime, appointment.apponum, appointment.appodate 
+                FROM schedule 
+                INNER JOIN appointment ON schedule.scheduleid = appointment.scheduleid 
+                INNER JOIN patient ON patient.pid = appointment.pid 
+                INNER JOIN doctor ON schedule.docid = doctor.docid 
+                WHERE patient.pid = ?";
+                
+        // Check if a scheduled date is provided and modify the query accordingly
+        if (!empty($_POST["sheduledate"])) {
+        $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8'); // Sanitize the date input
+        $sqlmain .= " AND schedule.scheduledate = ?"; // Add the condition for the scheduled date
+        }
 
-    if($_POST){
-        //print_r($_POST);
-        
+        // Append the ordering clause
+        $sqlmain .= " ORDER BY appointment.appodate ASC";
 
+        // Prepare the statement
+        $stmt = $database->prepare($sqlmain);
 
-        
-        if(!empty($_POST["sheduledate"])){
-            $sheduledate=$_POST["sheduledate"];
-            $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
-        };
+        // Bind parameters based on whether the scheduled date is provided
+        if (!empty($sheduledate)) {
+        // If the scheduled date is provided, bind both patient ID and the scheduled date
+        $stmt->bind_param("is", $userid, $sheduledate); // "i" for integer (user ID) and "s" for string (scheduled date)
+        } else {
+        // If the scheduled date is not provided, bind only the patient ID
+        $stmt->bind_param("i", $userid); // "i" for integer (user ID)
+        }
 
-    
+        // Execute the query
+        $stmt->execute();
 
-        //echo $sqlmain;
+        // Get the result
+        $result = $stmt->get_result();
 
-    }
-
-    $sqlmain.="order by appointment.appodate  asc";
-    $result= $database->query($sqlmain);
     ?>
     <div class="container">
         <div class="menu">
@@ -111,7 +131,7 @@
                 </tr>
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-session">
-                        <a href="prescriptions.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Prescriptions</p></a></div>
+                        <a href="prescriptions.php" class="non-style-link-menu"><div><p class="menu-text">My Prescriptions</p></a></div>
                     </td>
                 </tr>
                 <tr class="menu-row" >
@@ -194,7 +214,7 @@
                         </td>
                         <td width="30%">
                         <form action="" method="post">
-                            
+                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                             <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
 
                         </td>
@@ -253,15 +273,15 @@
                                             if (!isset($row)){
                                             break;
                                             };
-                                            $scheduleid=$row["scheduleid"];
-                                            $title=$row["title"];
-                                            $docname=$row["docname"];
-                                            $scheduledate=$row["scheduledate"];
-                                            $scheduletime=$row["scheduletime"];
-                                            $apponum=$row["apponum"];
-                                            $appodate=$row["appodate"];
-                                            $appoid=$row["appoid"];
-    
+                                            $scheduleid = htmlspecialchars($row["scheduleid"], ENT_QUOTES, 'UTF-8');
+                                            $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                            $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                            $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                            $scheduletime = htmlspecialchars($row["scheduletime"], ENT_QUOTES, 'UTF-8');
+                                            $apponum = htmlspecialchars($row["apponum"], ENT_QUOTES, 'UTF-8');
+                                            $appodate = htmlspecialchars($row["appodate"], ENT_QUOTES, 'UTF-8');
+                                            $appoid = htmlspecialchars($row["appoid"], ENT_QUOTES, 'UTF-8');
+
                                             if($scheduleid==""){
                                                 break;
                                             }
@@ -290,7 +310,7 @@
                                                                     Scheduled Date: '.$scheduledate.'<br>Starts: <b>@'.substr($scheduletime,0,5).'</b> (24h)
                                                                 </div>
                                                                 <br>
-                                                                <a href="?action=drop&id='.$appoid.'&title='.$title.'&doc='.$docname.'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Cancel Booking</font></button></a>
+                                                                <a href="?action=drop&id=' . urlencode($appoid) . '&title=' . urlencode($title) . '&doc=' . urlencode($docname) . '"><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Cancel Booking</font></button></a>
                                                         </div>
                                                                 
                                                     </div>
@@ -361,8 +381,9 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        // Sanitize and validate inputs from GET request
+        $id = isset($_GET["id"]) ? filter_var($_GET["id"], FILTER_VALIDATE_INT) : null;
+        $action = isset($_GET["action"]) ? htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8') : '';
         if($action=='booking-added'){
             
             echo '
@@ -373,7 +394,7 @@
                         <h2>Booking Successfully.</h2>
                         <a class="close" href="appointment.php">&times;</a>
                         <div class="content">
-                        Your Appointment number is '.$id.'.<br><br>
+                        Your Appointment number is '. htmlspecialchars($id, ENT_QUOTES, 'UTF-8') .'.<br><br>
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
@@ -386,8 +407,8 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $title=$_GET["title"];
-            $docname=$_GET["doc"];
+            $title = isset($_GET["title"]) ? htmlspecialchars($_GET["title"], ENT_QUOTES, 'UTF-8') : '';
+            $docname = isset($_GET["doc"]) ? htmlspecialchars($_GET["doc"], ENT_QUOTES, 'UTF-8') : '';
             
             echo '
             <div id="popup1" class="overlay">
@@ -402,7 +423,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-appointment.php" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $appoid . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -417,9 +444,9 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
             
             $sqlmain= "select sname from specialties where id=?";
             $stmt = $database->prepare($sqlmain);
@@ -427,9 +454,9 @@
             $stmt->execute();
             $spcil_res = $stmt->get_result();
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
-            $tele=$row['doctel'];
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars(decrypt($row['docnic'], ENT_QUOTES, 'UTF-8'));
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

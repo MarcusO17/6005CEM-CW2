@@ -25,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -47,6 +49,10 @@
     $userfetch=$userrow->fetch_assoc();
     $userid= $userfetch["docid"];
     $username=$userfetch["docname"];
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
 
 
     //echo $userid;
@@ -300,7 +306,7 @@
                                     $pid=$row["pid"];
                                     $name=$row["pname"];
                                     $email=$row["pemail"];
-                                    $nic=$row["pnic"];
+                                    $nic=decrypt($row["pnic"]);
                                     $dob=$row["pdob"];
                                     $tel=$row["ptel"];
                                     
@@ -360,10 +366,11 @@
             $row=$result->fetch_assoc();
             $name=$row["pname"];
             $email=$row["pemail"];
-            $nic=$row["pnic"];
+            $nic=decrypt($row["pnic"]);
             $dob=$row["pdob"];
             $tele=$row["ptel"];
             $address=$row["paddress"];
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
