@@ -76,22 +76,27 @@
                     //TODO
                     $checker = $database->query("select * from patient where pemail='$email' and ppassword='$password'");
                     if ($checker->num_rows==1){
+                      
+                      $hashedpassword = $checker->fetch_assoc()['ppassword'];
+                      if(password_verify($password,$hashedpassword)){
 
-                    session_regenerate_id(true);
+                          session_regenerate_id(true);
 
-                    //   Patient dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='p';
-                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-
-                    include('session_handler.php');
-                    
-                    header('location: patient/index.php');
-
-                        resetAccountLock($database,$email);
-                        header('location: patient/index.php');
-
+                          //   Patient dashbord
+                          $_SESSION['user']=$email;
+                          $_SESSION['usertype']='p';
+                          $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                          $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+                        
+                          include('session_handler.php');
+                          resetAccountLock($database,$email);
+                          header('location: patient/index.php');
+                        
+                        
+                        }else{
+                          recordFailedLogin($database,$email);
+                          $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                        }
                     }else{
                         recordFailedLogin($database,$email);
                         $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
@@ -101,6 +106,7 @@
                     //TODO
                     $checker = $database->query("select * from admin where aemail='$email' and apassword='$password'");
                     if ($checker->num_rows==1){
+
 
                     session_regenerate_id(true);
 
@@ -124,43 +130,40 @@
                         $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                     }
 
-
                 }elseif($utype=='d'){
                     //TODO
                     $checker = $database->query("select * from doctor where docemail='$email' and docpassword='$password'");
                     if ($checker->num_rows==1){
+                          $hashedpassword = $checker->fetch_assoc()['docpassword'];
+                          if(password_verify($password,$hashedpassword)){
 
+                                session_regenerate_id(true);
 
-                    session_regenerate_id(true);
+                                //   doctor dashbord
+                                $_SESSION['user']=$email;
+                                $_SESSION['usertype']='d';
+                                $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                                $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 
-                    //   doctor dashbord
-                    $_SESSION['user']=$email;
-                    $_SESSION['usertype']='d';
-                    $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-
-                    include('session_handler.php');
-
-                    header('location: doctor/index.php');
-
-                        //   doctor dashbord
-                        $_SESSION['user']=$email;
-                        $_SESSION['usertype']='d';
-
-                        resetAccountLock($database,$email);
-                        header('location: doctor/index.php');
-
+                                include('session_handler.php');
+                                resetAccountLock($database,$email);
+                                header('location: doctor/index.php');            
+                          }else{
+                            recordFailedLogin($database,$email);
+                            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                          }
                     }else{
                         recordFailedLogin($database,$email);
                         $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . '  attempt(s) left. </label>';
                     }
+
 
                 }
             }else{
                 $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Your account is locked till '. $row['end_lockout'].'</label>';
             }
         }else{
-            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any acount for this email.</label>';
+            $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any account for this email.</label>';
         }
 
     }else{
