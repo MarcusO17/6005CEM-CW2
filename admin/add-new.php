@@ -39,15 +39,14 @@
 
 
     if($_POST){
-        //print_r($_POST);
-        $result= $database->query("select * from webuser");
-        $name=$_POST['name'];
-        $nic=$_POST['nic'];
-        $spec=$_POST['spec'];
-        $email=$_POST['email'];
-        $tele=$_POST['Tele'];
-        $password=$_POST['password'];
-        $cpassword=$_POST['cpassword'];
+        // Sanitize and validate inputs
+        $name = htmlspecialchars(trim($_POST['name']), ENT_QUOTES, 'UTF-8');
+        $nic = htmlspecialchars(trim($_POST['nic']), ENT_QUOTES, 'UTF-8');
+        $spec = htmlspecialchars(trim($_POST['spec']), ENT_QUOTES, 'UTF-8');
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $tele = htmlspecialchars(trim($_POST['Tele']), ENT_QUOTES, 'UTF-8');
+        $password = $_POST['password'];
+        $cpassword = $_POST['cpassword'];
         
         if ($password==$cpassword){
             $error='3';
@@ -80,7 +79,7 @@
     }
     
 
-    header("location: doctors.php?action=add&error=".$error);
+    header("location: doctors.php?action=add&error=". urlencode($error));
     ?>
     
    
