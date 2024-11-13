@@ -45,8 +45,9 @@
     $stmt->execute();
     $result = $stmt->get_result();
     $userfetch = $result->fetch_assoc();
-    $userid = $userfetch["pid"];
-    $username = $userfetch["pname"];
+    $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
+
 
     date_default_timezone_set('Asia/Kolkata');
     $today = date('Y-m-d');
@@ -164,7 +165,7 @@
 
                                 if ($result->num_rows > 0) {
                                     $row = $result->fetch_assoc();
-                                    $scheduleid = $row["scheduleid"];
+                                    $scheduleid = htmlspecialchars($row["scheduleid"], ENT_QUOTES, 'UTF-8');
                                     $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
                                     $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
                                     $docemail = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
