@@ -131,6 +131,15 @@
                 </a>
             </td>
         </tr>
+        <tr class="menu-row">
+            <td class="menu-btn menu-icon-dashbord">
+                <a href="analytics.php" class="non-style-link-menu">
+                    <div>
+                        <p class="menu-text">Analytics</p>
+                    </div>
+                </a>
+            </td>
+        </tr>
     <?php endif; ?>
     </table>
     </div>
