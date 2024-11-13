@@ -43,9 +43,8 @@
     $useremail = mysqli_real_escape_string($database, $useremail);
     $userrow = $database->query("SELECT * FROM doctor WHERE docemail='$useremail'");
     $userfetch = $userrow->fetch_assoc();
-    $userid = $userfetch["docid"];
-    $username = htmlspecialchars($userfetch["docname"]);
-
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
 
 
     //echo $userid;
@@ -332,14 +331,14 @@
                                         </td>
                                         <td>
                                             <div style="display:flex;justify-content: center;">
-                                                <a href="?action=viewPrescription&id='.$pid .'" class="non-style-link"><button class="btn-primary-soft btn button-icon btn-view" style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View Prescription</font></button></a>
+                                                <a href="?action=viewPrescription&id='. urlencode($pid) .'" class="non-style-link"><button class="btn-primary-soft btn button-icon btn-view" style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View Prescription</font></button></a>
                                             </div>
                                         </td>
 
                                         <td >
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <a href="?action=view&id='.$pid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <a href="?action=view&id='. urlencode($pid) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        
                                         </div>
                                         </td>
