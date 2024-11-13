@@ -47,8 +47,9 @@
     $stmt->execute();
     $result = $stmt->get_result();
     $userfetch=$result->fetch_assoc();
-    $userid= $userfetch["pid"];
-    $username=$userfetch["pname"];
+    $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
+
 
 
     //echo $userid;
@@ -96,7 +97,7 @@
                 </tr>
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-session">
-                        <a href="prescriptions.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Prescriptions</p></a></div>
+                        <a href="prescriptions.php" class="non-style-link-menu"><div><p class="menu-text">My Prescriptions</p></a></div>
                     </td>
                 </tr>
                 <tr class="menu-row" >
@@ -124,21 +125,52 @@
                 $insertkey="";
                 $q='';
                 $searchtype="All";
-                        if($_POST){
-                            
-                        //print_r($_POST);
-                        
-                        if(!empty($_POST["search"])){
-                            /*TODO: make and understand */
-                            $keyword=$_POST["search"];
-                            $sqlmain= "select * from schedule inner join doctor on schedule.docid=doctor.docid where schedule.scheduledate>='$today' and (doctor.docname='$keyword' or doctor.docname like '$keyword%' or doctor.docname like '%$keyword' or doctor.docname like '%$keyword%' or schedule.title='$keyword' or schedule.title like '$keyword%' or schedule.title like '%$keyword' or schedule.title like '%$keyword%' or schedule.scheduledate like '$keyword%' or schedule.scheduledate like '%$keyword' or schedule.scheduledate like '%$keyword%' or schedule.scheduledate='$keyword' )  order by schedule.scheduledate asc";
-                            //echo $sqlmain;
-                            $insertkey=$keyword;
-                            $searchtype="Search Result : ";
-                            $q='"';
-                        }
-
-                    }
+                if (!empty($_POST["search"])) {
+                    // Sanitize the input
+                    $keyword = filter_input(INPUT_POST, "search", FILTER_SANITIZE_STRING);
+                    $keyword = trim($keyword); // Remove any leading or trailing spaces
+                
+                    // Prepare the query with placeholders for safe input
+                    $sqlmain = "
+                        SELECT * FROM schedule
+                        INNER JOIN doctor ON schedule.docid = doctor.docid
+                        WHERE schedule.scheduledate >= ?
+                        AND (
+                            doctor.docname = ? 
+                            OR doctor.docname LIKE CONCAT(?, '%') 
+                            OR doctor.docname LIKE CONCAT('%', ?) 
+                            OR doctor.docname LIKE CONCAT('%', ?, '%') 
+                            OR schedule.title = ? 
+                            OR schedule.title LIKE CONCAT(?, '%') 
+                            OR schedule.title LIKE CONCAT('%', ?) 
+                            OR schedule.title LIKE CONCAT('%', ?, '%') 
+                            OR schedule.scheduledate LIKE CONCAT(?, '%') 
+                            OR schedule.scheduledate LIKE CONCAT('%', ?) 
+                            OR schedule.scheduledate LIKE CONCAT('%', ?, '%') 
+                            OR schedule.scheduledate = ?
+                        )
+                        ORDER BY schedule.scheduledate ASC
+                    ";
+                
+                    // Prepare and execute the statement with bound parameters
+                    $stmt = $database->prepare($sqlmain);
+                
+                    // Bind parameters for each placeholder
+                    $stmt->bind_param(
+                        'sssssssssssss', 
+                        $today, 
+                        $keyword, $keyword, $keyword, $keyword, 
+                        $keyword, $keyword, $keyword, $keyword, 
+                        $keyword, $keyword, $keyword, $keyword
+                    );
+                
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                
+                    $insertkey = htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8'); // Safely encode for HTML
+                    $searchtype = "Search Result : ";
+                    $q = '"';
+                }
 
 
                 $result= $database->query($sqlmain)
@@ -164,14 +196,14 @@
                                             
                                             for ($y=0;$y<$list11->num_rows;$y++) {
                                                 $row00=$list11->fetch_assoc();
-                                                $d=$row00["docname"];
+                                                $d = htmlspecialchars($row00["docname"], ENT_QUOTES, 'UTF-8');
                                                
                                                 echo "<option value='$d'><br/>";
                                             };
 
                                             for ($y=0;$y<$list12->num_rows;$y++) {
                                                 $row00=$list12->fetch_assoc();
-                                                $d=$row00["title"];
+                                                $d = htmlspecialchars($row00["title"], ENT_QUOTES, 'UTF-8');
                                                
                                                 echo "<option value='$d'><br/>";
                                             };
@@ -255,11 +287,11 @@
                                         if (!isset($row)){
                                             break;
                                         };
-                                        $scheduleid=$row["scheduleid"];
-                                        $title=$row["title"];
-                                        $docname=$row["docname"];
-                                        $scheduledate=$row["scheduledate"];
-                                        $scheduletime=$row["scheduletime"];
+                                        $scheduleid = htmlspecialchars($row["scheduleid"], ENT_QUOTES, 'UTF-8');
+                                        $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                        $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                        $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                        $scheduletime = htmlspecialchars($row["scheduletime"], ENT_QUOTES, 'UTF-8');
 
                                         if($scheduleid==""){
                                             break;
@@ -280,7 +312,7 @@
                                                                 '.$scheduledate.'<br>Starts: <b>@'.substr($scheduletime,0,5).'</b> (24h)
                                                             </div>
                                                             <br>
-                                                            <a href="booking.php?id='.$scheduleid.'" ><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Book Now</font></button></a>
+                                                            <a href="booking.php?id=' . urlencode($scheduleid) . '"><button  class="login-btn btn-primary-soft btn "  style="padding-top:11px;padding-bottom:11px;width:100%"><font class="tn-in-text">Book Now</font></button></a>
                                                     </div>
                                                             
                                                 </div>

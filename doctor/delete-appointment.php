@@ -24,12 +24,11 @@
 
         //import database
         include("../connection.php");
-        $id=$_POST["id"];
-        //$result001= $database->query("select * from schedule where scheduleid=$id;");
-        //$email=($result001->fetch_assoc())["docemail"];
+         // Sanitize and validate the id parameter from GET
+        $id = isset($_POST["id"]) ? filter_var($_POST["id"], FILTER_VALIDATE_INT) : null;
+        
         $sql= $database->query("delete from appointment where appoid='$id';");
-        //$sql= $database->query("delete from doctor where docemail='$email';");
-        //print_r($email);
+
         header("location: appointment.php");
     }
 

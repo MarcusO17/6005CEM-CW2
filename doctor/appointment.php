@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="../css/add-prescription.css"> 
+
         
     <title>Appointments</title>
     <style>
@@ -38,24 +38,31 @@
     }else{
         header("location: ../login.php");
     }
-
-    include('../csrf_helper.php');
     
-    //import database
-    include("../connection.php");
-    $userrow = $database->query("select * from doctor where docemail='$useremail'");
-    $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    
 
-    // import EncryptionUtil
-    require "../utils/encryption-util.php";
-    use function Utils\decrypt;
+       //import database
+       include("../connection.php");
+       include('../csrf_helper.php');
 
+       // Fetch doctor's data using prepared statement
+        $sqlmain = "SELECT * FROM doctor WHERE docemail = ?";
+        $stmt = $database->prepare($sqlmain);
+        $stmt->bind_param("s", $useremail);
+        $stmt->execute();
+        $userrow = $stmt->get_result();
+        $userfetch = $userrow->fetch_assoc();
+        $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+        $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
+
+     // import EncryptionUtil
+     require "../utils/encryption-util.php";
+     use function Utils\decrypt;
+    //echo $userid;
     ?>
     <div class="container">
-        <div class="menu">
-        <table class="menu-container" border="0">
+    <div class="menu">
+            <table class="menu-container" border="0">
                 <tr>
                     <td style="padding:10px" colspan="2">
                         <table border="0" class="profile-container">
@@ -77,12 +84,12 @@
                     </td>
                 </tr>
                 <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-dashbord " >
-                        <a href="index.php" class="non-style-link-menu "><div><p class="menu-text">Dashboard</p></a></div></a>
+                    <td class="menu-btn menu-icon-dashbord" >
+                        <a href="index.php" class="non-style-link-menu"><div><p class="menu-text">Dashboard</p></a></div></a>
                     </td>
                 </tr>
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-appoinment  menu-active menu-icon-appoinment-active">
+                    <td class="menu-btn menu-icon-appoinment menu-icon-appoinment-active menu-active">
                         <a href="appointment.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Appointments</p></a></div>
                     </td>
                 </tr>
@@ -198,8 +205,8 @@
 
                         
                         if(!empty($_POST["sheduledate"])){
-                            $sheduledate=$_POST["sheduledate"];
-                            $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
+                            $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
+                            $sqlmain .= " AND schedule.scheduledate = ?";
                         };
 
                         
@@ -286,16 +293,16 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $appoid=$row["appoid"];
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
-                                    $pid =$row["pid"];
-                                    $pname=$row["pname"];
-                                    $apponum=$row["apponum"];
-                                    $appodate=$row["appodate"];
+                                    $appoid = $row["appoid"];
+                                    $scheduleid = $row["scheduleid"];
+                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                    $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                    $scheduletime = htmlspecialchars(string: $row["scheduletime"], flags: ENT_QUOTES, encoding: 'UTF-8');
+                                    $pid = htmlspecialchars(string: $row["pid"], flags: ENT_QUOTES, encoding: 'UTF-8');
+                                    $pname = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+                                    $apponum = htmlspecialchars($row["apponum"], ENT_QUOTES, 'UTF-8');
+                                    $appodate = htmlspecialchars($row["appodate"], ENT_QUOTES, 'UTF-8');
                                     echo '<tr >
                                         <td style="font-weight:600;"> &nbsp;'.
                                         
@@ -319,14 +326,14 @@
                                         <td>
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <!--<a href="?action=view&id='.$appoid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <!--<a href="?action=view&id='. urlencode($appoid) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;-->
-                                       <a href="?action=drop&id='.$appoid.'&name='.$pname.'&session='.$title.'&apponum='.$apponum.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
+                                       <a href="?action=drop&id='. urlencode($appoid) .'&name='. urlencode($pname) .'&session='. urlencode($title) .'&apponum='. urlencode($apponum) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
                                        &nbsp;&nbsp;&nbsp;</div>
                                         </td>
                                           <td>
                                         <div style="display:flex;justify-content: center;">
-                                        <a href="?action=add-prescription&id='.$appoid.'&pid='.$pid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
+                                        <a href="?action=add-prescription&id='. urlencode($appoid) .'&pid='. urlencode($pid) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
                                        &nbsp;&nbsp;&nbsp;
                                         </div>
                                         </td>
@@ -353,8 +360,9 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id = isset($_GET["id"]) ? filter_var($_GET["id"], FILTER_VALIDATE_INT) : null;
+        $action = isset($_GET["action"]) ? htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8') : '';
+        
         if($action=='add-session'){
 
             echo '
@@ -406,9 +414,9 @@
         
                                         for ($y=0;$y<$list11->num_rows;$y++){
                                             $row00=$list11->fetch_assoc();
-                                            $sn=$row00["docname"];
-                                            $id00=$row00["docid"];
-                                            echo "<option value=".$id00.">$sn</option><br/>";
+                                            $sn = htmlspecialchars($row00["docname"], ENT_QUOTES, 'UTF-8');
+                                            $id00 = htmlspecialchars($row00["docid"], ENT_QUOTES, 'UTF-8');
+                                            echo "<option value=". htmlspecialchars($id00, ENT_QUOTES, 'UTF-8') . ">". htmlspecialchars($sn, ENT_QUOTES, 'UTF-8') ."</option><br/>";
                                         };
         
         
@@ -468,7 +476,7 @@
             </div>
             ';
         }elseif($action=='session-added'){
-            $titleget=$_GET["title"];
+            $titleget = isset($_GET["title"]) ? htmlspecialchars($_GET["title"], ENT_QUOTES, 'UTF-8') : '';
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -490,9 +498,9 @@
             </div>
             ';
         }elseif($action=='drop'){
-            $nameget=$_GET["name"];
-            $session=$_GET["session"];
-            $apponum=$_GET["apponum"];
+            $nameget = isset($_GET["name"]) ? htmlspecialchars($_GET["name"], ENT_QUOTES, 'UTF-8') : '';
+            $session = isset($_GET["session"]) ? htmlspecialchars($_GET["session"], ENT_QUOTES, 'UTF-8') : '';
+            $apponum = isset($_GET["apponum"]) ? htmlspecialchars($_GET["apponum"], ENT_QUOTES, 'UTF-8') : '';
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -507,7 +515,7 @@
                         </div>
                         <div style="display: flex;justify-content: center;">
                         <form action="delete-appointment.php" method="POST" class="non-style-link">
-                            <input type="hidden" name="id" value="' . $id . '">
+                            <input type="hidden" name="id" value="' . urlencode($id). '">
                             <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                             <button type="submit" class="btn-primary btn" style="margin: 10px; padding: 10px;">
                                 <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
@@ -524,14 +532,14 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
-            $nic=decrypt($row['docnic']);
-            $tele=$row['doctel'];
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars(decrypt($row['docnic']), ENT_QUOTES, 'UTF-8');
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -622,7 +630,8 @@
             </div>
             ';  
     }elseif($action=='add-prescription'){
-            $pidget = $_GET["pid"];
+            $pidget = filter_input(INPUT_GET, 'pid', FILTER_VALIDATE_INT);
+            $pidget = htmlspecialchars($pidget, ENT_QUOTES, 'UTF-8');
             echo '
                 <div id="popup1" class="overlay">
                 <div class="popup">
