@@ -25,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='a'){
             header("location: ../login.php");
@@ -34,11 +36,14 @@
         header("location: ../login.php");
     }
     
-    
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
 
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
     
     ?>
     <div class="container">
@@ -526,7 +531,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-appointment.php" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $id . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -545,8 +556,9 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">

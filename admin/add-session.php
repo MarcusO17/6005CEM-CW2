@@ -2,6 +2,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='a'){
             header("location: ../login.php");
@@ -10,9 +12,15 @@
     }else{
         header("location: ../login.php");
     }
+
+    include('../csrf_helper.php');
     
     
     if($_POST){
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
         //import database
         include("../connection.php");
         $title=$_POST["title"];

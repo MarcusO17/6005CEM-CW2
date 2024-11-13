@@ -2,6 +2,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='a'){
             header("location: ../login.php");
@@ -10,20 +12,42 @@
         header("location: ../login.php");
     }
     
+    include('../csrf_helper.php');
     
-    if($_GET){
-        //import database
-        include("../connection.php");
-        $id=$_GET["id"];
-        //$result001= $database->query("select * from schedule where scheduleid=$id;");
-        //$email=($result001->fetch_assoc())["docemail"];
-        $sql= $database->query("delete from appointment where appoid='$id';");
-        //$stmt = $database->prepare($sqlmain);
-        //$stmt->bind_param("i",$id);
-        //$stmt->execute();
-        //$sql= $database->query("delete from doctor where docemail='$email';");
-        //print_r($email);
-        header("location: appointment.php");
+   
+    // Process GET request to delete appointment
+    if ($_POST) {
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
+        // Validate and sanitize the 'id' parameter
+        $id = filter_var($_POST["id"], FILTER_VALIDATE_INT);
+        
+        if ($id) {
+            // Import database connection
+            include("../connection.php");
+            
+            // Use a prepared statement to delete the appointment securely
+            $sql = "DELETE FROM appointment WHERE appoid = ?";
+            $stmt = $database->prepare($sql);
+            $stmt->bind_param("i", $id);
+
+            // Execute the query and check for success
+            if ($stmt->execute()) {
+                // Redirect to appointment page after successful deletion
+                header("location: appointment.php");
+                exit();
+            } else {
+                // Log error and display a user-friendly message
+                error_log("Error deleting appointment: " . $stmt->error);
+                echo "<p>Error: Unable to delete appointment. Please try again later.</p>";
+            }
+
+            $stmt->close();
+        } else {
+            echo "<p>Invalid appointment ID specified.</p>";
+        }
     }
 
 

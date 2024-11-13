@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="../css/add-prescription.css">
         
     <title>Patients</title>
     <style>
@@ -26,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -39,11 +40,15 @@
     
 
     //import database
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
     include("../connection.php");
-    $userrow = $database->query("select * from doctor where docemail='$useremail'");
-    $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $useremail = mysqli_real_escape_string($database, $useremail);
+    $userrow = $database->query("SELECT * FROM doctor WHERE docemail='$useremail'");
+    $userfetch = $userrow->fetch_assoc();
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
 
 
     //echo $userid;
@@ -60,8 +65,8 @@
                                     <img src="../img/user.png" alt="" width="100%" style="border-radius:50%">
                                 </td>
                                 <td style="padding:0px;margin:0px;">
-                                    <p class="profile-title"><?php echo substr($username,0,13)  ?>..</p>
-                                    <p class="profile-subtitle"><?php echo substr($useremail,0,22)  ?></p>
+                                    <p class="profile-title"><?php echo substr($username, 0, 13) ?>..</p>
+                                    <p class="profile-subtitle"><?php echo substr(htmlspecialchars($useremail), 0, 22) ?></p>
                                 </td>
                             </tr>
                             <tr>
@@ -104,25 +109,35 @@
         <?php       
 
                     $selecttype="My";
-                    $current="My patients Only";
+                    $current="My Patients Only";
                     if($_POST){
 
                         if(isset($_POST["search"])){
-                            $keyword=$_POST["search12"];
+                            $keyword = mysqli_real_escape_string($database, $_POST["search12"]);
                             
                             $sqlmain= "select * from patient where pemail='$keyword' or pname='$keyword' or pname like '$keyword%' or pname like '%$keyword' or pname like '%$keyword%' ";
                             $selecttype="my";
                         }
                         
-                        if(isset($_POST["filter"])){
-                            if($_POST["showonly"]=='all'){
-                                $sqlmain= "select * from patient";
-                                $selecttype="All";
-                                $current="All patients";
-                            }else{
-                                $sqlmain= "select * from appointment inner join patient on patient.pid=appointment.pid inner join schedule on schedule.scheduleid=appointment.scheduleid where schedule.docid=$userid;";
-                                $selecttype="My";
-                                $current="My patients Only";
+                        if (isset($_POST["filter"])) {
+                            // Check if 'showonly' is set in the $_POST array to avoid undefined key warning
+                            if (isset($_POST["showonly"])) {
+                                $showonly = mysqli_real_escape_string($database, $_POST["showonly"]);
+                                
+                                if ($showonly == 'all') {
+                                    $sqlmain = "SELECT * FROM patient";
+                                    $selecttype = "All";
+                                    $current = "All Patients";
+                                } else {
+                                    $sqlmain = "SELECT * FROM appointment INNER JOIN patient ON patient.pid=appointment.pid INNER JOIN schedule ON schedule.scheduleid=appointment.scheduleid WHERE schedule.docid=$userid";
+                                    $selecttype = "My";
+                                    $current = "My Patients Only";
+                                }
+                            } else {
+                                // Default behavior if no option is selected
+                                $sqlmain = "SELECT * FROM appointment INNER JOIN patient ON patient.pid=appointment.pid INNER JOIN schedule ON schedule.scheduleid=appointment.scheduleid WHERE schedule.docid=$userid";
+                                $selecttype = "My";
+                                $current = "My Patients Only";
                             }
                         }
                     }else{
@@ -154,8 +169,8 @@
 
                                 for ($y=0;$y<$list11->num_rows;$y++){
                                     $row00=$list11->fetch_assoc();
-                                    $d=$row00["pname"];
-                                    $c=$row00["pemail"];
+                                    $d = htmlspecialchars($row00["pname"]);
+                                    $c = htmlspecialchars($row00["pemail"]);
                                     echo "<option value='$d'><br/>";
                                     echo "<option value='$c'><br/>";
                                 };
@@ -192,7 +207,7 @@
                 
                 <tr>
                     <td colspan="4" style="padding-top:10px;">
-                        <p class="heading-main12" style="margin-left: 45px;font-size:18px;color:rgb(49, 49, 49)"><?php echo $selecttype." Patients (".$list11->num_rows.")"; ?></p>
+                        <p class="heading-main12" style="margin-left: 45px;font-size:18px;color:rgb(49, 49, 49)"><?php echo htmlspecialchars($selecttype) . " Patients (" . ($list11 ? $list11->num_rows : 0) . ")" ?></p>
                     </td>
                     
                 </tr>
@@ -295,13 +310,13 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $pid=$row["pid"];
-                                    $name=$row["pname"];
-                                    $email=$row["pemail"];
-                                    $nic=$row["pnic"];
-                                    $dob=$row["pdob"];
-                                    $tel=$row["ptel"];
-                                    
+                                    $pid = htmlspecialchars($row["pid"]);
+                                    $name = htmlspecialchars($row["pname"]);
+                                    $email = htmlspecialchars($row["pemail"]);
+                                    $nic = htmlspecialchars(decrypt($row["pnic"]));
+                                    $dob = htmlspecialchars($row["pdob"]);
+                                    $tel = htmlspecialchars($row["ptel"]);
+
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($name,0,35)
@@ -320,14 +335,14 @@
                                         </td>
                                         <td>
                                             <div style="display:flex;justify-content: center;">
-                                                <a href="?action=viewPrescription&id='.$pid .'" class="non-style-link"><button class="btn-primary-soft btn button-icon btn-view" style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View Prescription</font></button></a>
+                                                <a href="?action=viewPrescription&id='. urlencode($pid) .'" class="non-style-link"><button class="btn-primary-soft btn button-icon btn-view" style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View Prescription</font></button></a>
                                             </div>
                                         </td>
 
                                         <td >
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <a href="?action=view&id='.$pid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <a href="?action=view&id='. urlencode($pid) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        
                                         </div>
                                         </td>
@@ -361,12 +376,13 @@
             $sqlmain= "select * from patient where pid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
-            $nic=$row["pnic"];
-            $dob=$row["pdob"];
-            $tele=$row["ptel"];
-            $address=$row["paddress"];
+            $name = htmlspecialchars($row["pname"]);
+            $email = htmlspecialchars($row["pemail"]);
+            $nic = htmlspecialchars(decrypt($row["pnic"]));
+            $dob = htmlspecialchars($row["pdob"]);
+            $tele = htmlspecialchars($row["ptel"]);
+            $address = htmlspecialchars($row["paddress"]);
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -485,8 +501,9 @@
 
 <?php
 if ($_GET) {
-    $id = $_GET["id"];
-    $action = $_GET["action"];
+    $id = mysqli_real_escape_string($database, $_GET["id"]);
+    $action = mysqli_real_escape_string($database, $_GET["action"]);
+
     
     if ($action == "viewPrescription") {
         $sqlPrescription = "SELECT * FROM prescription WHERE pid='$id'";
@@ -518,10 +535,10 @@ if ($_GET) {
                 echo '
                     <tr>
                         <td>' . htmlspecialchars($prescription["appointment_id"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["medication"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["dosage"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["frequency"]) . '</td>
-                        <td>' . htmlspecialchars($prescription["additional_notes"]) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["medication"])) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["dosage"])) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["frequency"])) . '</td>
+                        <td>' . htmlspecialchars(decrypt($prescription["additional_notes"])) . '</td>
                     </tr>';
             }
             
