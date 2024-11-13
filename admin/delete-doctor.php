@@ -15,7 +15,7 @@
     if($_GET){
         //import database
         include("../connection.php");
-        $id=$_GET["id"];
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         $result001= $database->query("select * from doctor where docid=$id;");
         $email=($result001->fetch_assoc())["docemail"];
         $sql= $database->query("delete from webuser where email='$email';");
