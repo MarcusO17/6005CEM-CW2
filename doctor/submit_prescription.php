@@ -22,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Input validation and sanitization
         $appointment_id = filter_input(INPUT_POST, 'appointment_id', FILTER_VALIDATE_INT);
         $userid = filter_input(INPUT_POST, 'pid', FILTER_VALIDATE_INT);
-        $medication = htmlspecialchars(trim($_POST["medication"]), ENT_QUOTES, 'UTF-8'); // Encode output
-        $dosage = htmlspecialchars(trim($_POST["dosage"]), ENT_QUOTES, 'UTF-8'); // Encode output
-        $frequency = htmlspecialchars(trim($_POST["frequency"]), ENT_QUOTES, 'UTF-8'); // Encode output
-        $additional_notes = htmlspecialchars(trim($_POST["notes"]), ENT_QUOTES, 'UTF-8'); // Encode output
+        // Sanitize and encode text fields to prevent XSS if displayed
+        $medication = htmlspecialchars(trim(filter_input(INPUT_POST, 'medication', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
+        $dosage = htmlspecialchars(trim(filter_input(INPUT_POST, 'dosage', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
+        $frequency = htmlspecialchars(trim(filter_input(INPUT_POST, 'frequency', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
+        $additional_notes = htmlspecialchars(trim(filter_input(INPUT_POST, 'notes', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
 
         // Check if required fields are provided and valid
         if ($appointment_id && $userid && $medication && $dosage && $frequency) {
