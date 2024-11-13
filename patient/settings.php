@@ -265,7 +265,7 @@
                         <div style="display: flex;justify-content: center;">
                         <form action="delete-account.php" method="POST" style="display: inline;">
                             <input type="hidden" name="id" value="' . $id . '">
-                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                             <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
                                 <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
                             </button>
@@ -444,7 +444,7 @@
                                             <form action="edit-user.php" method="POST" class="add-new-form">
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
-                                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                         </td>
                                     </tr>
                                     <tr>

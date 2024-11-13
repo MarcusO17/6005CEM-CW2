@@ -240,7 +240,7 @@
                                             <input type="hidden" name="scheduleid" value="'.$scheduleid.'" >
                                             <input type="hidden" name="apponum" value="'.$apponum.'" >
                                             <input type="hidden" name="date" value="'.$today.'" >
-                                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
 
                                         
                                     
