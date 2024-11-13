@@ -36,7 +36,7 @@
         header("location: ../login.php");
     }
     
-    
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
@@ -528,7 +528,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-appointment.php" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $id . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>

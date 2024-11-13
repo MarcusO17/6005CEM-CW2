@@ -14,8 +14,9 @@
     }else{
         header("location: ../login.php");
     }
-    
 
+    include('../csrf_helper.php');
+    
     //import database
     include("../connection.php");
     $sqlmain= "select * from patient where pemail=?";
@@ -28,10 +29,15 @@
     $username=$userfetch["pname"];
 
     
-    if($_GET){
+    if($_POST){
+
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
         //import database
         include("../connection.php");
-        $id=$_GET["id"];
+        $id=$_POST["id"];
         $sqlmain= "select * from patient where pid=?";
         $stmt = $database->prepare($sqlmain);
         $stmt->bind_param("i",$id);

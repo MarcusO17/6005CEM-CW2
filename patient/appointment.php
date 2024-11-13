@@ -26,6 +26,7 @@
     session_start();
 
     include('../session_handler.php');
+    include('../csrf_helper.php');
 
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
@@ -37,7 +38,6 @@
     }else{
         header("location: ../login.php");
     }
-    
 
     //import database
     include("../connection.php");
@@ -62,7 +62,10 @@
         //print_r($_POST);
         
 
-
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
         
         if(!empty($_POST["sheduledate"])){
             $sheduledate=$_POST["sheduledate"];
@@ -196,7 +199,7 @@
                         </td>
                         <td width="30%">
                         <form action="" method="post">
-                            
+                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                             <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
 
                         </td>
@@ -404,7 +407,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-appointment.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-appointment.php" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $appoid . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="appointment.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>

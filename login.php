@@ -27,24 +27,39 @@
     //learn from w3schools.com
     //Unset all the server side variables
 
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ]);
+
+
     session_start();
 
     $_SESSION["user"]="";
     $_SESSION["usertype"]="";
+
     
     // Set the new timezone
     date_default_timezone_set('Asia/Kolkata');
     $date = date('Y-m-d');
 
     $_SESSION["date"]=$date;
+
+    include("csrf_helper.php");
     
 
     //import database
     include("connection.php");
 
-    
 
     if($_POST){
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
 
         $email=$_POST['useremail'];
         $password=$_POST['userpassword'];
@@ -255,6 +270,7 @@ function resetAccountLock($database,$email){
 
             <tr>
                 <td>
+                    <input type="hidden" name="csrf_token" value="<?= generateCsrfToken(); ?>">
                     <input type="submit" value="Login" class="login-btn btn-primary btn">
                 </td>
             </tr>
@@ -284,6 +300,10 @@ function resetAccountLock($database,$email){
 
         <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 'true'): ?>
             alert('Your session has timed out due to inactivity. Please log in again.');
+        <?php endif; ?>
+
+        <?php if (isset($_GET['csrf']) && $_GET['csrf'] == 'true'): ?>
+            alert('Your session terminated due to csrf. Please log in again.');
         <?php endif; ?>
 
         <?php

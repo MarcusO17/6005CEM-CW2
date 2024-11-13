@@ -32,6 +32,7 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
+include("csrf_helper.php");
 
 // Import database
 include "connection.php";
@@ -39,6 +40,12 @@ include "connection.php";
 
 
 if($_POST){
+
+    if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+        header('Location: ../login.php?csrf=true');
+        exit();
+    }
+
     $result= $database->query("select * from webuser");
 
     $fname=$_SESSION['personal']['fname'];
@@ -89,6 +96,7 @@ if($_POST){
     <center>
         <div class="container">
             <form action="" method="POST" >
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <table border="0" style="width: 69%;">
                     <!-- Header -->
                     <tr>
@@ -100,7 +108,8 @@ if($_POST){
 
                     <!-- Input Fields -->
                     <tr>
-                        <td class="label-td" colspan="2">
+                        
+                <td class="label-td" colspan="2">
                             <label for="newemail" class="form-label">Email:</label>
                         </td>
                     </tr>

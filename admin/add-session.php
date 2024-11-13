@@ -12,9 +12,15 @@
     }else{
         header("location: ../login.php");
     }
+
+    include('../csrf_helper.php');
     
     
     if($_POST){
+        if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+            header('Location: ../login.php?csrf=true');
+            exit();
+        }
         //import database
         include("../connection.php");
         $title=$_POST["title"];

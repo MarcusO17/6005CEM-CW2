@@ -36,7 +36,7 @@
         header("location: ../login.php");
     }
     
-    
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");

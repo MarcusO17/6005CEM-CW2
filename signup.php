@@ -28,9 +28,14 @@ $date = date('Y-m-d');
 
 $_SESSION["date"]=$date;
 
-
+include("csrf_helper.php");
 
 if($_POST){
+
+    if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+        header('Location: ../login.php?csrf=true');
+        exit();
+    }
 
     $_SESSION["personal"]=array(
         'fname'=>$_POST['fname'],
@@ -58,6 +63,8 @@ if($_POST){
             </tr>
             <tr>
                 <form action="" method="POST" >
+                <input type="hidden" name="csrf_token" value="<?= generateCsrfToken(); ?>">
+
                 <td class="label-td" colspan="2">
                     <label for="name" class="form-label">Name: </label>
                 </td>

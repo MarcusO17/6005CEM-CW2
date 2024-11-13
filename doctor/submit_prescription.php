@@ -20,6 +20,10 @@ if (isset($_SESSION["user"])) {
 include("../connection.php");
 
 if ($_POST) {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('CSRF token validation failed.');
+    }
+
     if (isset($_POST["medication"])) {
         $appointment_id = $_POST['appointment_id'];
         $userid = $_POST['pid'];

@@ -125,6 +125,7 @@
                 $q='';
                 $searchtype="All";
                         if($_POST){
+                            
                         //print_r($_POST);
                         
                         if(!empty($_POST["search"])){
