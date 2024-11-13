@@ -41,8 +41,9 @@
     include("../connection.php");
     $userrow = $database->query("select * from patient where pemail='$useremail'");
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["pid"];
-    $username=$userfetch["pname"];
+    $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
+
 
     ?>
     <div class="container">
@@ -238,7 +239,7 @@
                             You want to delete this record for $nameget.
                         </div>
                         <div style='display: flex;justify-content: center;'>
-                            <a href='delete-doctor.php?id=$id' class='non-style-link'><button class='btn-primary btn'>Yes</button></a>
+                            <a href='delete-doctor.php?id=". urlencode($id) ."' class='non-style-link'><button class='btn-primary btn'>Yes</button></a>
                             &nbsp;
                             <a href='doctors.php' class='non-style-link'><button class='btn-primary btn'>No</button></a>
                         </div>
