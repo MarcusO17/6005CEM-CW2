@@ -55,8 +55,8 @@ if($_POST){
     $address=$_SESSION['personal']['address'];
     $nic=$_SESSION['personal']['nic'];
     $dob=$_SESSION['personal']['dob'];
-    $email=$_POST['newemail'];
-    $tele=$_POST['tele'];
+    $email = filter_var(trim($_POST['newemail']), FILTER_SANITIZE_EMAIL);
+    $tele = filter_var(trim($_POST['tele']), FILTER_SANITIZE_STRING);
     $newpassword=$_POST['newpassword'];
     $cpassword=$_POST['cpassword'];
 
@@ -85,10 +85,15 @@ if($_POST){
             //TODO
             //Password Hashing
             $hashedpassword = password_hash($newpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
+            // Insert data into the patient table
+            $stmt = $database->prepare("INSERT INTO patient (pemail, pname, ppassword, paddress, pnic, pdob, ptel) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssss", $email, $name, $hashedpassword, $address, $encrypted_nic, $dob, $tele);
+            $stmt->execute();
 
-            $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$hashedpassword','$address','$encrypted_nic','$dob','$tele');");
-            $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
-
+            // Insert data into the webuser table
+            $stmt = $database->prepare("INSERT INTO webuser (email, usertype, attempts, last_recorded_attempt, end_lockout) VALUES (?, 'p', 0, NULL, NULL)");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
             //print_r("insert into patient values($pid,'$email','$fname','$lname','$newpassword','$address','$nic','$dob','$tele');");
             $_SESSION["user"]=$email;
             $_SESSION["usertype"]="p";
