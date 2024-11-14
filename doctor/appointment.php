@@ -172,12 +172,12 @@
                            </td> 
                         <td width="5%" style="text-align: center;">
                         Date:
-                        </td>
                         <td width="30%">
-                        <form action="" method="post">
-                            
-                            <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
-
+                            <form action="" method="post">
+                                <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" 
+                                    style="margin: 0;width: 95%;" 
+                                    min="1999-01-01" max="2099-12-31">
+                            </form>
                         </td>
                         
                     <td width="12%">
@@ -204,6 +204,7 @@
 
 
                         
+
                         if(!empty($_POST["sheduledate"])){
                             $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
                             $sqlmain .= " AND schedule.scheduledate = ?";
