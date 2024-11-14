@@ -29,6 +29,7 @@
     session_start();
 
     include('../session_handler.php');
+    require_once('../modules/Logger.php');
 
     if (isset($_SESSION["user"])) {
         if (($_SESSION["user"]) == "" or $_SESSION['usertype'] != 'p') {
@@ -63,6 +64,10 @@
 
 
     //echo $userid;
+    // log this page view
+    $logger = Logger::getInstance($database);
+    $logger->setUser($_SESSION["user"], $_SESSION["usertype"])
+        ->logPageView('/patient/schedule.php', 'Scheduled Sessions');
     ?>
     <div class="container">
         <div class="menu">
@@ -143,18 +148,18 @@
     </div>
     <?php
 
-                
-                $sqlpt1="";
-                $insertkey="";
-                $q='';
-                $searchtype="All";
-                if (!empty($_POST["search"])) {
-                    // Sanitize the input
-                    $keyword = filter_input(type: INPUT_POST, var_name: "search", filter: FILTER_SANITIZE_STRING);
-                    $keyword = trim($keyword); // Remove any leading or trailing spaces
-                
-                    // Prepare the query with placeholders for safe input
-                    $sqlmain = "
+
+    $sqlpt1 = "";
+    $insertkey = "";
+    $q = '';
+    $searchtype = "All";
+    if (!empty($_POST["search"])) {
+        // Sanitize the input
+        $keyword = filter_input(type: INPUT_POST, var_name: "search", filter: FILTER_SANITIZE_STRING);
+        $keyword = trim($keyword); // Remove any leading or trailing spaces
+
+        // Prepare the query with placeholders for safe input
+        $sqlmain = "
                         SELECT * FROM schedule
                         INNER JOIN doctor ON schedule.docid = doctor.docid
                         WHERE schedule.scheduledate >= ?

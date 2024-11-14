@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/animations.css">  
-    <link rel="stylesheet" href="../css/main.css">  
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/admin.css">
-        
+
     <title>Doctors</title>
     <style>
-        .popup{
+        .popup {
             animation: transitionIn-Y-bottom 0.5s;
         }
-        .sub-table{
+
+        .sub-table {
             animation: transitionIn-Y-bottom 0.5s;
         }
-</style>
+    </style>
 </head>
+
 <body>
     <?php
 
@@ -27,29 +30,40 @@
 
     include('../session_handler.php');
 
-    if(isset($_SESSION["user"])){
-        if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
+    if (isset($_SESSION["user"])) {
+        if (($_SESSION["user"]) == "" or $_SESSION['usertype'] != 'p') {
             header("location: ../login.php");
-        }else{
-            $useremail=$_SESSION["user"];
+        } else {
+            $useremail = $_SESSION["user"];
         }
-
-    }else{
+    } else {
         header("location: ../login.php");
     }
-    
+
 
     //import database
     include("../connection.php");
     $userrow = $database->query("select * from patient where pemail='$useremail'");
-    $userfetch=$userrow->fetch_assoc();
+    $userfetch = $userrow->fetch_assoc();
     $userid = htmlspecialchars($userfetch["pid"], ENT_QUOTES, 'UTF-8');
     $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
 
     // import EncryptionUtil
     require "../utils/encryption-util.php";
+
     use function Utils\decrypt;
 
+    require_once('../modules/Logger.php');
+
+
+    // Add analytics and logs
+    require_once('../modules/Analytics.php');
+    $analytics = new Analytics($database, $_SESSION["user"], $_SESSION["usertype"]);
+    $logger = Logger::getInstance($database);
+    $logger->setUser($_SESSION["user"], $_SESSION["usertype"])->logPageView(
+        'patient/doctors.php',
+        'All Doctors'
+    );
     ?>
     <div class="container">
         <div class="menu">
@@ -78,107 +92,130 @@
                 <!-- Menu Navigation -->
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-home">
-                        <a href="index.php" class="non-style-link-menu"><div><p class="menu-text">Home</p></a></div>
-                    </td>
-                </tr>
-
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-doctor menu-active menu-icon-doctor-active">
-                        <a href="doctors.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">All Doctors</p></a></div>
-                    </td>
-                </tr>
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-session">
-                        <a href="prescriptions.php" class="non-style-link-menu"><div><p class="menu-text">My Prescriptions</p></a></div>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-session">
-                        <a href="schedule.php" class="non-style-link-menu"><div><p class="menu-text">Scheduled Sessions</p></div></a>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-appoinment">
-                        <a href="appointment.php" class="non-style-link-menu"><div><p class="menu-text">My Bookings</p></a></div>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-settings">
-                        <a href="settings.php" class="non-style-link-menu"><div><p class="menu-text">Settings</p></a></div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        
-        <div class="dash-body">
-            <table border="0" width="100%" style="margin-top:25px;">
-                <tr>
-                    <td width="13%">
-                        <a href="doctors.php">
-                            <button class="login-btn btn-primary-soft btn btn-icon-back" style="padding:11px;margin-left:20px;width:125px"><font class="tn-in-text">Back</font></button>
+                        <a href="index.php" class="non-style-link-menu">
+                            <div>
+                                <p class="menu-text">Home</p>
                         </a>
-                    </td>
-                    <td>
-                        <form action="" method="post" class="header-search">
-                            <input type="search" name="search" class="input-text header-searchbar" placeholder="Search Doctor name or Email" list="doctors" required>
-                            <datalist id="doctors">
-                                <?php
-                                $list11 = $database->query("SELECT docname, docemail FROM doctor");
-                                while ($row00 = $list11->fetch_assoc()) {
-                                    echo "<option value='" . htmlspecialchars($row00['docname'], ENT_QUOTES, 'UTF-8') . "'></option>";
-                                    echo "<option value='" . htmlspecialchars($row00['docemail'], ENT_QUOTES, 'UTF-8') . "'></option>";
-                                }
-                                ?>
-                            </datalist>
-                            <input type="submit" value="Search" class="login-btn btn-primary btn" style="padding:10px 25px;">
-                        </form>
-                    </td>
-                    <td width="15%">
-                        <p style="font-size:14px;color:rgb(119,119,119);text-align:right;">Today's Date</p>
-                        <p class="heading-sub12"><?= date('Y-m-d') ?></p>
-                    </td>
-                    <td width="10%">
-                        <button class="btn-label" style="display:flex;justify-content:center;"><img src="../img/calendar.svg" width="100%"></button>
-                    </td>
-                </tr>
+        </div>
+        </td>
+        </tr>
 
-                <tr>
-                    <td colspan="4" style="padding-top:10px;">
-                        <p class="heading-main12" style="margin-left:45px;font-size:18px;color:rgb(49,49,49)">All Doctors (<?= $list11->num_rows ?>)</p>
-                    </td>
-                </tr>
+        <tr class="menu-row">
+            <td class="menu-btn menu-icon-doctor menu-active menu-icon-doctor-active">
+                <a href="doctors.php" class="non-style-link-menu non-style-link-menu-active">
+                    <div>
+                        <p class="menu-text">All Doctors</p>
+                </a>
+    </div>
+    </td>
+    </tr>
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-session">
+            <a href="prescriptions.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">My Prescriptions</p>
+            </a></div>
+        </td>
+    </tr>
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-session">
+            <a href="schedule.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">Scheduled Sessions</p>
+                </div>
+            </a>
+        </td>
+    </tr>
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-appoinment">
+            <a href="appointment.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">My Bookings</p>
+            </a></div>
+        </td>
+    </tr>
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-settings">
+            <a href="settings.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">Settings</p>
+            </a></div>
+        </td>
+    </tr>
+    </table>
+    </div>
 
-                <?php
-                $sqlmain = "SELECT * FROM doctor ORDER BY docid DESC";
-                if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['search'])) {
-                    $keyword = '%' . $database->real_escape_string($_POST['search']) . '%';
-                    $sqlmain = "SELECT * FROM doctor WHERE docemail LIKE ? OR docname LIKE ?";
-                    $stmt = $database->prepare($sqlmain);
-                    $stmt->bind_param("ss", $keyword, $keyword);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                } else {
-                    $result = $database->query($sqlmain);
-                }
-                ?>
-                
-                <tr>
-                   <td colspan="4">
-                       <center>
-                        <div class="abc scroll">
-                        <table width="93%" class="sub-table scrolldown" border="0">
-                        <thead>
-                        <tr>
-                            <th class="table-headin">Doctor Name</th>
-                            <th class="table-headin">Email</th>
-                            <th class="table-headin">Specialties</th>
-                            <th class="table-headin">Events</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+    <div class="dash-body">
+        <table border="0" width="100%" style="margin-top:25px;">
+            <tr>
+                <td width="13%">
+                    <a href="doctors.php">
+                        <button class="login-btn btn-primary-soft btn btn-icon-back" style="padding:11px;margin-left:20px;width:125px">
+                            <font class="tn-in-text">Back</font>
+                        </button>
+                    </a>
+                </td>
+                <td>
+                    <form action="" method="post" class="header-search">
+                        <input type="search" name="search" class="input-text header-searchbar" placeholder="Search Doctor name or Email" list="doctors" required>
+                        <datalist id="doctors">
                             <?php
-                            if ($result->num_rows == 0) {
-                                echo '<tr>
+                            $list11 = $database->query("SELECT docname, docemail FROM doctor");
+                            while ($row00 = $list11->fetch_assoc()) {
+                                echo "<option value='" . htmlspecialchars($row00['docname'], ENT_QUOTES, 'UTF-8') . "'></option>";
+                                echo "<option value='" . htmlspecialchars($row00['docemail'], ENT_QUOTES, 'UTF-8') . "'></option>";
+                            }
+                            ?>
+                        </datalist>
+                        <input type="submit" value="Search" class="login-btn btn-primary btn" style="padding:10px 25px;">
+                    </form>
+                </td>
+                <td width="15%">
+                    <p style="font-size:14px;color:rgb(119,119,119);text-align:right;">Today's Date</p>
+                    <p class="heading-sub12"><?= date('Y-m-d') ?></p>
+                </td>
+                <td width="10%">
+                    <button class="btn-label" style="display:flex;justify-content:center;"><img src="../img/calendar.svg" width="100%"></button>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="4" style="padding-top:10px;">
+                    <p class="heading-main12" style="margin-left:45px;font-size:18px;color:rgb(49,49,49)">All Doctors (<?= $list11->num_rows ?>)</p>
+                </td>
+            </tr>
+
+            <?php
+            $sqlmain = "SELECT * FROM doctor ORDER BY docid DESC";
+            if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['search'])) {
+                $keyword = '%' . $database->real_escape_string($_POST['search']) . '%';
+                $sqlmain = "SELECT * FROM doctor WHERE docemail LIKE ? OR docname LIKE ?";
+                $stmt = $database->prepare($sqlmain);
+                $stmt->bind_param("ss", $keyword, $keyword);
+                $stmt->execute();
+                $result = $stmt->get_result();
+            } else {
+                $result = $database->query($sqlmain);
+            }
+            ?>
+
+            <tr>
+                <td colspan="4">
+                    <center>
+                        <div class="abc scroll">
+                            <table width="93%" class="sub-table scrolldown" border="0">
+                                <thead>
+                                    <tr>
+                                        <th class="table-headin">Doctor Name</th>
+                                        <th class="table-headin">Email</th>
+                                        <th class="table-headin">Specialties</th>
+                                        <th class="table-headin">Events</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    if ($result->num_rows == 0) {
+                                        echo '<tr>
                                         <td colspan="4">
                                             <center>
                                             <img src="../img/notfound.svg" width="25%">
@@ -189,19 +226,19 @@
                                             </center>
                                         </td>
                                     </tr>';
-                            } else {
-                                while ($row = $result->fetch_assoc()) {
-                                    $docid = htmlspecialchars($row["docid"], ENT_QUOTES, 'UTF-8');
-                                    $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
-                                    $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
-                                    $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
+                                    } else {
+                                        while ($row = $result->fetch_assoc()) {
+                                            $docid = htmlspecialchars($row["docid"], ENT_QUOTES, 'UTF-8');
+                                            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+                                            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
 
-                                    $stmt = $database->prepare("SELECT sname FROM specialties WHERE id = ?");
-                                    $stmt->bind_param("s", $spe);
-                                    $stmt->execute();
-                                    $spcil_name = htmlspecialchars($stmt->get_result()->fetch_assoc()["sname"], ENT_QUOTES, 'UTF-8');
+                                            $stmt = $database->prepare("SELECT sname FROM specialties WHERE id = ?");
+                                            $stmt->bind_param("s", $spe);
+                                            $stmt->execute();
+                                            $spcil_name = htmlspecialchars($stmt->get_result()->fetch_assoc()["sname"], ENT_QUOTES, 'UTF-8');
 
-                                    echo "<tr>
+                                            echo "<tr>
                                         <td>$name</td>
                                         <td>$email</td>
                                         <td>$spcil_name</td>
@@ -213,21 +250,21 @@
                                             </div>
                                         </td>
                                     </tr>";
-                                }
-                            }
-                            ?>
-                        </tbody>
-                        </table>
+                                        }
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
                         </div>
-                        </center>
-                   </td> 
-                </tr>
-            </table>
-        </div>
+                    </center>
+                </td>
+            </tr>
+        </table>
     </div>
-    <?php 
-    if($_GET){
-        
+    </div>
+    <?php
+    if ($_GET) {
+
         $id = filter_var($_GET["id"], FILTER_VALIDATE_INT);
         $action = htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8');
 
@@ -244,27 +281,25 @@
                             You want to delete this record for $nameget.
                         </div>
                         <div style='display: flex;justify-content: center;'>
-                            <a href='delete-doctor.php?id=". urlencode($id) ."' class='non-style-link'><button class='btn-primary btn'>Yes</button></a>
+                            <a href='delete-doctor.php?id=" . urlencode($id) . "' class='non-style-link'><button class='btn-primary btn'>Yes</button></a>
                             &nbsp;
                             <a href='doctors.php' class='non-style-link'><button class='btn-primary btn'>No</button></a>
                         </div>
                     </center>
                 </div>
             </div>";
-        }
-
-        elseif ($action === 'view' && $id !== null) {
+        } elseif ($action === 'view' && $id !== null) {
             $sqlmain = "SELECT * FROM doctor WHERE docid = ?";
             $stmt = $database->prepare($sqlmain);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
-    
+
             if ($row = $result->fetch_assoc()) {
                 $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
                 $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
                 $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
-    
+
                 // Get the specialty name
                 $stmt = $database->prepare("SELECT sname FROM specialties WHERE id = ?");
                 $stmt->bind_param("s", $spe);
@@ -274,7 +309,7 @@
                 $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
                 $nic = htmlspecialchars(decrypt($row['docnic']), ENT_QUOTES, 'UTF-8');
                 $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
-    
+
                 echo "
                 <div id='popup1' class='overlay'>
                     <div class='popup'>
@@ -305,7 +340,6 @@
             } else {
                 echo "<p>Error: Doctor not found.</p>";
             }
-    
         } elseif ($action === 'session' && isset($_GET["name"])) {
             $name = htmlspecialchars($_GET["name"], ENT_QUOTES, 'UTF-8');
             echo "
@@ -322,20 +356,18 @@
                     </center>
                 </div>
             </div>";
-            
-    
         } elseif ($action === 'edit' && $id !== null) {
             $sqlmain = "SELECT * FROM doctor WHERE docid = ?";
             $stmt = $database->prepare($sqlmain);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
-    
+
             if ($row = $result->fetch_assoc()) {
                 $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
                 $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
                 $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
-    
+
                 $stmt = $database->prepare("SELECT sname FROM specialties WHERE id = ?");
                 $stmt->bind_param("s", $spe);
                 $stmt->execute();
@@ -343,7 +375,7 @@
                 $spcil_name = htmlspecialchars($spcil_res->fetch_assoc()["sname"], ENT_QUOTES, 'UTF-8');
                 $nic = htmlspecialchars(decrypt($row['docnic']), ENT_QUOTES, 'UTF-8');
                 $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
-    
+
                 $error_1 = isset($_GET["error"]) ? $_GET["error"] : '';
                 $errorlist = array(
                     '1' => "<label for='promter' class='form-label' style='color:rgb(255,62,62);text-align:center;'>Already have an account for this Email address.</label>",
@@ -353,7 +385,7 @@
                     '0' => '',
                 );
                 $error_msg = isset($errorlist[$error_1]) ? $errorlist[$error_1] : '';
-    
+
                 echo "
                 <div id='popup1' class='overlay'>
                     <div class='popup'>
@@ -380,7 +412,7 @@
                                         <tr><td class='label-td' colspan='2'><input type='tel' name='Tele' class='input-text' placeholder='Telephone Number' value='$tele' required><br></td></tr>
                                         <tr><td class='label-td' colspan='2'><label for='spec' class='form-label'>Choose specialties: (Current: $spcil_name)</label></td></tr>
                                         <tr><td class='label-td' colspan='2'><select name='spec' id='' class='box'>";
-    
+
                 $list11 = $database->query("SELECT * FROM specialties;");
                 while ($row00 = $list11->fetch_assoc()) {
                     $sn = htmlspecialchars($row00["sname"], ENT_QUOTES, 'UTF-8');
@@ -400,9 +432,8 @@
                         <br><br>
                     </div>
                 </div>";
-        }
-        else{
-            echo '
+            } else {
+                echo '
                 <div id="popup1" class="overlay">
                         <div class="popup">
                         <center>
@@ -423,11 +454,12 @@
                 </div>
                 </div>
     ';
-        }; 
+            };
+        };
     };
-};
-?>
-</div>
+    ?>
+    </div>
 
 </body>
+
 </html>

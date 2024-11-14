@@ -1,5 +1,6 @@
 <?php
-class MockAnalyticsData {
+class MockAnalyticsData
+{
     private static $logs = [
         ['timestamp' => '2024-03-07 14:30:25', 'user_id' => 'admin@edoc.com', 'action' => 'LOGIN', 'level' => 'INFO'],
         ['timestamp' => '2024-03-07 14:35:12', 'user_id' => 'doctor@edoc.com', 'action' => 'UPDATE_SCHEDULE', 'level' => 'INFO'],
@@ -9,7 +10,8 @@ class MockAnalyticsData {
     ];
 
     // Mock data for page views over the last 7 days
-    public static function getPageViews() {
+    public static function getPageViews()
+    {
         return [
             ['date' => '2024-03-01', 'total_views' => 150, 'unique_users' => 45],
             ['date' => '2024-03-02', 'total_views' => 165, 'unique_users' => 52],
@@ -22,7 +24,8 @@ class MockAnalyticsData {
     }
 
     // Mock data for user type distribution
-    public static function getUserDistribution() {
+    public static function getUserDistribution()
+    {
         return [
             ['type' => 'Patients', 'count' => 250],
             ['type' => 'Doctors', 'count' => 45],
@@ -31,7 +34,8 @@ class MockAnalyticsData {
     }
 
     // Mock data for most visited pages
-    public static function getPopularPages() {
+    public static function getPopularPages()
+    {
         return [
             ['page' => '/appointment.php', 'views' => 450, 'avg_time' => '3:45'],
             ['page' => '/doctors.php', 'views' => 380, 'avg_time' => '2:30'],
@@ -42,12 +46,14 @@ class MockAnalyticsData {
     }
 
     // Mock data for system logs
-    public static function getSystemLogs() {
+    public static function getSystemLogs()
+    {
         return self::$logs;
     }
 
-    public static function clearLogs() {
+    public static function clearLogs()
+    {
         self::$logs = [];
         return true;
     }
-} 
+}

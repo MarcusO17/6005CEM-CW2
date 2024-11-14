@@ -68,6 +68,15 @@
     //import database
     include("connection.php");
 
+    // Add these at the top after database connection
+    require_once("modules/Logger.php");
+    require_once("modules/Analytics.php");
+
+    $logger = Logger::getInstance($database);
+    $analytics = new Analytics($database);
+
+    // Track page view for login page
+    $analytics->trackPageView('/login.php', 'Login Page');
 
     if ($_POST) {
         if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
@@ -75,7 +84,7 @@
             exit();
         }
 
-         // Sanitize and validate email
+        // Sanitize and validate email
         $email = filter_var($_POST['useremail'], FILTER_SANITIZE_EMAIL);
         $password = $_POST['userpassword'];
 
@@ -104,6 +113,31 @@
                     if ($result->num_rows == 1) {
                         $hashedpassword = $result->fetch_assoc()['ppassword'];
                         if (password_verify($password, $hashedpassword)) {
+                            // Log successful login
+                            $logger->setUser($email, 'p')
+                                ->log(
+                                    Logger::CATEGORY_AUTH,
+                                    'LOGIN',
+                                    [
+                                        'user_type' => 'p',
+                                        'ip_address' => $_SERVER['REMOTE_ADDR'],
+                                        'user_agent' => $_SERVER['HTTP_USER_AGENT']
+                                    ],
+                                    Logger::LEVEL_INFO
+                                );
+
+                            // Track login event
+                            $analytics->logUserEvent(
+                                'AUTH',
+                                'LOGIN',
+                                'Patient Login',
+                                1,
+                                [
+                                    'user_type' => 'p',
+                                    'login_time' => date('Y-m-d H:i:s')
+                                ]
+                            );
+
                             $OTPSettings = getOTP();
 
                             $_SESSION['otp'] = $OTPSettings['otp'];
@@ -128,6 +162,28 @@
                     if ($result->num_rows == 1) {
                         $hashedpassword = $result->fetch_assoc()['apassword'];
                         if (password_verify($password, $hashedpassword)) {
+                            $logger->setUser($email, 'a')
+                                ->log(
+                                    Logger::CATEGORY_AUTH,
+                                    'LOGIN',
+                                    [
+                                        'user_type' => 'a',
+                                        'ip_address' => $_SERVER['REMOTE_ADDR'],
+                                        'user_agent' => $_SERVER['HTTP_USER_AGENT']
+                                    ],
+                                    Logger::LEVEL_INFO
+                                );
+
+                            $analytics->logUserEvent(
+                                'AUTH',
+                                'LOGIN',
+                                'Admin Login',
+                                1,
+                                [
+                                    'user_type' => 'a',
+                                    'login_time' => date('Y-m-d H:i:s')
+                                ]
+                            );
 
                             session_regenerate_id(true);
                             //   Admin dashbord
@@ -154,6 +210,28 @@
                     if ($result->num_rows == 1) {
                         $hashedpassword = $result->fetch_assoc()['docpassword'];
                         if (password_verify($password, $hashedpassword)) {
+                            $logger->setUser($email, 'd')
+                                ->log(
+                                    Logger::CATEGORY_AUTH,
+                                    'LOGIN',
+                                    [
+                                        'user_type' => 'd',
+                                        'ip_address' => $_SERVER['REMOTE_ADDR'],
+                                        'user_agent' => $_SERVER['HTTP_USER_AGENT']
+                                    ],
+                                    Logger::LEVEL_INFO
+                                );
+
+                            $analytics->logUserEvent(
+                                'AUTH',
+                                'LOGIN',
+                                'Doctor Login',
+                                1,
+                                [
+                                    'user_type' => 'd',
+                                    'login_time' => date('Y-m-d H:i:s')
+                                ]
+                            );
 
                             $OTPSettings = getOTP();
 
@@ -187,7 +265,6 @@
 
     function recordFailedLogin($database, $email)
     {
-
         $stmt = $database->prepare("SELECT * FROM webuser WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -196,7 +273,7 @@
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             if ($row != NULL) {
-                $attempt = $row["attempts"];
+                $attempt = $row["attempts"] ?? 0;
                 $lastfailedattempt = $row["last_recorded_attempt"];
                 if ($lastfailedattempt != NULL) {
                     $lastfailedattempt = strtotime($lastfailedattempt);
@@ -211,12 +288,23 @@
                 $stmt->execute();
             } else {
                 $now = date('Y-m-d H:i:s');
-
-                $stmt = $database ->prepare(" UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt='$now' where email='$email';");
-
+                $stmt = $database->prepare("UPDATE webuser SET attempts = ?, last_recorded_attempt = ? WHERE email = ?");
                 $stmt->bind_param("iss", $failedAttempts, $now, $email);
                 $stmt->execute();
             }
+
+            $logger = Logger::getInstance($database);
+            $logger->setUser($email, 'u')
+                ->log(
+                    Logger::CATEGORY_AUTH,
+                    'LOGIN_FAILED',
+                    [
+                        'attempts' => $failedAttempts,
+                        'ip_address' => $_SERVER['REMOTE_ADDR'],
+                        'user_agent' => $_SERVER['HTTP_USER_AGENT']
+                    ],
+                    Logger::LEVEL_WARNING
+                );
         }
     }
 
