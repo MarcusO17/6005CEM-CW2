@@ -32,6 +32,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -43,6 +45,7 @@
         header("location: ../login.php");
     }
     
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
@@ -50,6 +53,10 @@
     $userfetch=$userrow->fetch_assoc();
     $userid= $userfetch["docid"];
     $username=$userfetch["docname"];
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
 
 
     //echo $userid;
@@ -274,7 +281,7 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
             echo '
             <div id="popup1" class="overlay">
@@ -376,7 +383,7 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
 
             $error_1=$_GET["error"];
@@ -416,6 +423,7 @@
                                             <form action="edit-doc.php" method="POST" class="add-new-form">
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                         </td>
                                     </tr>
                                     <tr>
@@ -444,7 +452,7 @@
                                     </tr>
                                     <tr>
                                         <td class="label-td" colspan="2">
-                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" required><br>
+                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" maxlength="15" required><br>
                                         </td>
                                     </tr>
                                     <tr>

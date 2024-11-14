@@ -25,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='a'){
             header("location: ../login.php");
@@ -34,10 +36,14 @@
         header("location: ../login.php");
     }
     
-    
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
 
     
     ?>
@@ -237,7 +243,7 @@
                                     $pid=$row["pid"];
                                     $name=$row["pname"];
                                     $email=$row["pemail"];
-                                    $nic=$row["pnic"];
+                                    $nic=decrypt($row["pnic"]);
                                     $dob=$row["pdob"];
                                     $tel=$row["ptel"];
                                     
@@ -294,7 +300,7 @@
             $row=$result->fetch_assoc();
             $name=$row["pname"];
             $email=$row["pemail"];
-            $nic=$row["pnic"];
+            $nic=decrypt($row["pnic"]);
             $dob=$row["pdob"];
             $tele=$row["ptel"];
             $address=$row["paddress"];

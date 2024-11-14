@@ -32,6 +32,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
             header("location: ../login.php");
@@ -42,7 +44,8 @@
     }else{
         header("location: ../login.php");
     }
-    
+
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
@@ -54,6 +57,10 @@
     $userfetch=$result->fetch_assoc();
     $userid= $userfetch["pid"];
     $username=$userfetch["pname"];
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
 
     ?>
     <div class="container">
@@ -260,7 +267,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-account.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-account.php" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $id . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="display: flex; justify-content: center; align-items: center; margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="settings.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -279,10 +292,10 @@
             $email=$row["pemail"];
             $address=$row["paddress"];
             
-           
             $dob=$row["pdob"];
-            $nic=$row['pnic'];
+            $nic=decrypt($row['pnic']);
             $tele=$row['ptel'];
+
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -393,10 +406,8 @@
             $name=$row["pname"];
             $email=$row["pemail"];
            
-            
-            
             $address=$row["paddress"];
-            $nic=$row['pnic'];
+            $nic=decrypt($row['pnic']);
             $tele=$row['ptel'];
 
             $error_1=$_GET["error"];
@@ -405,6 +416,7 @@
                     '2'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password Conformation Error! Reconform Password</label>',
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
+                    '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
                     '0'=>'',
 
                 );
@@ -435,6 +447,7 @@
                                             <form action="edit-user.php" method="POST" class="add-new-form">
                                             <label for="Email" class="form-label">Email: </label>
                                             <input type="hidden" value="'.$id.'" name="id00">
+                                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                         </td>
                                     </tr>
                                     <tr>
@@ -463,7 +476,7 @@
                                     </tr>
                                     <tr>
                                         <td class="label-td" colspan="2">
-                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" required><br>
+                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" maxlength="15" required><br>
                                         </td>
                                     </tr>
                                     <tr>

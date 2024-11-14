@@ -25,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='a'){
             //header("location: ../login.php");
@@ -40,6 +42,10 @@
 
     //import database
     include("../connection.php");
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+    use function Utils\decrypt;
 
     
     ?>
@@ -314,7 +320,7 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
             echo '
             <div id="popup1" class="overlay">
@@ -466,7 +472,7 @@
                             </tr>
                             <tr>
                                 <td class="label-td" colspan="2">
-                                    <input type="text" name="nic" class="input-text" placeholder="NIC Number" required><br>
+                                    <input type="text" name="nic" class="input-text" placeholder="NIC Number" maxlength="15" required><br>
                                 </td>
                             </tr>
                             <tr>
@@ -580,7 +586,7 @@
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
             $spcil_name=$spcil_array["sname"];
-            $nic=$row['docnic'];
+            $nic=decrypt($row['docnic']);
             $tele=$row['doctel'];
 
             $error_1=$_GET["error"];
@@ -647,7 +653,7 @@
                                     </tr>
                                     <tr>
                                         <td class="label-td" colspan="2">
-                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" required><br>
+                                            <input type="text" name="nic" class="input-text" placeholder="NIC Number" value="'.$nic.'" maxlength="15" required><br>
                                         </td>
                                     </tr>
                                     <tr>

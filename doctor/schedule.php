@@ -25,6 +25,8 @@
 
     session_start();
 
+    include('../session_handler.php');
+
     if(isset($_SESSION["user"])){
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
             header("location: ../login.php");
@@ -35,15 +37,26 @@
     }else{
         header("location: ../login.php");
     }
-    
-    
+
+    include('../csrf_helper.php');
 
     //import database
     include("../connection.php");
-    $userrow = $database->query("select * from doctor where docemail='$useremail'");
+
+    // Sanitize user email to prevent SQL injection
+    $useremail = mysqli_real_escape_string($database, $useremail);
+    
+    // Query to fetch doctor details with error handling
+    $userrow = $database->query("SELECT * FROM doctor WHERE docemail='$useremail'");
+    if (!$userrow) {
+        echo '<p class="error-message">An error occurred while retrieving data. Please try again later.</p>';
+        error_log("Database error: " . $database->error);
+        exit();
+    }
+
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
  //echo $userid;
  ?>
  <div class="container">
@@ -120,7 +133,13 @@
                         $today = date('Y-m-d');
                         echo $today;
 
-                        $list110 = $database->query("select  * from  schedule where docid=$userid;");
+                        $sqlmain = "SELECT * FROM schedule WHERE docid=$userid";
+                        $list110 = $database->query($sqlmain);
+                        if (!$list110) {
+                            echo '<p class="error-message">An error occurred while retrieving sessions. Please try again later.</p>';
+                            error_log("Database error: " . $database->error);
+                            exit();
+                        }
 
                         ?>
                         </p>
@@ -155,15 +174,19 @@
                         <td width="30%">
                         <form action="" method="post">
                             
-                            <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
+                            <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;"min="1900-01-01" max="2099-12-31">
 
                         </td>
                         
-                    <td width="12%">
-                        <input type="submit"  name="filter" value=" Filter" class=" btn-primary-soft btn button-icon btn-filter"  style="padding: 15px; margin :0;width:100%">
-                        </form>
+                    <<td width="20%">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <a href="?action=<?php echo isset($_GET['action']) && $_GET['action'] == 'upcoming' ? 'all' : 'upcoming'; ?>" class="non-style-link">
+                                <input type="button" value="<?php echo isset($_GET['action']) && $_GET['action'] == 'upcoming' ? 'Show All' : 'View Upcoming'; ?>" class="btn-primary-soft btn button-icon btn-view" style="padding: 12px 40px;">
+                            </a>
+                            <input type="submit" name="filter" value="Filter" class="btn-primary-soft btn button-icon btn-filter" style="padding: 12px 40px;">
+                        </div>
                     </td>
-
+                    </form>
                     </tr>
                             </table>
 
@@ -179,10 +202,14 @@
                         //print_r($_POST);
                         $sqlpt1="";
                         if(!empty($_POST["sheduledate"])){
-                            $sheduledate=$_POST["sheduledate"];
+                            $sheduledate = mysqli_real_escape_string($database, $_POST["sheduledate"]);
                             $sqlmain.=" and schedule.scheduledate='$sheduledate' ";
                         }
 
+                    }
+                    if (isset($_GET['action']) && $_GET['action'] == 'upcoming') {
+                        $today = date("Y-m-d");
+                        $sqlmain .= " AND schedule.scheduledate >= '$today'";
                     }
 
                 ?>
@@ -210,6 +237,12 @@
                                 <th class="table-headin">
                                     
                                 Max num that can be booked
+                                    
+                                </th>
+
+                                <th class="table-headin">
+                                    
+                                Session Details
                                     
                                 </th>
                                 
@@ -246,12 +279,11 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $scheduleid=$row["scheduleid"];
-                                    $title=$row["title"];
-                                    $docname=$row["docname"];
-                                    $scheduledate=$row["scheduledate"];
-                                    $scheduletime=$row["scheduletime"];
-                                    $nop=$row["nop"];
+                                    $scheduleid = htmlspecialchars($row["scheduleid"]);
+                                    $title = htmlspecialchars($row["title"]);
+                                    $scheduledate = htmlspecialchars($row["scheduledate"]);
+                                    $scheduletime = htmlspecialchars($row["scheduletime"]);
+                                    $nop = htmlspecialchars($row["nop"]);
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($title,0,30)
@@ -266,12 +298,22 @@
 
                                         <td>
                                         <div style="display:flex;justify-content: center;">
-                                        
-                                        <a href="?action=view&id='.$scheduleid.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
-                                       &nbsp;&nbsp;&nbsp;
-                                       <a href="?action=drop&id='.$scheduleid.'&name='.$title.'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel Session</font></button></a>
+                                            <a href="?action=view&id=' . urlencode($scheduleid) . '" class="non-style-link">
+                                                <button class="btn-primary-soft btn button-icon btn-view" style="padding: 12px 40px;margin-top: 10px;">
+                                                    <font class="tn-in-text">View</font>
+                                                </button>
+                                            </a>
                                         </div>
-                                        </td>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;justify-content: center;">
+                                            <a href="?action=drop&id=' . urlencode($scheduleid) . '&name=' . urlencode(urlencode($title)) . '" class="non-style-link">
+                                                <button class="btn-primary-soft btn button-icon btn-delete" style="padding: 12px 40px;margin-top: 10px;">
+                                                    <font class="tn-in-text">Cancel Session</font>
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </td>
                                     </tr>';
                                     
                                 }
@@ -295,10 +337,10 @@
     <?php
     
     if($_GET){
-        $id=$_GET["id"];
-        $action=$_GET["action"];
+        $id = htmlspecialchars($_GET["id"], ENT_QUOTES, 'UTF-8');
+        $action = htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8');
         if($action=='drop'){
-            $nameget=$_GET["name"];
+            $nameget = htmlspecialchars($_GET["name"]);
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -310,7 +352,13 @@
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
-                        <a href="delete-session.php?id='.$id.'" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"<font class="tn-in-text">&nbsp;Yes&nbsp;</font></button></a>&nbsp;&nbsp;&nbsp;
+                        <form action="delete-session.php" method="POST" class="non-style-link">
+                            <input type="hidden" name="id" value="' . urlencode($id) . '">
+                            <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
+                            <button type="submit" class="btn-primary btn" style="margin: 10px; padding: 10px;">
+                                <font class="tn-in-text">&nbsp;&nbsp;Yes&nbsp;&nbsp;</font>
+                            </button>
+                        </form>
                         <a href="schedule.php" class="non-style-link"><button  class="btn-primary btn"  style="display: flex;justify-content: center;align-items: center;margin:10px;padding:10px;"><font class="tn-in-text">&nbsp;&nbsp;No&nbsp;&nbsp;</font></button></a>
 
                         </div>
@@ -322,11 +370,11 @@
             $sqlmain= "select schedule.scheduleid,schedule.title,doctor.docname,schedule.scheduledate,schedule.scheduletime,schedule.nop from schedule inner join doctor on schedule.docid=doctor.docid  where  schedule.scheduleid=$id";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $docname=$row["docname"];
-            $scheduleid=$row["scheduleid"];
-            $title=$row["title"];
-            $scheduledate=$row["scheduledate"];
-            $scheduletime=$row["scheduletime"];
+            $docname = htmlspecialchars($row["docname"]);
+            $title = htmlspecialchars($row["title"]);
+            $scheduledate = htmlspecialchars($row["scheduledate"]);
+            $scheduletime = htmlspecialchars($row["scheduletime"]);
+            $nop = htmlspecialchars($row['nop']);
             
            
             $nop=$row['nop'];
@@ -455,10 +503,10 @@
                                          else{
                                          for ( $x=0; $x<$result->num_rows;$x++){
                                              $row=$result->fetch_assoc();
-                                             $apponum=$row["apponum"];
-                                             $pid=$row["pid"];
-                                             $pname=$row["pname"];
-                                             $ptel=$row["ptel"];
+                                             $apponum=htmlspecialchars($row["apponum"]);
+                                             $pid= htmlspecialchars($row["pid"]);
+                                             $pname= htmlspecialchars($row["pname"]);
+                                             $ptel= htmlspecialchars($row["ptel"]);
                                              
                                              echo '<tr style="text-align:center;">
                                                 <td>
@@ -476,16 +524,11 @@
                                                  '.substr($ptel,0,25).'
                                                  </td>
                                                  
-                                                 
-                
-                                                 
                                              </tr>';
                                              
                                          }
                                      }
-                                          
-                                     
-                
+
                                     echo '</tbody>
                 
                                  </table>
