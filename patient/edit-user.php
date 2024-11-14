@@ -8,13 +8,21 @@
     include("../connection.php");
 
     // import EncryptionUtil
-    require "utils/encryption-util.php";
+    require "../utils/encryption-util.php";
     include('../csrf_helper.php');
     use function Utils\encrypt;    
 
     if($_POST){
 
         if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+
+            if (isset($_COOKIE[session_name()])) {
+                setcookie(session_name(), '', time()-86400, '/');
+            }
+    
+            session_unset();
+            session_destroy();
+            
             header('Location: ../login.php?csrf=true');
             exit();
         }
