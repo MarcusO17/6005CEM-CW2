@@ -51,8 +51,9 @@
     include("../connection.php");
     $userrow = $database->query("select * from doctor where docemail='$useremail'");
     $userfetch=$userrow->fetch_assoc();
-    $userid= $userfetch["docid"];
-    $username=$userfetch["docname"];
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
+    
 
     // import EncryptionUtil
     require "../utils/encryption-util.php";
@@ -140,10 +141,10 @@
                                 echo $today;
 
 
-                                $patientrow = $database->query("select  * from  patient;");
-                                $doctorrow = $database->query("select  * from  doctor;");
-                                $appointmentrow = $database->query("select  * from  appointment where appodate>='$today';");
-                                $schedulerow = $database->query("select  * from  schedule where scheduledate='$today';");
+                                // $patientrow = $database->query("select  * from  patient;");
+                                // $doctorrow = $database->query("select  * from  doctor;");
+                                // $appointmentrow = $database->query("select  * from  appointment where appodate>='$today';");
+                                // $schedulerow = $database->query("select  * from  schedule where scheduledate='$today';");
 
 
                                 ?>
@@ -167,7 +168,7 @@
                             </tr>
                             <tr>
                                 <td style="width: 25%;">
-                                    <a href="?action=edit&id=<?php echo $userid ?>&error=0" class="non-style-link">
+                                    <a href="?action=edit&id=<?php echo urlencode($userid) ?>&error=0" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/doctors-hover.svg');"></div>
                                         <div>
@@ -193,7 +194,7 @@
                             </tr>
                             <tr>
                             <td style="width: 25%;">
-                                    <a href="?action=view&id=<?php echo $userid ?>" class="non-style-link">
+                                    <a href="?action=view&id=<?php echo urlencode($userid) ?>" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting " style="background-image: url('../img/icons/view-iceblue.svg');"></div>
                                         <div>
@@ -218,7 +219,7 @@
                             </tr>
                             <tr>
                             <td style="width: 25%;">
-                                    <a href="?action=drop&id=<?php echo $userid.'&name='.$username ?>" class="non-style-link">
+                                    <a href="?action=drop&id=<?php echo urlencode($userid).'&name='.urlencode($username) ?>" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/patients-hover.svg');"></div>
                                         <div>
@@ -274,15 +275,15 @@
             $sqlmain= "select * from doctor where docid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
             
             $spcil_res= $database->query("select sname from specialties where id='$spe'");
             $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
             $nic=decrypt($row['docnic']);
-            $tele=$row['doctel'];
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
@@ -373,18 +374,26 @@
             </div>
             ';
         }elseif($action=='edit'){
-            $sqlmain= "select * from doctor where docid='$id'";
-            $result= $database->query($sqlmain);
-            $row=$result->fetch_assoc();
-            $name=$row["docname"];
-            $email=$row["docemail"];
-            $spe=$row["specialties"];
+            $sqlmain = "SELECT * FROM doctor WHERE docid = ?";
+            $stmt = $database->prepare($sqlmain);
+            $stmt->bind_param("i", $id);  // "i" means the id parameter is an integer
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+            $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
+
             
-            $spcil_res= $database->query("select sname from specialties where id='$spe'");
-            $spcil_array= $spcil_res->fetch_assoc();
-            $spcil_name=$spcil_array["sname"];
+            $sql = "SELECT sname FROM specialties WHERE id = ?";
+            $stmt = $database->prepare($sql);
+            $stmt->bind_param("s", $spe);  // "s" means the parameter is a string
+            $stmt->execute();
+            $spcil_res = $stmt->get_result();
+            $spcil_array = $spcil_res->fetch_assoc();
+            $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
             $nic=decrypt($row['docnic']);
-            $tele=$row['doctel'];
+            $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
 
             $error_1=$_GET["error"];
                 $errorlist= array(
@@ -393,6 +402,7 @@
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
                     '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
+                    '6'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Name must only contain letters, spaces, hyphens, and apostrophese.</label>',
                     '0'=>'',
 
                 );
@@ -540,7 +550,7 @@
                             <h2>Edit Successfully!</h2>
                             <a class="close" href="settings.php">&times;</a>
                             <div class="content">
-                                If You change your email also Please logout and login again with your new email
+                                If the changes are not reflected, please log out and log in again. 
                                 
                             </div>
                             <div style="display: flex;justify-content: center;">
