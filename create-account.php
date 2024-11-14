@@ -56,8 +56,8 @@ if($_POST){
 
     $result= $database->query("select * from webuser");
     
-    $email=$_POST['newemail'];
-    $tele=$_POST['tele'];
+    $email = filter_var(trim($_POST['newemail']), FILTER_SANITIZE_EMAIL);
+    $tele = filter_var(trim($_POST['tele']), FILTER_SANITIZE_STRING);
     $newpassword=$_POST['newpassword'];
     $cpassword=$_POST['cpassword'];
 

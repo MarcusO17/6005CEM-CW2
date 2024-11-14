@@ -166,13 +166,41 @@
                     
                 </tr>
                 <?php
-                    if($_POST){
-                        $keyword=$_POST["search"];
+                    if ($_POST) {
+                        // Get and sanitize the search input
+                        $keyword = $_POST["search"];
                         
-                        $sqlmain= "select * from doctor where docemail='$keyword' or docname='$keyword' or docname like '$keyword%' or docname like '%$keyword' or docname like '%$keyword%'";
-                    }else{
-                        $sqlmain= "select * from doctor order by docid desc";
-
+                        // Prepare the SQL statement with placeholders
+                        $sqlmain = "
+                            SELECT * FROM doctor
+                            WHERE docemail = ? 
+                            OR docname = ? 
+                            OR docname LIKE CONCAT(?, '%') 
+                            OR docname LIKE CONCAT('%', ?) 
+                            OR docname LIKE CONCAT('%', ?, '%')
+                        ";
+                        
+                        // Prepare the statement
+                        if ($stmt = $database->prepare($sqlmain)) {
+                            // Bind the same keyword to each placeholder
+                            $stmt->bind_param("sssss", $keyword, $keyword, $keyword, $keyword, $keyword);
+                            
+                            // Execute the statement
+                            $stmt->execute();
+                            
+                            // Get the result set
+                            $result = $stmt->get_result();
+                            
+                            // Close the statement
+                            $stmt->close();
+                        } else {
+                            // Handle error
+                            echo "Error preparing the statement: " . $database->error;
+                        }
+                    } else {
+                        // Default query without search input
+                        $sqlmain = "SELECT * FROM doctor ORDER BY docid DESC";
+                        $result = $database->query($sqlmain);
                     }
 
 
@@ -211,7 +239,7 @@
                             <?php
 
                                 
-                                $result= $database->query($sqlmain);
+                                // $result= $database->query(query: $sqlmain);
 
                                 if($result->num_rows==0){
                                     echo '<tr>
@@ -233,13 +261,13 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $docid=$row["docid"];
-                                    $name=$row["docname"];
-                                    $email=$row["docemail"];
-                                    $spe=$row["specialties"];
+                                    $docid = htmlspecialchars($row["docid"], ENT_QUOTES, 'UTF-8');
+                                    $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                    $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+                                    $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
                                     $spcil_res= $database->query("select sname from specialties where id='$spe'");
-                                    $spcil_array= $spcil_res->fetch_assoc();
-                                    $spcil_name=$spcil_array["sname"];
+                                    $spcil_array = $spcil_res->fetch_assoc();
+                                    $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($name,0,30)
@@ -601,6 +629,7 @@
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
                     '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
+                    '6'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Name can only contain letters, spaces, hyphens, and apostrophes</label>',
                     '0'=>'',
 
                 );

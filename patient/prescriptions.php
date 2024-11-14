@@ -149,12 +149,26 @@
                     </td>
                 </tr>
                 <?php
-                    $keyword = $_POST["search"] ?? '';
-                    $sqlmain = $keyword ? 
-                        "SELECT * FROM prescription WHERE medication LIKE '%$keyword%' OR additional_notes LIKE '%$keyword%'" : 
-                        "SELECT * FROM prescription WHERE pid ='$userid'";
+                    $keyword = '';
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["search"])) {
+                        // Sanitize input for HTML
+                        $keyword = htmlspecialchars(trim($_POST["search"]), ENT_QUOTES, 'UTF-8');
                     
-                    $result = $database->query($sqlmain);
+                        // Prepare the SQL query with wildcard search
+                        $sqlmain = "SELECT * FROM prescription WHERE (medication LIKE ? OR additional_notes LIKE ?) AND pid = ?";
+                        $stmt = $database->prepare($sqlmain);
+                        $search_param = "%" . $database->real_escape_string($keyword) . "%";
+                        $stmt->bind_param("ssi", $search_param, $search_param, $userid);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                    } else {
+                        // Default query to fetch all prescriptions for the user
+                        $sqlmain = "SELECT * FROM prescription WHERE pid = ?";
+                        $stmt = $database->prepare($sqlmain);
+                        $stmt->bind_param("i", $userid);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                    }
                 ?>
                 <tr>
                     <td colspan="4" style="padding-top:10px;">

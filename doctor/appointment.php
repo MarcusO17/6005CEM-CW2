@@ -227,21 +227,21 @@
                             <tr>
                                 <td width="10%">
 
-                                </td>
-                                <td width="5%" style="text-align: center;">
-                                    Date:
-                                </td>
-                                <td width="30%">
-                                    <form action="" method="post">
-
-                                        <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" style="margin: 0;width: 95%;">
-
-                                </td>
-
-                                <td width="12%">
-                                    <input type="submit" name="filter" value=" Filter" class=" btn-primary-soft btn button-icon btn-filter" style="padding: 15px; margin :0;width:100%">
-                                    </form>
-                                </td>
+                           </td> 
+                        <td width="5%" style="text-align: center;">
+                        Date:
+                        <td width="30%">
+                            <form action="" method="post">
+                                <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" 
+                                    style="margin: 0;width: 95%;" 
+                                    min="1999-01-01" max="2099-12-31">
+                            </form>
+                        </td>
+                        
+                    <td width="12%">
+                        <input type="submit"  name="filter" value=" Filter" class=" btn-primary-soft btn button-icon btn-filter"  style="padding: 15px; margin :0;width:100%">
+                        </form>
+                    </td>
 
                             </tr>
                         </table>
@@ -256,16 +256,17 @@
 
             $sqlmain = "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pid,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ";
 
-            if ($_POST) {
-                //print_r($_POST);
+                    if($_POST){
+                        //print_r($_POST);
+                        
 
 
+                        
 
-
-                if (!empty($_POST["sheduledate"])) {
-                    $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
-                    $sqlmain .= " AND schedule.scheduledate = ?";
-                };
+                        if(!empty($_POST["sheduledate"])){
+                            $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
+                            $sqlmain .= " AND schedule.scheduledate = ?";
+                        };
 
 
 
