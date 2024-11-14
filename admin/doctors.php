@@ -261,13 +261,13 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $docid=$row["docid"];
-                                    $name=$row["docname"];
-                                    $email=$row["docemail"];
-                                    $spe=$row["specialties"];
+                                    $docid = htmlspecialchars($row["docid"], ENT_QUOTES, 'UTF-8');
+                                    $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                    $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
+                                    $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
                                     $spcil_res= $database->query("select sname from specialties where id='$spe'");
-                                    $spcil_array= $spcil_res->fetch_assoc();
-                                    $spcil_name=$spcil_array["sname"];
+                                    $spcil_array = $spcil_res->fetch_assoc();
+                                    $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
                                     echo '<tr>
                                         <td> &nbsp;'.
                                         substr($name,0,30)
@@ -629,6 +629,7 @@
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
                     '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
+                    '6'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Name can only contain letters, spaces, hyphens, and apostrophes</label>',
                     '0'=>'',
 
                 );
