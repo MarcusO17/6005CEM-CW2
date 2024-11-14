@@ -42,24 +42,37 @@ if($_POST){
     $lname = filter_var(trim($_POST['lname']), FILTER_SANITIZE_STRING);
     $address = filter_var(trim($_POST['address']), FILTER_SANITIZE_STRING);
     $nic = filter_var(trim($_POST['nic']), FILTER_SANITIZE_STRING);
-    $dob = filter_var(trim($_POST['dob']), FILTER_SANITIZE_STRING);
+    $dob = filter_var(trim($_POST['dob']), filter: FILTER_SANITIZE_STRING);
 
-    // Basic validation example
+    // allows uppercase, lowercase, hyphen, apostrophe, and space
     if (!preg_match("/^[a-zA-Z-' ]*$/", $fname) || !preg_match("/^[a-zA-Z-' ]*$/", $lname)) {
-        die("Invalid name format");
+        $name_error = 'Invalid name format. Only letters, spaces, hyphens, and apostrophes are allowed.';
     }
 
-    $_SESSION["personal"]=array(
-        'fname' => htmlspecialchars($fname, ENT_QUOTES, 'UTF-8'),
-        'lname' => htmlspecialchars($lname, ENT_QUOTES, 'UTF-8'),
-        'address' => htmlspecialchars($address, ENT_QUOTES, 'UTF-8'),
-        'nic' => htmlspecialchars($nic, ENT_QUOTES, 'UTF-8'),
-        'dob' => htmlspecialchars($dob, ENT_QUOTES, 'UTF-8')
-    );
+    // Validate Date of Birth (DOB) - check if DOB is at least 18 years old
+    $dob_date = new DateTime($dob);
+    $today = new DateTime($date); // Today's date
+    $age = $today->diff($dob_date)->y; // Get the age in years
+
+    if ($age < 18) {
+        $dob_error = 'You must be at least 18 years old to register.';
+    }
+
+
+    // Only proceed if there is no error
+    if (!isset($name_error)&& !isset($dob_error)) {
+        $_SESSION["personal"] = array(
+            'fname' => htmlspecialchars($fname, ENT_QUOTES, 'UTF-8'),
+            'lname' => htmlspecialchars($lname, ENT_QUOTES, 'UTF-8'),
+            'address' => htmlspecialchars($address, ENT_QUOTES, 'UTF-8'),
+            'nic' => htmlspecialchars($nic, ENT_QUOTES, 'UTF-8'),
+            'dob' => htmlspecialchars($dob, ENT_QUOTES, 'UTF-8')
+        );
+    
 
     print_r($_SESSION["personal"]);
     header("location: create-account.php");
-}
+}}
 
 ?>
 
@@ -73,6 +86,7 @@ if($_POST){
                     <p class="sub-text">Add Your Personal Details to Continue</p>
                 </td>
             </tr>
+            
             <tr>
                 <form action="" method="POST" >
                 <input type="hidden" name="csrf_token" value="<?= generateCsrfToken(); ?>">
@@ -87,6 +101,12 @@ if($_POST){
                 </td>
                 <td class="label-td">
                     <input type="text" name="lname" class="input-text" placeholder="Last Name" required>
+                </td>
+            </tr>
+              <!-- Name Error Message Display -->
+              <tr>
+                <td colspan="2" style="text-align: center; color: red; font-size: 12px;">
+                    <?php echo isset($name_error) ? htmlspecialchars($name_error, ENT_QUOTES, 'UTF-8') : ''; ?>
                 </td>
             </tr>
             <tr>
@@ -117,6 +137,12 @@ if($_POST){
             <tr>
                 <td class="label-td" colspan="2">
                     <input type="date" name="dob" class="input-text" required>
+                </td>
+            </tr>
+            <!-- Date of Birth Error Message Display -->
+            <tr>
+                <td colspan="2" style="text-align: center; color: red; font-size: 12px;">
+                    <?php echo isset($dob_error) ? htmlspecialchars($dob_error, ENT_QUOTES, 'UTF-8') : ''; ?>
                 </td>
             </tr>
             <tr>
