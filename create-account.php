@@ -42,6 +42,14 @@ define("OTP_EXPIRY", 30);
 if($_POST){
 
     if (!isset($_POST['csrf_token']) || !validateCsrfToken($_POST['csrf_token'])) {
+
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', time()-86400, '/');
+        }
+
+        session_unset();
+        session_destroy();
+        
         header('Location: ../login.php?csrf=true');
         exit();
     }
