@@ -1,5 +1,6 @@
 <?php
-
+require "utils/encryption-util.php";
+use function Utils\encrypt;
 include("connection.php");
 
 session_start();
@@ -11,6 +12,7 @@ if ($_SESSION['otp'] == NULL) {
 
 $generatedOtp = $_SESSION['otp'];
 $expiryTime = $_SESSION['expiryTime'];
+
 
 $currentTime = time();
 if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
@@ -44,7 +46,7 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
     if($_SESSION['usertype'] == 'pnew'){
 
         $email = $_SESSION['credentials']['email'];
-        $password = $_SESSION['credentials']['newpassword'];
+        $password = $_SESSION['credentials']['password'];
         $tele =  $_SESSION['credentials']['tele'];
         $fname=$_SESSION['personal']['fname'];
         $lname=$_SESSION['personal']['lname'];
@@ -52,12 +54,10 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
         $address=$_SESSION['personal']['address'];
         $nic=$_SESSION['personal']['nic'];
         $dob=$_SESSION['personal']['dob'];
-    
+        // Encrypt sensitive data
+        $encrypted_nic = encrypt($nic);
 
-        $hashedpassword = password_hash($newpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
-
-        
-        $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$hashedpassword','$address','$encrypted_nic','$dob','$tele');");
+        $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$password','$address','$encrypted_nic','$dob','$tele');");
         $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
 
         $_SESSION["user"]=$email;

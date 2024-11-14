@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/animations.css">  
     <link rel="stylesheet" href="css/main.css">  
     <link rel="stylesheet" href="css/signup.css">
+    <link rel="stylesheet" href="css/otp.css">
         
     <title>Create Account</title>
     <style>
@@ -35,9 +36,7 @@ $_SESSION["date"]=$date;
 //import database
 include("connection.php");
 include("csrf_helper.php");
-// import EncryptionUtil
-require "utils/encryption-util.php";
-use function Utils\encrypt;
+define("OTP_EXPIRY", 30);
 
 
 if($_POST){
@@ -54,12 +53,6 @@ if($_POST){
     $newpassword=$_POST['newpassword'];
     $cpassword=$_POST['cpassword'];
 
-    $_SESSION["credentials"]=array(
-        'email'=>$email,
-        'tele'=>$tele,
-        'password'=>$newpassword,
-      );
-
     //ReGex Policy (1 digit,lowercase,uppercase and 8-64 length, any character non spaces.)
     $passwordPolicy = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,64}$/";
 
@@ -75,14 +68,18 @@ if($_POST){
         $stmt->bind_param("s",$email);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        // Encrypt sensitive data
-        $encrypted_nic = encrypt($nic);
+    
 
         if ($result->num_rows==1) {
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>';
         }else{
             $OTPSettings = getOTP();
+
+            $_SESSION['credentials']=array(
+                'password'=> password_hash($cpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]),
+                'tele'=>$tele,
+                'email'=>$email,
+              );
 
             $_SESSION['otp'] = $OTPSettings['otp'];
             $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
