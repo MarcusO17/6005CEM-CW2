@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/animations.css">  
     <link rel="stylesheet" href="css/main.css">  
     <link rel="stylesheet" href="css/signup.css">
+    <link rel="stylesheet" href="css/otp.css">
         
     <title>Create Account</title>
     <style>
@@ -35,9 +36,7 @@ $_SESSION["date"]=$date;
 //import database
 include("connection.php");
 include("csrf_helper.php");
-// import EncryptionUtil
-require "utils/encryption-util.php";
-use function Utils\encrypt;
+define("OTP_EXPIRY", 30);
 
 
 if($_POST){
@@ -56,13 +55,7 @@ if($_POST){
     }
 
     $result= $database->query("select * from webuser");
-
-    $fname=$_SESSION['personal']['fname'];
-    $lname=$_SESSION['personal']['lname'];
-    $name=$fname." ".$lname;
-    $address=$_SESSION['personal']['address'];
-    $nic=$_SESSION['personal']['nic'];
-    $dob=$_SESSION['personal']['dob'];
+    
     $email=$_POST['newemail'];
     $tele=$_POST['tele'];
     $newpassword=$_POST['newpassword'];
@@ -83,26 +76,27 @@ if($_POST){
         $stmt->bind_param("s",$email);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        // Encrypt sensitive data
-        $encrypted_nic = encrypt($nic);
+    
 
         if ($result->num_rows==1) {
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>';
         }else{
-            //TODO
-            //Password Hashing
-            $hashedpassword = password_hash($newpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]);
+            $OTPSettings = getOTP();
 
-            $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$hashedpassword','$address','$encrypted_nic','$dob','$tele');");
-            $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
+            $_SESSION['credentials']=array(
+                'password'=> password_hash($cpassword, PASSWORD_ARGON2ID, ['memory_cost' => 19456, 'time_cost' => 2, 'threads' => 1]),
+                'tele'=>$tele,
+                'email'=>$email,
+              );
 
-            //print_r("insert into patient values($pid,'$email','$fname','$lname','$newpassword','$address','$nic','$dob','$tele');");
-            $_SESSION["user"]=$email;
-            $_SESSION["usertype"]="p";
-            $_SESSION["username"]=$fname;
+            $_SESSION['otp'] = $OTPSettings['otp'];
+            $_SESSION['expiryTime'] = $OTPSettings['expiryTime'];
+            $_SESSION['user'] = $email;
+            $_SESSION['usertype'] = 'pnew';
 
-            header('Location: patient/index.php');
+            sendOTP($email);
+
+            
             $error='<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>';
         }
     }
@@ -112,6 +106,75 @@ if($_POST){
     $error='<label for="promter" class="form-label"></label>';
 }
 
+
+function sendMail($email, $otp)
+{
+    $data = [
+        'Messages' => [
+            [
+                'From' => [
+                    'Email' => getenv("SenderEmail"),
+                    'Name' => "EDoc Services"
+                ],
+                'To' => [
+                    [
+                        'Email' => $email,
+                        'Name' => ""
+                    ]
+                ],
+                'Subject' => "Your OTP for Edoc Services",
+                'HTMLPart' => "<h3>Dear User, Here is your OTP <b>$otp</b>, Your OTP expires in 30 seconds.</h3><br />"
+            ]
+        ]
+    ];
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, "https://api.mailjet.com/v3.1/send");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_USERPWD, getenv("MJPublicKey") . ":" . getenv("MJSecretKey"));
+    curl_exec($ch);
+    curl_close($ch);
+}
+
+function getOTP()
+{
+    $otp = rand(100000, 999999);
+    $expiryTime = time() + OTP_EXPIRY;
+    return ['otp' => $otp, 'expiryTime' => $expiryTime];
+}
+
+function sendOTP($email)
+{
+    //sendMail($email,$_SESSION['otp']);
+
+    echo '<div id="popup1" class="overlay">
+                            <div class="popup">
+                                <div class="popup-content">
+                                    <div class="content-wrapper">
+                                        <div class="abc">
+                                            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 5px;">Enter OTP</h3>
+                                            <p style="color: grey; font-size: 14px; margin-bottom: 20px;">Please enter the verification code sent to your email in <b>30 seconds.</b></p>
+                                            <form action="verify_otp.php" method="POST" id="otpForm">
+                                                <div class="otp-input-group">
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                    <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
+                                            </form>';
+    echo "<p>{$_SESSION['otp']}</p>";
+    echo  '</div>
+                                    </div>
+                                </div>
+                            </div>';
+}
 ?>
 
     <center>
