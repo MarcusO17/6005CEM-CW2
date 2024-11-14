@@ -58,9 +58,15 @@ if($_POST){
         $dob_error = 'You must be at least 18 years old to register.';
     }
 
+    //validate address
+    if (strlen($address) < 5 || strlen($address) > 255) {
+        $address_error = 'Address must be between 5 and 255 characters.';
+    } elseif (!preg_match("/^[a-zA-Z0-9\s,.-]*$/", $address)) {
+        $address_error = 'Address contains invalid characters. Only letters, numbers, spaces, commas, periods, and hyphens are allowed.';
+    }
 
     // Only proceed if there is no error
-    if (!isset($name_error)&& !isset($dob_error)) {
+    if (!isset($name_error)&& !isset($dob_error)&& !isset($address_error)) {
         $_SESSION["personal"] = array(
             'fname' => htmlspecialchars($fname, ENT_QUOTES, 'UTF-8'),
             'lname' => htmlspecialchars($lname, ENT_QUOTES, 'UTF-8'),
@@ -117,6 +123,12 @@ if($_POST){
             <tr>
                 <td class="label-td" colspan="2">
                     <input type="text" name="address" class="input-text" placeholder="Address" required>
+                </td>
+            </tr>
+            <!-- Address Error Message Display -->
+            <tr>
+                <td colspan="2" style="text-align: center; color: red; font-size: 12px;">
+                    <?php echo isset($address_error) ? htmlspecialchars($address_error, ENT_QUOTES, 'UTF-8') : ''; ?>
                 </td>
             </tr>
             <tr>
