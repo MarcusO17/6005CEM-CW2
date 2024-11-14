@@ -120,14 +120,14 @@
         </div>
         <?php
 
-                $sqlmain= "select * from schedule inner join doctor on schedule.docid=doctor.docid where schedule.scheduledate>='$today'  order by schedule.scheduledate asc";
+                
                 $sqlpt1="";
                 $insertkey="";
                 $q='';
                 $searchtype="All";
                 if (!empty($_POST["search"])) {
                     // Sanitize the input
-                    $keyword = filter_input(INPUT_POST, "search", FILTER_SANITIZE_STRING);
+                    $keyword = filter_input(type: INPUT_POST, var_name: "search", filter: FILTER_SANITIZE_STRING);
                     $keyword = trim($keyword); // Remove any leading or trailing spaces
                 
                     // Prepare the query with placeholders for safe input
@@ -167,14 +167,14 @@
                     $stmt->execute();
                     $result = $stmt->get_result();
                 
-                    $insertkey = htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8'); // Safely encode for HTML
+                    $insertkey = filter_var($keyword, FILTER_SANITIZE_STRING); // Safely encode for HTML
                     $searchtype = "Search Result : ";
                     $q = '"';
                 }
-
-
-                $result= $database->query($sqlmain)
-
+                else{
+                $sqlmain= "select * from schedule inner join doctor on schedule.docid=doctor.docid where schedule.scheduledate>='$today'  order by schedule.scheduledate asc";
+                $result= $database->query($sqlmain);
+                }
 
                 ?>
                   
