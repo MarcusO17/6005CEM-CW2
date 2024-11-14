@@ -37,12 +37,24 @@ if($_POST){
         exit();
     }
 
+    // Sanitize and validate inputs
+    $fname = filter_var(trim($_POST['fname']), FILTER_SANITIZE_STRING);
+    $lname = filter_var(trim($_POST['lname']), FILTER_SANITIZE_STRING);
+    $address = filter_var(trim($_POST['address']), FILTER_SANITIZE_STRING);
+    $nic = filter_var(trim($_POST['nic']), FILTER_SANITIZE_STRING);
+    $dob = filter_var(trim($_POST['dob']), FILTER_SANITIZE_STRING);
+
+    // Basic validation example
+    if (!preg_match("/^[a-zA-Z-' ]*$/", $fname) || !preg_match("/^[a-zA-Z-' ]*$/", $lname)) {
+        die("Invalid name format");
+    }
+
     $_SESSION["personal"]=array(
-        'fname'=>$_POST['fname'],
-        'lname'=>$_POST['lname'],
-        'address'=>$_POST['address'],
-        'nic'=>$_POST['nic'],
-        'dob'=>$_POST['dob']
+        'fname' => htmlspecialchars($fname, ENT_QUOTES, 'UTF-8'),
+        'lname' => htmlspecialchars($lname, ENT_QUOTES, 'UTF-8'),
+        'address' => htmlspecialchars($address, ENT_QUOTES, 'UTF-8'),
+        'nic' => htmlspecialchars($nic, ENT_QUOTES, 'UTF-8'),
+        'dob' => htmlspecialchars($dob, ENT_QUOTES, 'UTF-8')
     );
 
     print_r($_SESSION["personal"]);
