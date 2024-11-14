@@ -8,7 +8,7 @@
     include("../connection.php");
 
     // import EncryptionUtil
-    require "utils/encryption-util.php";
+    require "../utils/encryption-util.php";
     include('../csrf_helper.php');
     use function Utils\encrypt;    
 
