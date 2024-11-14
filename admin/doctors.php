@@ -166,13 +166,41 @@
                     
                 </tr>
                 <?php
-                    if($_POST){
-                        $keyword=$_POST["search"];
+                    if ($_POST) {
+                        // Get and sanitize the search input
+                        $keyword = $_POST["search"];
                         
-                        $sqlmain= "select * from doctor where docemail='$keyword' or docname='$keyword' or docname like '$keyword%' or docname like '%$keyword' or docname like '%$keyword%'";
-                    }else{
-                        $sqlmain= "select * from doctor order by docid desc";
-
+                        // Prepare the SQL statement with placeholders
+                        $sqlmain = "
+                            SELECT * FROM doctor
+                            WHERE docemail = ? 
+                            OR docname = ? 
+                            OR docname LIKE CONCAT(?, '%') 
+                            OR docname LIKE CONCAT('%', ?) 
+                            OR docname LIKE CONCAT('%', ?, '%')
+                        ";
+                        
+                        // Prepare the statement
+                        if ($stmt = $database->prepare($sqlmain)) {
+                            // Bind the same keyword to each placeholder
+                            $stmt->bind_param("sssss", $keyword, $keyword, $keyword, $keyword, $keyword);
+                            
+                            // Execute the statement
+                            $stmt->execute();
+                            
+                            // Get the result set
+                            $result = $stmt->get_result();
+                            
+                            // Close the statement
+                            $stmt->close();
+                        } else {
+                            // Handle error
+                            echo "Error preparing the statement: " . $database->error;
+                        }
+                    } else {
+                        // Default query without search input
+                        $sqlmain = "SELECT * FROM doctor ORDER BY docid DESC";
+                        $result = $database->query($sqlmain);
                     }
 
 
@@ -211,7 +239,7 @@
                             <?php
 
                                 
-                                $result= $database->query($sqlmain);
+                                // $result= $database->query(query: $sqlmain);
 
                                 if($result->num_rows==0){
                                     echo '<tr>
