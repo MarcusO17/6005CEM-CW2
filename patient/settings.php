@@ -38,7 +38,7 @@
         if(($_SESSION["user"])=="" or $_SESSION['usertype']!='p'){
             header("location: ../login.php");
         }else{
-            $useremail=$_SESSION["user"];
+            $useremail = htmlspecialchars($_SESSION["user"], ENT_QUOTES, 'UTF-8');
         }
 
     }else{
@@ -56,7 +56,7 @@
     $result = $stmt->get_result();
     $userfetch=$result->fetch_assoc();
     $userid= $userfetch["pid"];
-    $username=$userfetch["pname"];
+    $username = htmlspecialchars($userfetch["pname"], ENT_QUOTES, 'UTF-8');
 
     // import EncryptionUtil
     require "../utils/encryption-util.php";
@@ -99,7 +99,7 @@
                 </tr>
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-session">
-                        <a href="prescriptions.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Prescriptions</p></a></div>
+                        <a href="prescriptions.php" class="non-style-link-menu"><div><p class="menu-text">My Prescriptions</p></a></div>
                     </td>
                 </tr>
                 <tr class="menu-row" >
@@ -145,10 +145,10 @@
                                 echo $today;
 
 
-                                $patientrow = $database->query("select  * from  patient;");
-                                $doctorrow = $database->query("select  * from  doctor;");
-                                $appointmentrow = $database->query("select  * from  appointment where appodate>='$today';");
-                                $schedulerow = $database->query("select  * from  schedule where scheduledate='$today';");
+                                // $patientrow = $database->query("select  * from  patient;");
+                                // $doctorrow = $database->query("select  * from  doctor;");
+                                // $appointmentrow = $database->query("select  * from  appointment where appodate>='$today';");
+                                // $schedulerow = $database->query("select  * from  schedule where scheduledate='$today';");
 
 
                                 ?>
@@ -172,7 +172,7 @@
                             </tr>
                             <tr>
                                 <td style="width: 25%;">
-                                    <a href="?action=edit&id=<?php echo $userid ?>&error=0" class="non-style-link">
+                                    <a href="?action=edit&id=<?php echo urlencode($userid) ?>&error=0" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/doctors-hover.svg');"></div>
                                         <div>
@@ -198,7 +198,7 @@
                             </tr>
                             <tr>
                             <td style="width: 25%;">
-                                    <a href="?action=view&id=<?php echo $userid ?>" class="non-style-link">
+                                    <a href="?action=view&id=<?php echo urlencode($userid) ?>" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting " style="background-image: url('../img/icons/view-iceblue.svg');"></div>
                                         <div>
@@ -223,7 +223,7 @@
                             </tr>
                             <tr>
                             <td style="width: 25%;">
-                                    <a href="?action=drop&id=<?php echo $userid.'&name='.$username ?>" class="non-style-link">
+                                    <a href="?action=drop&id=<?php echo urlencode($userid).'&name='.urlencode($username) ?>" class="non-style-link">
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/patients-hover.svg');"></div>
                                         <div>
@@ -288,13 +288,12 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
-            $address=$row["paddress"];
-            
-            $dob=$row["pdob"];
-            $nic=decrypt($row['pnic']);
-            $tele=$row['ptel'];
+            $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
+            $address = htmlspecialchars($row["paddress"], ENT_QUOTES, 'UTF-8');
+            $dob = htmlspecialchars($row["pdob"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars(decrypt($row['pnic']), ENT_QUOTES, 'UTF-8');
+            $tele = htmlspecialchars($row['ptel'], ENT_QUOTES, 'UTF-8');
 
             echo '
             <div id="popup1" class="overlay">
@@ -403,13 +402,12 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
-           
-            $address=$row["paddress"];
+            $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
+            $address = htmlspecialchars($row["paddress"], ENT_QUOTES, 'UTF-8');
             $nic=decrypt($row['pnic']);
-            $tele=$row['ptel'];
-
+            $tele = htmlspecialchars($row['ptel'], ENT_QUOTES, 'UTF-8');
+            
             $error_1=$_GET["error"];
                 $errorlist= array(
                     '1'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Already have an account for this Email address.</label>',
@@ -417,6 +415,8 @@
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
                     '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
+                    '6'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Name must only contain letters, spaces, hyphens, and apostrophes.</label>',
+                    '7'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Address must only contain letters, numbers, spaces, commas, periods, and hyphens.</label>',
                     '0'=>'',
 
                 );
@@ -549,7 +549,7 @@
                             <h2>Edit Successfully!</h2>
                             <a class="close" href="settings.php">&times;</a>
                             <div class="content">
-                                If You change your email also Please logout and login again with your new email
+                                If the changes are not reflected, please log out and log in again. 
                                 
                             </div>
                             <div style="display: flex;justify-content: center;">

@@ -57,7 +57,7 @@
             <div class='popup'>
                 <a href='login.php' class='close'>&times;</a>
                 <div class='error-message'>";
-        echo $_SESSION['otp_error_message'];
+        echo htmlspecialchars($_SESSION['otp_error_message'], ENT_QUOTES, 'UTF-8');
         unset($_SESSION['otp_error_message']);
         echo '
                 </div>
@@ -75,22 +75,34 @@
             exit();
         }
 
-        $email = $_POST['useremail'];
+         // Sanitize and validate email
+        $email = filter_var($_POST['useremail'], FILTER_SANITIZE_EMAIL);
         $password = $_POST['userpassword'];
 
         $error = '<label for="promter" class="form-label"></label>';
 
-        $result = $database->query("select * from webuser where email='$email'");
+        // Use prepared statement to prevent SQL injection
+        $stmt = $database->prepare("SELECT * FROM webuser WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             $locktime = $row["end_lockout"];
+
             if (!testAccountLock($locktime, $database, $email)) {
                 $utype = $row['usertype'];
                 if ($utype == 'p') {
                     //TODO
-                    $checker = $database->query("select * from patient where pemail='$email'");
-                    if ($checker->num_rows == 1) {
-                        $hashedpassword = $checker->fetch_assoc()['ppassword'];
+                    $checker = $database->prepare("SELECT * FROM patient WHERE pemail = ?");
+                    $checker->bind_param("s", $email);
+                    $checker->execute();
+                    $result = $checker->get_result();
+
+
+                    if ($result->num_rows == 1) {
+                        $hashedpassword = $result->fetch_assoc()['ppassword'];
                         if (password_verify($password, $hashedpassword)) {
                             $OTPSettings = getOTP();
 
@@ -108,10 +120,13 @@
                         $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials111: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
                     }
                 } elseif ($utype == 'a') {
-                    //TODO
-                    $checker = $database->query("select * from admin where aemail='$email'");
-                    if ($checker->num_rows == 1) {
-                        $hashedpassword = $checker->fetch_assoc()['apassword'];
+                    // Prepared statement to fetch admin record
+                    $checker = $database->prepare("SELECT * FROM admin WHERE aemail = ?");
+                    $checker->bind_param("s", $email); // Bind the email to the prepared statement
+                    $checker->execute();
+                    $result = $checker->get_result();
+                    if ($result->num_rows == 1) {
+                        $hashedpassword = $result->fetch_assoc()['apassword'];
                         if (password_verify($password, $hashedpassword)) {
 
                             session_regenerate_id(true);
@@ -131,10 +146,13 @@
                         $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
                     }
                 } elseif ($utype == 'd') {
-                    //TODO
-                    $checker = $database->query("select * from doctor where docemail='$email'");
-                    if ($checker->num_rows == 1) {
-                        $hashedpassword = $checker->fetch_assoc()['docpassword'];
+                    // Prepared statement to fetch doctor record
+                    $checker = $database->prepare("SELECT * FROM doctor WHERE docemail = ?");
+                    $checker->bind_param("s", $email);
+                    $checker->execute();
+                    $result = $checker->get_result();
+                    if ($result->num_rows == 1) {
+                        $hashedpassword = $result->fetch_assoc()['docpassword'];
                         if (password_verify($password, $hashedpassword)) {
 
                             $OTPSettings = getOTP();
@@ -170,7 +188,11 @@
     function recordFailedLogin($database, $email)
     {
 
-        $result = $database->query("select * from webuser where email='$email'");
+        $stmt = $database->prepare("SELECT * FROM webuser WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             if ($row != NULL) {
@@ -184,12 +206,16 @@
 
             if ($failedAttempts >= MAX_ATTEMPTS) {
                 $endDate = date('Y-m-d H:i:s', strtotime(LOCKOUT_DURATION, $lastfailedattempt));
-                $sql1 = "UPDATE webuser SET end_lockout='$endDate' where email='$email';";
-                $database->query($sql1);
+                $stmt = $database->prepare("UPDATE webuser SET end_lockout = ? WHERE email = ?");
+                $stmt->bind_param("ss", $endDate, $email);
+                $stmt->execute();
             } else {
                 $now = date('Y-m-d H:i:s');
-                $sql1 =  " UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt='$now' where email='$email';";
-                $database->query($sql1);
+
+                $stmt = $database ->prepare(" UPDATE webuser SET attempts='$failedAttempts', last_recorded_attempt='$now' where email='$email';");
+
+                $stmt->bind_param("iss", $failedAttempts, $now, $email);
+                $stmt->execute();
             }
         }
     }
@@ -208,10 +234,12 @@
         }
         return true;
     }
+
     function resetAccountLock($database, $email)
     {
-        $sql1 =  " UPDATE webuser SET attempts=NULL, last_recorded_attempt=NULL, end_lockout=NULL where email='$email';";
-        $database->query($sql1);
+        $stmt = $database->prepare("UPDATE webuser SET attempts = NULL, last_recorded_attempt = NULL, end_lockout = NULL WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
     }
 
 

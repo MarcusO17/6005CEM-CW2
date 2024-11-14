@@ -143,17 +143,18 @@
     </div>
     <?php
 
-    $insertkey = "";
-    $q = '';
-    $searchtype = "All";
-
-    if (!empty($_POST["search"])) {
-        // Sanitize the input
-        $keyword = filter_input(INPUT_POST, "search", FILTER_SANITIZE_STRING);
-        $keyword = trim($keyword); // Remove any leading or trailing spaces
-
-        // Prepare the query with placeholders for safe input
-        $sqlmain = "
+                
+                $sqlpt1="";
+                $insertkey="";
+                $q='';
+                $searchtype="All";
+                if (!empty($_POST["search"])) {
+                    // Sanitize the input
+                    $keyword = filter_input(type: INPUT_POST, var_name: "search", filter: FILTER_SANITIZE_STRING);
+                    $keyword = trim($keyword); // Remove any leading or trailing spaces
+                
+                    // Prepare the query with placeholders for safe input
+                    $sqlmain = "
                         SELECT * FROM schedule
                         INNER JOIN doctor ON schedule.docid = doctor.docid
                         WHERE schedule.scheduledate >= ?
@@ -198,7 +199,7 @@
         $stmt->execute();
         $result = $stmt->get_result();
 
-        $insertkey = htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8'); // Safely encode for HTML
+        $insertkey = filter_var($keyword, FILTER_SANITIZE_STRING); // Safely encode for HTML
         $searchtype = "Search Result : ";
         $q = '"';
     } else {

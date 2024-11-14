@@ -57,8 +57,16 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
         // Encrypt sensitive data
         $encrypted_nic = encrypt($nic);
 
-        $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$password','$address','$encrypted_nic','$dob','$tele');");
-        $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
+
+        // Insert data into the patient table
+        $stmt = $database->prepare("INSERT INTO patient (pemail, pname, ppassword, paddress, pnic, pdob, ptel) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssss", $email, $name, $password, $address, $encrypted_nic, $dob, $tele);
+        $stmt->execute();
+
+        // Insert data into the webuser table
+        $stmt = $database->prepare("INSERT INTO webuser (email, usertype, attempts, last_recorded_attempt, end_lockout) VALUES (?, 'p', 0, NULL, NULL)");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
 
         $_SESSION["user"]=$email;
         $_SESSION["usertype"]="p";

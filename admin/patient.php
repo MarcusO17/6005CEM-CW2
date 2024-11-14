@@ -161,13 +161,38 @@
                     
                 </tr>
                 <?php
-                    if($_POST){
-                        $keyword=$_POST["search"];
-                        
-                        $sqlmain= "select * from patient where pemail='$keyword' or pname='$keyword' or pname like '$keyword%' or pname like '%$keyword' or pname like '%$keyword%' ";
-                    }else{
-                        $sqlmain= "select * from patient order by pid desc";
-
+                    if ($_POST) {
+                        // Sanitize the search input
+                        $keyword = $_POST["search"];
+                    
+                        // Prepare the SQL query with placeholders for secure binding
+                        $sqlmain = "
+                            SELECT * FROM patient 
+                            WHERE pemail = ? 
+                            OR pname = ? 
+                            OR pname LIKE CONCAT(?, '%') 
+                            OR pname LIKE CONCAT('%', ?) 
+                            OR pname LIKE CONCAT('%', ?, '%')
+                        ";
+                    
+                        // Prepare the statement
+                        $stmt = $database->prepare($sqlmain);
+                    
+                        // Bind the same keyword to each placeholder
+                        $stmt->bind_param("sssss", $keyword, $keyword, $keyword, $keyword, $keyword);
+                    
+                        // Execute the statement
+                        $stmt->execute();
+                    
+                        // Get the result
+                        $result = $stmt->get_result();
+                    
+                        // Close the statement
+                        $stmt->close();
+                    } else {
+                        // Default query without search input
+                        $sqlmain = "SELECT * FROM patient ORDER BY pid DESC";
+                        $result = $database->query($sqlmain);
                     }
 
 
@@ -218,7 +243,7 @@
                             <?php
 
                                 
-                                $result= $database->query($sqlmain);
+                                // $result= $database->query($sqlmain);
 
                                 if($result->num_rows==0){
                                     echo '<tr>
@@ -240,12 +265,12 @@
                                 else{
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
-                                    $pid=$row["pid"];
-                                    $name=$row["pname"];
-                                    $email=$row["pemail"];
-                                    $nic=decrypt($row["pnic"]);
-                                    $dob=$row["pdob"];
-                                    $tel=$row["ptel"];
+                                    $pid = htmlspecialchars($row["pid"], ENT_QUOTES, 'UTF-8');
+                                    $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+                                    $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
+                                    $nic = htmlspecialchars(decrypt($row["pnic"]), ENT_QUOTES, 'UTF-8');
+                                    $dob = htmlspecialchars($row["pdob"], ENT_QUOTES, 'UTF-8');
+                                    $tel = htmlspecialchars($row["ptel"], ENT_QUOTES, 'UTF-8');
                                     
                                     echo '<tr>
                                         <td> &nbsp;'.
@@ -258,7 +283,7 @@
                                             '.substr($tel,0,10).'
                                         </td>
                                         <td>
-                                        '.substr($email,0,20).'
+                                        '.substr($email,0,30).'
                                          </td>
                                         <td>
                                         '.substr($dob,0,10).'
@@ -298,12 +323,12 @@
             $sqlmain= "select * from patient where pid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name=$row["pname"];
-            $email=$row["pemail"];
-            $nic=decrypt($row["pnic"]);
-            $dob=$row["pdob"];
-            $tele=$row["ptel"];
-            $address=$row["paddress"];
+            $pid = htmlspecialchars($row["pid"], ENT_QUOTES, 'UTF-8');
+            $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars(decrypt($row["pnic"]), ENT_QUOTES, 'UTF-8');
+            $dob = htmlspecialchars($row["pdob"], ENT_QUOTES, 'UTF-8');
+            $tel = htmlspecialchars($row["ptel"], ENT_QUOTES, 'UTF-8');
             echo '
             <div id="popup1" class="overlay">
                     <div class="popup">
