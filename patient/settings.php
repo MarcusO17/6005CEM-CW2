@@ -415,7 +415,7 @@
                     '3'=>'<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;"></label>',
                     '4'=>"",
                     '5'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Password must be at least 8 characters and less than 64 characters, include uppercase, lowercase, a number, and a special character.</label>',
-                    '6'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Only letters, spaces, hyphens, and apostrophes allowed for name.</label>',
+                    '6'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Name must only contain letters, spaces, hyphens, and apostrophes.</label>',
                     '7'=> '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Address must only contain letters, numbers, spaces, commas, periods, and hyphens.</label>',
                     '0'=>'',
 
