@@ -316,15 +316,15 @@
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $appoid=$row["appoid"];
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
-                                                    $pname=$row["pname"];
-                                                    $apponum=$row["apponum"];
-                                                    $appodate=$row["appodate"];
+                                                    $appoid = htmlspecialchars($row["appoid"], ENT_QUOTES, 'UTF-8');
+                                                    $scheduleid = htmlspecialchars($row["scheduleid"], ENT_QUOTES, 'UTF-8');
+                                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                                    $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                                    $scheduletime = htmlspecialchars($row["scheduletime"], ENT_QUOTES, 'UTF-8');
+                                                    $pname = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+                                                    $apponum = htmlspecialchars($row["apponum"], ENT_QUOTES, 'UTF-8');
+                                                    $appodate = htmlspecialchars($row["appodate"], ENT_QUOTES, 'UTF-8');
                                                     echo '<tr>
 
 
@@ -411,12 +411,12 @@
                                                 else{
                                                 for ( $x=0; $x<$result->num_rows;$x++){
                                                     $row=$result->fetch_assoc();
-                                                    $scheduleid=$row["scheduleid"];
-                                                    $title=$row["title"];
-                                                    $docname=$row["docname"];
-                                                    $scheduledate=$row["scheduledate"];
-                                                    $scheduletime=$row["scheduletime"];
-                                                    $nop=$row["nop"];
+                                                    $scheduleid = htmlspecialchars($row["scheduleid"], ENT_QUOTES, 'UTF-8');
+                                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                                    $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                                    $scheduletime = htmlspecialchars($row["scheduletime"], ENT_QUOTES, 'UTF-8');
+                                                    $nop = htmlspecialchars($row["nop"], ENT_QUOTES, 'UTF-8');
                                                     echo '<tr>
                                                         <td style="padding:20px;"> &nbsp;'.
                                                         substr($title,0,30)
