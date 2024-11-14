@@ -1,7 +1,7 @@
 <?php
 
     session_start();
-
+    include('../csrf_helper.php'); 
     include('../session_handler.php');
 
     if(isset($_SESSION["user"])){
