@@ -1,5 +1,6 @@
 <?php
-
+require "utils/encryption-util.php";
+use function Utils\encrypt;
 include("connection.php");
 
 session_start();
@@ -11,6 +12,7 @@ if ($_SESSION['otp'] == NULL) {
 
 $generatedOtp = $_SESSION['otp'];
 $expiryTime = $_SESSION['expiryTime'];
+
 
 $currentTime = time();
 if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
@@ -40,6 +42,33 @@ if ($otp == $generatedOtp && $currentTime <= $expiryTime) {
         include('session_handler.php');
         resetAccountLock($database, $_SESSION['user']);
         header('location: doctor/index.php');
+    }
+    if($_SESSION['usertype'] == 'pnew'){
+
+        $email = $_SESSION['credentials']['email'];
+        $password = $_SESSION['credentials']['password'];
+        $tele =  $_SESSION['credentials']['tele'];
+        $fname=$_SESSION['personal']['fname'];
+        $lname=$_SESSION['personal']['lname'];
+        $name=$fname." ".$lname;
+        $address=$_SESSION['personal']['address'];
+        $nic=$_SESSION['personal']['nic'];
+        $dob=$_SESSION['personal']['dob'];
+        // Encrypt sensitive data
+        $encrypted_nic = encrypt($nic);
+
+        $database->query("insert into patient(pemail,pname,ppassword, paddress, pnic,pdob,ptel) values('$email','$name','$password','$address','$encrypted_nic','$dob','$tele');");
+        $database->query("insert into webuser values('$email','p',0,NULL,NULL)");
+
+        $_SESSION["user"]=$email;
+        $_SESSION["usertype"]="p";
+        $_SESSION["username"]=$fname;
+        $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+        $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+        include('session_handler.php');
+
+        header('Location: patient/index.php');
     }
 } else {
     if ($currentTime > $expiryTime) {

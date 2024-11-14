@@ -1,24 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/animations.css">  
-    <link rel="stylesheet" href="../css/main.css">  
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/admin.css">
 
-        
+
     <title>Appointments</title>
     <style>
-        .popup{
+        .popup {
             animation: transitionIn-Y-bottom 0.5s;
+            padding: 40px 20px;
         }
-        .sub-table{
+
+        .sub-table {
             animation: transitionIn-Y-bottom 0.5s;
+            max-width: 100%;
+            margin: 20px auto;
         }
-</style>
+
+        .input-text {
+            border: 2px solid #e5e5e5;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-text:focus {
+            border-color: #4c84ff;
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #2d2d2d;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .label-td {
+            padding: 10px 0;
+        }
+
+        textarea.input-text {
+            font-family: inherit;
+            line-height: 1.4;
+        }
+    </style>
 </head>
+
 <body>
     <?php
 
@@ -28,106 +66,126 @@
 
     include('../session_handler.php');
 
-    if(isset($_SESSION["user"])){
-        if(($_SESSION["user"])=="" or $_SESSION['usertype']!='d'){
+    if (isset($_SESSION["user"])) {
+        if (($_SESSION["user"]) == "" or $_SESSION['usertype'] != 'd') {
             header("location: ../login.php");
-        }else{
-            $useremail=$_SESSION["user"];
+        } else {
+            $useremail = $_SESSION["user"];
         }
-
-    }else{
+    } else {
         header("location: ../login.php");
     }
-    
-    
 
-       //import database
-       include("../connection.php");
-       include('../csrf_helper.php');
 
-       // Fetch doctor's data using prepared statement
-        $sqlmain = "SELECT * FROM doctor WHERE docemail = ?";
-        $stmt = $database->prepare($sqlmain);
-        $stmt->bind_param("s", $useremail);
-        $stmt->execute();
-        $userrow = $stmt->get_result();
-        $userfetch = $userrow->fetch_assoc();
-        $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
-        $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
 
-     // import EncryptionUtil
-     require "../utils/encryption-util.php";
-     use function Utils\decrypt;
+    //import database
+    include("../connection.php");
+    include('../csrf_helper.php');
+
+    // Fetch doctor's data using prepared statement
+    $sqlmain = "SELECT * FROM doctor WHERE docemail = ?";
+    $stmt = $database->prepare($sqlmain);
+    $stmt->bind_param("s", $useremail);
+    $stmt->execute();
+    $userrow = $stmt->get_result();
+    $userfetch = $userrow->fetch_assoc();
+    $userid = htmlspecialchars($userfetch["docid"], ENT_QUOTES, 'UTF-8');
+    $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
+
+    // import EncryptionUtil
+    require "../utils/encryption-util.php";
+
+    use function Utils\decrypt;
     //echo $userid;
     ?>
     <div class="container">
-    <div class="menu">
+        <div class="menu">
             <table class="menu-container" border="0">
                 <tr>
                     <td style="padding:10px" colspan="2">
                         <table border="0" class="profile-container">
                             <tr>
-                                <td width="30%" style="padding-left:20px" >
+                                <td width="30%" style="padding-left:20px">
                                     <img src="../img/user.png" alt="" width="100%" style="border-radius:50%">
                                 </td>
                                 <td style="padding:0px;margin:0px;">
-                                    <p class="profile-title"><?php echo substr($username,0,13)  ?>..</p>
-                                    <p class="profile-subtitle"><?php echo substr($useremail,0,22)  ?></p>
+                                    <p class="profile-title"><?php echo substr($username, 0, 13)  ?>..</p>
+                                    <p class="profile-subtitle"><?php echo substr($useremail, 0, 22)  ?></p>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <a href="../logout.php" ><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
+                                    <a href="../logout.php"><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
                                 </td>
                             </tr>
-                    </table>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-dashbord" >
-                        <a href="index.php" class="non-style-link-menu"><div><p class="menu-text">Dashboard</p></a></div></a>
+                        </table>
                     </td>
                 </tr>
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-appoinment menu-icon-appoinment-active menu-active">
-                        <a href="appointment.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Appointments</p></a></div>
-                    </td>
-                </tr>
-                
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-session">
-                        <a href="schedule.php" class="non-style-link-menu"><div><p class="menu-text">My Sessions</p></div></a>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-patient">
-                        <a href="patient.php" class="non-style-link-menu"><div><p class="menu-text">My Patients</p></a></div>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-settings">
-                        <a href="settings.php" class="non-style-link-menu"><div><p class="menu-text">Settings</p></a></div>
-                    </td>
-                </tr>
-                
-            </table>
-        </div>
-        <div class="dash-body">
-            <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;margin-top:25px; ">
-                <tr >
-                    <td width="13%" >
-                    <a href="appointment.php" ><button  class="login-btn btn-primary-soft btn btn-icon-back"  style="padding-top:11px;padding-bottom:11px;margin-left:20px;width:125px"><font class="tn-in-text">Back</font></button></a>
-                    </td>
-                    <td>
-                        <p style="font-size: 23px;padding-left:12px;font-weight: 600;">Appointment Manager</p>
-                                           
-                    </td>
-                    <td width="15%">
-                        <p style="font-size: 14px;color: rgb(119, 119, 119);padding: 0;margin: 0;text-align: right;">
-                            Today's Date
-                        </p>
-                        <p class="heading-sub12" style="padding: 0;margin: 0;">
-                            <?php 
+                    <td class="menu-btn menu-icon-dashbord">
+                        <a href="index.php" class="non-style-link-menu">
+                            <div>
+                                <p class="menu-text">Dashboard</p>
+                        </a>
+        </div></a>
+        </td>
+        </tr>
+        <tr class="menu-row">
+            <td class="menu-btn menu-icon-appoinment menu-icon-appoinment-active menu-active">
+                <a href="appointment.php" class="non-style-link-menu non-style-link-menu-active">
+                    <div>
+                        <p class="menu-text">My Appointments</p>
+                </a>
+    </div>
+    </td>
+    </tr>
+
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-session">
+            <a href="schedule.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">My Sessions</p>
+                </div>
+            </a>
+        </td>
+    </tr>
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-patient">
+            <a href="patient.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">My Patients</p>
+            </a></div>
+        </td>
+    </tr>
+    <tr class="menu-row">
+        <td class="menu-btn menu-icon-settings">
+            <a href="settings.php" class="non-style-link-menu">
+                <div>
+                    <p class="menu-text">Settings</p>
+            </a></div>
+        </td>
+    </tr>
+
+    </table>
+    </div>
+    <div class="dash-body">
+        <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;margin-top:25px; ">
+            <tr>
+                <td width="13%">
+                    <a href="appointment.php"><button class="login-btn btn-primary-soft btn btn-icon-back" style="padding-top:11px;padding-bottom:11px;margin-left:20px;width:125px">
+                            <font class="tn-in-text">Back</font>
+                        </button></a>
+                </td>
+                <td>
+                    <p style="font-size: 23px;padding-left:12px;font-weight: 600;">Appointment Manager</p>
+
+                </td>
+                <td width="15%">
+                    <p style="font-size: 14px;color: rgb(119, 119, 119);padding: 0;margin: 0;text-align: right;">
+                        Today's Date
+                    </p>
+                    <p class="heading-sub12" style="padding: 0;margin: 0;">
+                        <?php
 
                         date_default_timezone_set('Asia/Kolkata');
 
@@ -137,16 +195,16 @@
                         $list110 = $database->query("select * from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ");
 
                         ?>
-                        </p>
-                    </td>
-                    <td width="10%">
-                        <button  class="btn-label"  style="display: flex;justify-content: center;align-items: center;"><img src="../img/calendar.svg" width="100%"></button>
-                    </td>
+                    </p>
+                </td>
+                <td width="10%">
+                    <button class="btn-label" style="display: flex;justify-content: center;align-items: center;"><img src="../img/calendar.svg" width="100%"></button>
+                </td>
 
 
-                </tr>
-               
-                <!-- <tr>
+            </tr>
+
+            <!-- <tr>
                     <td colspan="4" >
                         <div style="display: flex;margin-top: 40px;">
                         <div class="heading-main12" style="margin-left: 45px;font-size:20px;color:rgb(49, 49, 49);margin-top: 5px;">Schedule a Session</div>
@@ -155,19 +213,19 @@
                         </div>
                     </td>
                 </tr> -->
-                <tr>
-                    <td colspan="4" style="padding-top:10px;width: 100%;" >
-                    
-                        <p class="heading-main12" style="margin-left: 45px;font-size:18px;color:rgb(49, 49, 49)">My Appointments (<?php echo $list110->num_rows; ?>)</p>
-                    </td>
-                    
-                </tr>
-                <tr>
-                    <td colspan="4" style="padding-top:0px;width: 100%;" >
-                        <center>
-                        <table class="filter-container" border="0" >
-                        <tr>
-                           <td width="10%">
+            <tr>
+                <td colspan="4" style="padding-top:10px;width: 100%;">
+
+                    <p class="heading-main12" style="margin-left: 45px;font-size:18px;color:rgb(49, 49, 49)">My Appointments (<?php echo $list110->num_rows; ?>)</p>
+                </td>
+
+            </tr>
+            <tr>
+                <td colspan="4" style="padding-top:0px;width: 100%;">
+                    <center>
+                        <table class="filter-container" border="0">
+                            <tr>
+                                <td width="10%">
 
                            </td> 
                         <td width="5%" style="text-align: center;">
@@ -185,18 +243,18 @@
                         </form>
                     </td>
 
-                    </tr>
-                            </table>
+                            </tr>
+                        </table>
 
-                        </center>
-                    </td>
-                    
-                </tr>
-                
-                <?php
+                    </center>
+                </td>
+
+            </tr>
+
+            <?php
 
 
-                    $sqlmain= "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pid,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ";
+            $sqlmain = "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pid,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ";
 
                     if($_POST){
                         //print_r($_POST);
@@ -210,72 +268,55 @@
                             $sqlmain .= " AND schedule.scheduledate = ?";
                         };
 
-                        
-
-                        //echo $sqlmain;
-
-                    }
 
 
-                ?>
-                  
-                <tr>
-                   <td colspan="4">
-                       <center>
+                //echo $sqlmain;
+
+            }
+
+
+            ?>
+
+            <tr>
+                <td colspan="4">
+                    <center>
                         <div class="abc scroll">
-                        <table width="93%" class="sub-table scrolldown" border="0">
-                        <thead>
-                        <tr>
-                                <th class="table-headin">
-                                    Patient name
-                                </th>
-                                <th class="table-headin">
-                                    
-                                    Appointment number
-                                    
-                                </th>
-                               
-                                <th class="table-headin">
-                                    
-                                
-                                    Session Title
-                                    
-                                    </th>
-                                
-                                <th class="table-headin" >
-                                    
-                                    Session Date & Time
-                                    
-                                </th>
-                                
-                                <th class="table-headin">
-                                    
-                                    Appointment Date
-                                    
-                                </th>
-                                
-                                <th class="table-headin">
-                                    
-                                    Events
+                            <table width="93%" class="sub-table scrolldown" border="0">
+                                <thead>
+                                    <tr>
+                                        <th class="table-headin">
+                                            Patient Name
+                                        </th>
+                                        <th class="table-headin">
+                                            Appointment Number
+                                        </th>
+                                        <th class="table-headin">
+                                            Session Title
+                                        </th>
+                                        <th class="table-headin">
+                                            Session Date & Time
+                                        </th>
+                                        <th class="table-headin">
+                                            Appointment Date
+                                        </th>
+                                        <th class="table-headin">
+                                            Events
+                                        </th>
+                                        <th class="table-headin">
+                                            Prescriptions
+                                        </th>
 
-                                </th>
-                                <th class="table-headin">
-                                    
-                                    Prescriptions
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                </th>
+                                    <?php
 
-                                </tr>
-                        </thead>
-                        <tbody>
-                        
-                            <?php
 
-                                
-                                $result= $database->query($sqlmain);
+                                    $result = $database->query($sqlmain);
 
-                                if($result->num_rows==0){
-                                    echo '<tr>
+                                    if ($result->num_rows == 0) {
+                                        echo '<tr>
                                     <td colspan="7">
                                     <br><br><br><br>
                                     <center>
@@ -289,82 +330,79 @@
                                     <br><br><br><br>
                                     </td>
                                     </tr>';
-                                    
-                                }
-                                else{
-                                for ( $x=0; $x<$result->num_rows;$x++){
-                                    $row=$result->fetch_assoc();
-                                    $appoid = $row["appoid"];
-                                    $scheduleid = $row["scheduleid"];
-                                    $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
-                                    $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
-                                    $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
-                                    $scheduletime = htmlspecialchars(string: $row["scheduletime"], flags: ENT_QUOTES, encoding: 'UTF-8');
-                                    $pid = htmlspecialchars(string: $row["pid"], flags: ENT_QUOTES, encoding: 'UTF-8');
-                                    $pname = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
-                                    $apponum = htmlspecialchars($row["apponum"], ENT_QUOTES, 'UTF-8');
-                                    $appodate = htmlspecialchars($row["appodate"], ENT_QUOTES, 'UTF-8');
-                                    echo '<tr >
-                                        <td style="font-weight:600;"> &nbsp;'.
-                                        
-                                        substr($pname,0,25)
-                                        .'</td >
+                                    } else {
+                                        for ($x = 0; $x < $result->num_rows; $x++) {
+                                            $row = $result->fetch_assoc();
+                                            $appoid = $row["appoid"];
+                                            $scheduleid = $row["scheduleid"];
+                                            $title = htmlspecialchars($row["title"], ENT_QUOTES, 'UTF-8');
+                                            $docname = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
+                                            $scheduledate = htmlspecialchars($row["scheduledate"], ENT_QUOTES, 'UTF-8');
+                                            $scheduletime = htmlspecialchars(string: $row["scheduletime"], flags: ENT_QUOTES, encoding: 'UTF-8');
+                                            $pid = htmlspecialchars(string: $row["pid"], flags: ENT_QUOTES, encoding: 'UTF-8');
+                                            $pname = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+                                            $apponum = htmlspecialchars($row["apponum"], ENT_QUOTES, 'UTF-8');
+                                            $appodate = htmlspecialchars($row["appodate"], ENT_QUOTES, 'UTF-8');
+                                            echo '<tr >
+                                        <td style="font-weight:600;"> &nbsp;' .
+
+                                                substr($pname, 0, 25)
+                                                . '</td >
                                         <td style="text-align:center;font-size:23px;font-weight:500; color: var(--btnnicetext);">
-                                        '.$apponum.'
+                                        ' . $apponum . '
                                         
                                         </td>
                                         <td>
-                                        '.substr($title,0,15).'
+                                        ' . substr($title, 0, 15) . '
                                         </td>
                                         <td style="text-align:center;;">
-                                            '.substr($scheduledate,0,10).' @'.substr($scheduletime,0,5).'
+                                            ' . substr($scheduledate, 0, 10) . ' @' . substr($scheduletime, 0, 5) . '
                                         </td>
                                         
                                         <td style="text-align:center;">
-                                            '.$appodate.'
+                                            ' . $appodate . '
                                         </td>
 
                                         <td>
                                         <div style="display:flex;justify-content: center;">
                                         
-                                        <!--<a href="?action=view&id='. urlencode($appoid) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
+                                        <!--<a href="?action=view&id=' . urlencode($appoid) . '" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-view"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">View</font></button></a>
                                        &nbsp;&nbsp;&nbsp;-->
-                                       <a href="?action=drop&id='. urlencode($appoid) .'&name='. urlencode($pname) .'&session='. urlencode($title) .'&apponum='. urlencode($apponum) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
+                                       <a href="?action=drop&id=' . urlencode($appoid) . '&name=' . urlencode($pname) . '&session=' . urlencode($title) . '&apponum=' . urlencode($apponum) . '" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-delete"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Cancel</font></button></a>
                                        &nbsp;&nbsp;&nbsp;</div>
                                         </td>
                                           <td>
                                         <div style="display:flex;justify-content: center;">
-                                        <a href="?action=add-prescription&id='. urlencode($appoid) .'&pid='. urlencode($pid) .'" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
+                                        <a href="?action=add-prescription&id=' . urlencode($appoid) . '&pid=' . urlencode($pid) . '" class="non-style-link"><button  class="btn-primary-soft btn button-icon btn-edit"  style="padding-left: 40px;padding-top: 12px;padding-bottom: 12px;margin-top: 10px;"><font class="tn-in-text">Add New</font></button></a>
                                        &nbsp;&nbsp;&nbsp;
                                         </div>
                                         </td>
                                     </tr>';
-                                    
-                                }
-                            }
-                                 
-                            ?>
- 
-                            </tbody>
+                                        }
+                                    }
 
-                        </table>
+                                    ?>
+
+                                </tbody>
+
+                            </table>
                         </div>
-                        </center>
-                   </td> 
-                </tr>
-                       
-                        
-                        
-            </table>
-        </div>
+                    </center>
+                </td>
+            </tr>
+
+
+
+        </table>
+    </div>
     </div>
     <?php
-    
-    if($_GET){
+
+    if ($_GET) {
         $id = isset($_GET["id"]) ? filter_var($_GET["id"], FILTER_VALIDATE_INT) : null;
         $action = isset($_GET["action"]) ? htmlspecialchars($_GET["action"], ENT_QUOTES, 'UTF-8') : '';
-        
-        if($action=='add-session'){
+
+        if ($action == 'add-session') {
 
             echo '
             <div id="popup1" class="overlay">
@@ -377,10 +415,10 @@
                         <div class="abc">
                         <table width="80%" class="sub-table scrolldown add-doc-form-container" border="0">
                         <tr>
-                                <td class="label-td" colspan="2">'.
-                                   ""
-                                
-                                .'</td>
+                                <td class="label-td" colspan="2">' .
+                ""
+
+                . '</td>
                             </tr>
 
                             <tr>
@@ -409,21 +447,21 @@
                                 <td class="label-td" colspan="2">
                                     <select name="docid" id="" class="box" >
                                     <option value="" disabled selected hidden>Choose Doctor Name from the list</option><br/>';
-                                        
-        
-                                        $list11 = $database->query("select  * from  doctor;");
-        
-                                        for ($y=0;$y<$list11->num_rows;$y++){
-                                            $row00=$list11->fetch_assoc();
-                                            $sn = htmlspecialchars($row00["docname"], ENT_QUOTES, 'UTF-8');
-                                            $id00 = htmlspecialchars($row00["docid"], ENT_QUOTES, 'UTF-8');
-                                            echo "<option value=". htmlspecialchars($id00, ENT_QUOTES, 'UTF-8') . ">". htmlspecialchars($sn, ENT_QUOTES, 'UTF-8') ."</option><br/>";
-                                        };
-        
-        
-        
-                                        
-                        echo     '       </select><br><br>
+
+
+            $list11 = $database->query("select  * from  doctor;");
+
+            for ($y = 0; $y < $list11->num_rows; $y++) {
+                $row00 = $list11->fetch_assoc();
+                $sn = htmlspecialchars($row00["docname"], ENT_QUOTES, 'UTF-8');
+                $id00 = htmlspecialchars($row00["docid"], ENT_QUOTES, 'UTF-8');
+                echo "<option value=" . htmlspecialchars($id00, ENT_QUOTES, 'UTF-8') . ">" . htmlspecialchars($sn, ENT_QUOTES, 'UTF-8') . "</option><br/>";
+            };
+
+
+
+
+            echo     '       </select><br><br>
                                 </td>
                             </tr>
                             <tr>
@@ -443,7 +481,7 @@
                             </tr>
                             <tr>
                                 <td class="label-td" colspan="2">
-                                    <input type="date" name="date" class="input-text" min="'.date('Y-m-d').'" required><br>
+                                    <input type="date" name="date" class="input-text" min="' . date('Y-m-d') . '" required><br>
                                 </td>
                             </tr>
                             <tr>
@@ -476,7 +514,7 @@
             </div>
             </div>
             ';
-        }elseif($action=='session-added'){
+        } elseif ($action == 'session-added') {
             $titleget = isset($_GET["title"]) ? htmlspecialchars($_GET["title"], ENT_QUOTES, 'UTF-8') : '';
             echo '
             <div id="popup1" class="overlay">
@@ -486,7 +524,7 @@
                         <h2>Session Placed.</h2>
                         <a class="close" href="schedule.php">&times;</a>
                         <div class="content">
-                        '.substr($titleget,0,40).' was scheduled.<br><br>
+                        ' . substr($titleget, 0, 40) . ' was scheduled.<br><br>
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
@@ -498,7 +536,7 @@
             </div>
             </div>
             ';
-        }elseif($action=='drop'){
+        } elseif ($action == 'drop') {
             $nameget = isset($_GET["name"]) ? htmlspecialchars($_GET["name"], ENT_QUOTES, 'UTF-8') : '';
             $session = isset($_GET["session"]) ? htmlspecialchars($_GET["session"], ENT_QUOTES, 'UTF-8') : '';
             $apponum = isset($_GET["apponum"]) ? htmlspecialchars($_GET["apponum"], ENT_QUOTES, 'UTF-8') : '';
@@ -510,13 +548,13 @@
                         <a class="close" href="appointment.php">&times;</a>
                         <div class="content">
                             You want to delete this record<br><br>
-                            Patient Name: &nbsp;<b>'.substr($nameget,0,40).'</b><br>
-                            Appointment number &nbsp; : <b>'.substr($apponum,0,40).'</b><br><br>
+                            Patient Name: &nbsp;<b>' . substr($nameget, 0, 40) . '</b><br>
+                            Appointment number &nbsp; : <b>' . substr($apponum, 0, 40) . '</b><br><br>
                             
                         </div>
                         <div style="display: flex;justify-content: center;">
                         <form action="delete-appointment.php" method="POST" class="non-style-link">
-                            <input type="hidden" name="id" value="' . urlencode($id). '">
+                            <input type="hidden" name="id" value="' . urlencode($id) . '">
                             <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                             <button type="submit" class="btn-primary btn" style="margin: 10px; padding: 10px;">
                                 <font class="tn-in-text">&nbsp;Yes&nbsp;</font>
@@ -528,16 +566,16 @@
                     </center>
             </div>
             </div>
-            '; 
-        }elseif($action=='view'){
-            $sqlmain= "select * from doctor where docid='$id'";
-            $result= $database->query($sqlmain);
-            $row=$result->fetch_assoc();
+            ';
+        } elseif ($action == 'view') {
+            $sqlmain = "select * from doctor where docid='$id'";
+            $result = $database->query($sqlmain);
+            $row = $result->fetch_assoc();
             $name = htmlspecialchars($row["docname"], ENT_QUOTES, 'UTF-8');
             $email = htmlspecialchars($row["docemail"], ENT_QUOTES, 'UTF-8');
             $spe = htmlspecialchars($row["specialties"], ENT_QUOTES, 'UTF-8');
-            $spcil_res= $database->query("select sname from specialties where id='$spe'");
-            $spcil_array= $spcil_res->fetch_assoc();
+            $spcil_res = $database->query("select sname from specialties where id='$spe'");
+            $spcil_array = $spcil_res->fetch_assoc();
             $spcil_name = htmlspecialchars($spcil_array["sname"], ENT_QUOTES, 'UTF-8');
             $nic = htmlspecialchars(decrypt($row['docnic']), ENT_QUOTES, 'UTF-8');
             $tele = htmlspecialchars($row['doctel'], ENT_QUOTES, 'UTF-8');
@@ -568,7 +606,7 @@
                             </tr>
                             <tr>
                                 <td class="label-td" colspan="2">
-                                    '.$name.'<br><br>
+                                    ' . $name . '<br><br>
                                 </td>
                                 
                             </tr>
@@ -579,7 +617,7 @@
                             </tr>
                             <tr>
                                 <td class="label-td" colspan="2">
-                                '.$email.'<br><br>
+                                ' . $email . '<br><br>
                                 </td>
                             </tr>
                             <tr>
@@ -589,7 +627,7 @@
                             </tr>
                             <tr>
                                 <td class="label-td" colspan="2">
-                                '.$nic.'<br><br>
+                                ' . $nic . '<br><br>
                                 </td>
                             </tr>
                             <tr>
@@ -599,7 +637,7 @@
                             </tr>
                             <tr>
                                 <td class="label-td" colspan="2">
-                                '.$tele.'<br><br>
+                                ' . $tele . '<br><br>
                                 </td>
                             </tr>
                             <tr>
@@ -610,7 +648,7 @@
                             </tr>
                             <tr>
                             <td class="label-td" colspan="2">
-                            '.$spcil_name.'<br><br>
+                            ' . $spcil_name . '<br><br>
                             </td>
                             </tr>
                             <tr>
@@ -629,54 +667,87 @@
                     <br><br>
             </div>
             </div>
-            ';  
-    }elseif($action=='add-prescription'){
+            ';
+        } elseif ($action == 'add-prescription') {
             $pidget = filter_input(INPUT_GET, 'pid', FILTER_VALIDATE_INT);
             $pidget = htmlspecialchars($pidget, ENT_QUOTES, 'UTF-8');
             echo '
-                <div id="popup1" class="overlay">
+            <div id="popup1" class="overlay">
                 <div class="popup">
                     <center>
-                        <h2>Add Prescription</h2>
+                        <h2 style="margin-top: 20px;">Add Prescription</h2>
                         <a class="close" href="appointment.php">&times;</a>
                         <div class="content">
-                            <form action="submit_prescription.php" method="POST" class="sub-table scrolldown add-doc-form-container">
+                            <form action="submit_prescription.php" method="POST">
                                 <input type="hidden" name="appointment_id" value="' . $id . '">
                                 <input type="hidden" name="pid" value="' . $pidget . '">
                                 <input type="hidden" name="csrf_token" value="' . generateCsrfToken() . '">
                                 
-                                <div class="form-group">
-                                    <label for="medication" class="form-label">Medication:</label>
-                                    <input type="text" id="medication" name="medication" maxlength="255" required class="form-input">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="dosage" class="form-label">Dosage:</label>
-                                    <input type="text" id="dosage" name="dosage" maxlength="100" required class="form-input">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="frequency" class="form-label">Frequency:</label>
-                                    <input type="text" id="frequency" name="frequency" maxlength="100" required class="form-input">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="notes" class="form-label">Additional Notes:</label>
-                                    <textarea id="notes" name="notes" class="form-textarea"></textarea>
-                                </div>
-
-                                <div class="form-actions">
-                                    <input type="submit" value="Submit Prescription" class="login-btn btn-primary-soft btn">
-                                    <a href="appointment.php" class="cancel-btn"><button type="button" class="login-btn btn-primary-soft btn">Cancel</button></a>
-                                </div>
+                                <table width="80%" class="sub-table scrolldown add-doc-form-container" border="0">
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <label for="medication" class="form-label">Medication:</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <input type="text" id="medication" name="medication" class="input-text" 
+                                                   maxlength="255" placeholder="Enter medication name" required>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <label for="dosage" class="form-label">Dosage:</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <input type="text" id="dosage" name="dosage" class="input-text" 
+                                                   maxlength="100" placeholder="e.g., 500mg" required>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <label for="frequency" class="form-label">Frequency:</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <input type="text" id="frequency" name="frequency" class="input-text" 
+                                                   maxlength="100" placeholder="e.g., Every 8 hours" required>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <label for="notes" class="form-label">Additional Notes:</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-td" colspan="2">
+                                            <textarea id="notes" name="notes" class="input-text" 
+                                                      style="height:100px;resize:none;" 
+                                                      placeholder="Enter any additional instructions or notes"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <input type="submit" value="Submit Prescription" 
+                                                   class="login-btn btn-primary btn" 
+                                                   style="margin-right:10px;">
+                                            <a href="appointment.php">
+                                                <input type="button" value="Cancel" 
+                                                       class="login-btn btn-primary-soft btn">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
                             </form>
                         </div>
                     </center>
                 </div>
-            </div>
-        ';
-    }elseif($action=='prescription-added'){
-                echo '
+            </div>';
+        } elseif ($action == 'prescription-added') {
+            echo '
                 <div id="popup1" class="overlay">
                     <div class="popup">
                         <center>
@@ -706,4 +777,5 @@
     </div>
 
 </body>
+
 </html>
