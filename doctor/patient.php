@@ -141,7 +141,7 @@
                             }
                         }
                     }else{
-                        $sqlmain= "select * from appointment inner join patient on patient.pid=appointment.pid inner join schedule on schedule.scheduleid=appointment.scheduleid where schedule.docid=$userid;";
+                        $sqlmain= "SELECT DISTINCT patient.* FROM appointment INNER JOIN patient ON patient.pid = appointment.pid INNER JOIN schedule ON schedule.scheduleid = appointment.scheduleid WHERE schedule.docid = $userid;";
                         $selecttype="My";
                     }
 
