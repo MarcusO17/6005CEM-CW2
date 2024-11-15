@@ -13,14 +13,37 @@
     <title>Appointments</title>
     <style>
         .popup {
-            animation: transitionIn-Y-bottom 0.5s;
+            animation: 0.5s ease-in-out;
             padding: 40px 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
         }
 
         .sub-table {
-            animation: transitionIn-Y-bottom 0.5s;
+            animation: none;
             max-width: 100%;
             margin: 20px auto;
+            background: #fff;
         }
 
         .input-text {
@@ -53,6 +76,26 @@
         textarea.input-text {
             font-family: inherit;
             line-height: 1.4;
+        }
+
+        .add-doc-form-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
         }
     </style>
 </head>
@@ -227,21 +270,21 @@
                             <tr>
                                 <td width="10%">
 
-                           </td> 
-                        <td width="5%" style="text-align: center;">
-                        Date:
-                        <td width="30%">
-                            <form action="" method="post">
-                                <input type="date" name="sheduledate" id="date" class="input-text filter-container-items" 
-                                    style="margin: 0;width: 95%;" 
-                                    min="1999-01-01" max="2099-12-31">
-                            </form>
-                        </td>
-                        
-                    <td width="12%">
-                        <input type="submit"  name="filter" value=" Filter" class=" btn-primary-soft btn button-icon btn-filter"  style="padding: 15px; margin :0;width:100%">
-                        </form>
-                    </td>
+                                </td>
+                                <td width="5%" style="text-align: center;">
+                                    Date:
+                                <td width="30%">
+                                    <form action="" method="post">
+                                        <input type="date" name="sheduledate" id="date" class="input-text filter-container-items"
+                                            style="margin: 0;width: 95%;"
+                                            min="1999-01-01" max="2099-12-31">
+                                    </form>
+                                </td>
+
+                                <td width="12%">
+                                    <input type="submit" name="filter" value=" Filter" class=" btn-primary-soft btn button-icon btn-filter" style="padding: 15px; margin :0;width:100%">
+                                    </form>
+                                </td>
 
                             </tr>
                         </table>
@@ -256,17 +299,17 @@
 
             $sqlmain = "select appointment.appoid,schedule.scheduleid,schedule.title,doctor.docname,patient.pid,patient.pname,schedule.scheduledate,schedule.scheduletime,appointment.apponum,appointment.appodate from schedule inner join appointment on schedule.scheduleid=appointment.scheduleid inner join patient on patient.pid=appointment.pid inner join doctor on schedule.docid=doctor.docid  where  doctor.docid=$userid ";
 
-                    if($_POST){
-                        //print_r($_POST);
-                        
+            if ($_POST) {
+                //print_r($_POST);
 
 
-                        
 
-                        if(!empty($_POST["sheduledate"])){
-                            $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
-                            $sqlmain .= " AND schedule.scheduledate = ?";
-                        };
+
+
+                if (!empty($_POST["sheduledate"])) {
+                    $sheduledate = htmlspecialchars($_POST["sheduledate"], ENT_QUOTES, 'UTF-8');
+                    $sqlmain .= " AND schedule.scheduledate = ?";
+                };
 
 
 
