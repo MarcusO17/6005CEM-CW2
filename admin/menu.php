@@ -1,6 +1,17 @@
 <?php
 // Add this at the top of the file
 $page = $page ?? '';  // Initialize $page if not already set
+
+// Move superadmin check to menu.php
+$is_super_admin = false;
+if (isset($_SESSION["user"])) {
+    $admin_query = $database->prepare("SELECT isSuperAdmin FROM admin WHERE aemail=?");
+    $admin_query->bind_param("s", $_SESSION["user"]);
+    $admin_query->execute();
+    $admin_result = $admin_query->get_result();
+    $is_super_admin = $admin_result->fetch_assoc()['isSuperAdmin'] ?? false;
+    $admin_query->close();
+}
 ?>
 <div class="menu">
     <table class="menu-container" border="0">
@@ -88,15 +99,15 @@ $page = $page ?? '';  // Initialize $page if not already set
                     </a>
                 </td>
             </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-dashbord <?php echo $page == 'manage_analytics_data' ? 'menu-active' : ''; ?>">
+                    <a href="manage_analytics_data.php" class="non-style-link-menu">
+                        <div>
+                            <p class="menu-text">Manage Analytics Data</p>
+                        </div>
+                    </a>
+                </td>
+            </tr>
         <?php endif; ?>
-        <tr class="menu-row">
-            <td class="menu-btn menu-icon-dashbord <?php echo $page == 'manage_analytics' ? 'menu-btn-active' : 'menu-btn'; ?>">
-                <a href="manage_analytics_data.php" class="non-style-link-menu">
-                    <div>
-                        <p class="menu-text">Manage Analytics Data</p>
-                    </div>
-                </a>
-            </td>
-        </tr>
     </table>
 </div>

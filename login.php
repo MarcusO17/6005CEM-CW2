@@ -494,6 +494,18 @@
             }
         }
         ?>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.querySelector('.overlay');
+            if (overlay) {
+                document.body.classList.add('has-overlay');
+                // Hide container explicitly
+                const containers = document.querySelectorAll('.container');
+                containers.forEach(container => {
+                    container.style.display = 'none';
+                });
+            }
+        });
     </script>
 
 </body>

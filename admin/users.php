@@ -11,14 +11,15 @@ if (isset($_SESSION["user"])) {
 
 include("../connection.php");
 
-// Add superadmin check here
+// Check if user is super admin
 $admin_query = $database->prepare("SELECT isSuperAdmin FROM admin WHERE aemail=?");
 $admin_query->bind_param("s", $_SESSION["user"]);
 $admin_query->execute();
 $admin_result = $admin_query->get_result();
 $is_super_admin = $admin_result->fetch_assoc()['isSuperAdmin'] ?? false;
 $admin_query->close();
-if (!$is_super_admin) {
+
+if (!isset($is_super_admin) || !$is_super_admin) {
   header("location: index.php");
   exit();
 }

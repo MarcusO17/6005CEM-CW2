@@ -19,7 +19,7 @@ $admin_result = $admin_query->get_result();
 $is_super_admin = $admin_result->fetch_assoc()['isSuperAdmin'] ?? false;
 $admin_query->close();
 
-if (!$is_super_admin) {
+if (!isset($is_super_admin) || !$is_super_admin) {
   header("location: index.php");
   exit();
 }
@@ -46,6 +46,8 @@ $totalPages = $systemLogsData['pages'];
 $logger = Logger::getInstance($database);
 $logger->setUser($_SESSION["user"], $_SESSION["usertype"])
   ->logPageView('/admin/analytics.php', 'Analytics Dashboard');
+
+$page = 'analytics'; // Set current page for menu highlighting
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +66,9 @@ $logger->setUser($_SESSION["user"], $_SESSION["usertype"])
 
 <body>
   <div class="container">
-    <?php include("menu.php"); ?>
+    <?php
+    include("menu.php");
+    ?>
     <div class="analytics-container">
       <div class="header-section">
         <div class="header-content">

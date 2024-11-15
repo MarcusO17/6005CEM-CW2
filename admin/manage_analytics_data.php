@@ -63,7 +63,7 @@ $counts = [
 ];
 
 // Set the current page for menu highlighting
-$page = 'manage_analytics';
+$page = 'manage_analytics_data';
 ?>
 
 <!DOCTYPE html>
@@ -170,7 +170,9 @@ $page = 'manage_analytics';
 
 <body>
   <div class="container">
-    <?php include("menu.php"); ?>
+    <?php
+    include("menu.php");
+    ?>
     <div class="analytics-container">
       <div class="header-section">
         <h1 class="header-title">Manage Analytics Data</h1>
