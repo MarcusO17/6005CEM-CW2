@@ -313,7 +313,7 @@
                                     $pid = htmlspecialchars($row["pid"]);
                                     $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
                                     $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
-                                    $nic = htmlspecialchars(decrypt($row["pnic"], ENT_QUOTES, 'UTF-8'));
+                                    $nic = htmlspecialchars(decrypt($row["pnic"]),ENT_QUOTES, 'UTF-8');
                                     $dob = htmlspecialchars($row["pdob"], ENT_QUOTES, 'UTF-8');
                                     $tel = htmlspecialchars($row["ptel"], ENT_QUOTES, 'UTF-8');
                                     
