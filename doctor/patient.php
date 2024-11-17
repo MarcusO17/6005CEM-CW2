@@ -311,11 +311,13 @@
                                 for ( $x=0; $x<$result->num_rows;$x++){
                                     $row=$result->fetch_assoc();
                                     $pid = htmlspecialchars($row["pid"]);
-                                    $name = htmlspecialchars($row["pname"]);
-                                    $email = htmlspecialchars($row["pemail"]);
-                                    $nic = htmlspecialchars(decrypt($row["pnic"]));
-                                    $dob = htmlspecialchars($row["pdob"]);
-                                    $tel = htmlspecialchars($row["ptel"]);
+                                    $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+                                    $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
+                                    $nic = htmlspecialchars(decrypt($row["pnic"], ENT_QUOTES, 'UTF-8'));
+                                    $dob = htmlspecialchars($row["pdob"], ENT_QUOTES, 'UTF-8');
+                                    $tel = htmlspecialchars($row["ptel"], ENT_QUOTES, 'UTF-8');
+                                    
+                                    
 
                                     echo '<tr>
                                         <td> &nbsp;'.
@@ -376,12 +378,12 @@
             $sqlmain= "select * from patient where pid='$id'";
             $result= $database->query($sqlmain);
             $row=$result->fetch_assoc();
-            $name = htmlspecialchars($row["pname"]);
-            $email = htmlspecialchars($row["pemail"]);
-            $nic = htmlspecialchars(decrypt($row["pnic"]));
-            $dob = htmlspecialchars($row["pdob"]);
-            $tele = htmlspecialchars($row["ptel"]);
-            $address = htmlspecialchars($row["paddress"]);
+            $name = htmlspecialchars($row["pname"], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row["pemail"], ENT_QUOTES, 'UTF-8');
+            $nic = htmlspecialchars(decrypt($row["pnic"]), ENT_QUOTES, 'UTF-8');
+            $dob = htmlspecialchars($row["pdob"], ENT_QUOTES, 'UTF-8');
+            $tele = htmlspecialchars($row["ptel"], ENT_QUOTES, 'UTF-8');
+            $address = htmlspecialchars($row["paddress"], ENT_QUOTES, 'UTF-8');
 
             echo '
             <div id="popup1" class="overlay">
