@@ -147,11 +147,11 @@
                             sendOTP($email);
                         } else {
                             recordFailedLogin($database, $email);
-                            $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password</label>';
+                            $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
                         }
                     } else {
                         recordFailedLogin($database, $email);
-                        $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials111: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
+                        $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">Wrong credentials: Invalid email or password, You have ' . (3 - $row["attempts"]) . ' attempt(s) left. </label>';
                     }
                 } elseif ($utype == 'a') {
                     // Prepared statement to fetch admin record
@@ -373,7 +373,7 @@
 
     function sendOTP($email)
     {
-        //sendMail($email,$_SESSION['otp']);
+        sendMail($email,$_SESSION['otp']);
 
         echo '<div id="popup1" class="overlay">
                                 <div class="popup">
@@ -392,9 +392,8 @@
                                                         <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
                                                     </div>
                                                     <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
-                                                </form>';
-        echo "<p>{$_SESSION['otp']}</p>";
-        echo  '</div>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>';

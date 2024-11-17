@@ -149,7 +149,7 @@ function getOTP()
 
 function sendOTP($email)
 {
-    //sendMail($email,$_SESSION['otp']);
+    sendMail($email,$_SESSION['otp']);
 
     echo '<div id="popup1" class="overlay">
                             <div class="popup">
@@ -168,9 +168,8 @@ function sendOTP($email)
                                                     <input type="text" maxlength="1" class="input-text otp-input" name="otp[]" required />
                                                 </div>
                                                 <button type="submit" class="btn btn-primary" style="margin-top: 20px;margin-left: 120px">Verify OTP</button>
-                                            </form>';
-    echo "<p>{$_SESSION['otp']}</p>";
-    echo  '</div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>';
