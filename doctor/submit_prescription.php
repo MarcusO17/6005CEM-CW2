@@ -41,12 +41,13 @@ if ($_POST) {
         // Input validation and sanitization
         $appointment_id = filter_input(INPUT_POST, 'appointment_id', FILTER_VALIDATE_INT);
         $userid = filter_input(INPUT_POST, 'pid', FILTER_VALIDATE_INT);
-        // Sanitize and encode text fields to prevent XSS if displayed
-        $medication = htmlspecialchars(trim(filter_input(INPUT_POST, 'medication', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
-        $dosage = htmlspecialchars(trim(filter_input(INPUT_POST, 'dosage', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
-        $frequency = htmlspecialchars(trim(filter_input(INPUT_POST, 'frequency', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
-        $additional_notes = htmlspecialchars(trim(filter_input(INPUT_POST, 'notes', FILTER_SANITIZE_STRING)), ENT_QUOTES, 'UTF-8');
 
+        // Sanitize inputs without HTML escaping
+        $medication = trim(filter_input(INPUT_POST, 'medication', FILTER_SANITIZE_STRING));
+        $dosage = trim(filter_input(INPUT_POST, 'dosage', FILTER_SANITIZE_STRING));
+        $frequency = trim(filter_input(INPUT_POST, 'frequency', FILTER_SANITIZE_STRING));
+        $additional_notes = trim(filter_input(INPUT_POST, 'notes', FILTER_SANITIZE_STRING));
+        
         // Encrypt sensitive data
         $encrypted_medication = encrypt($medication);
         $encrypted_dosage = encrypt($dosage);
@@ -68,7 +69,9 @@ if ($_POST) {
                 echo "An error occurred while processing your request. Please try again later.";
             }
         } else {
-            echo "Please provide valid information for all required fields.";
+            $_SESSION['error_message'] = "An error occurred. Please try again.";
+            header("Location: appointment.php?action=add-prescription");
+            exit();
         }
     }
 }
