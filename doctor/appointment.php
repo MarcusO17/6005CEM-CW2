@@ -712,6 +712,15 @@
             </div>
             ';
         } elseif ($action == 'add-prescription') {
+
+            // Check for error message from URL or session
+            $error_message = '';
+            if (isset($_GET['error'])) {
+                $error_message = $_GET['error']; // Get error from URL parameter
+            } elseif (isset($_SESSION['error_message'])) {
+                $error_message = $_SESSION['error_message']; // Get error from session
+                unset($_SESSION['error_message']); // Clear session after displaying it
+            }
             $pidget = filter_input(INPUT_GET, 'pid', FILTER_VALIDATE_INT);
             $pidget = htmlspecialchars($pidget, ENT_QUOTES, 'UTF-8');
             echo '
@@ -720,7 +729,14 @@
                     <center>
                         <h2 style="margin-top: 20px;">Add Prescription</h2>
                         <a class="close" href="appointment.php">&times;</a>
-                        <div class="content">
+                        <div class="content">';
+                        // Display error message if any
+                        if ($error_message) {
+                            echo '<div class="error-message" style="color: red; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 15px;">' . $error_message . '</div>';
+                        }
+
+                        echo '
+
                             <form action="submit_prescription.php" method="POST">
                                 <input type="hidden" name="appointment_id" value="' . $id . '">
                                 <input type="hidden" name="pid" value="' . $pidget . '">
