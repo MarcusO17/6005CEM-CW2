@@ -10,119 +10,6 @@
     <link rel="stylesheet" href="../css/admin.css">
 
     <title>Schedule</title>
-    <style>
-        .popup {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            animation: none;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .sub-table {
-            animation: none;
-            background: white;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 10px;
-        }
-
-        .add-doc-form-container {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .popup .content {
-            margin: 10px 0;
-            color: #333;
-        }
-
-        .popup .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            text-decoration: none;
-            color: #666;
-        }
-
-        .popup .close:hover {
-            color: #333;
-        }
-
-        .abc.scroll {
-            scrollbar-width: thin;
-            scrollbar-color: #ddd transparent;
-            max-height: calc(90vh - 100px);
-            overflow-y: auto;
-        }
-
-        .abc.scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .abc.scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .abc.scroll::-webkit-scrollbar-thumb {
-            background-color: #ddd;
-            border-radius: 3px;
-        }
-
-        .table-headin {
-            background: white;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-            padding: 8px;
-        }
-
-        br {
-            display: block;
-            margin: 5px 0;
-        }
-
-        .form-label {
-            margin-bottom: 3px;
-            display: inline-block;
-        }
-
-        p {
-            margin: 5px 0;
-        }
-
-        .label-td {
-            padding: 5px 10px;
-        }
-
-        .sub-table td {
-            padding: 8px;
-        }
-    </style>
-</head>
 
 <body>
     <?php
@@ -164,76 +51,59 @@
     $username = htmlspecialchars($userfetch["docname"], ENT_QUOTES, 'UTF-8');
     //echo $userid;
     ?>
-    <div class="container">
-        <div class="menu">
+     <div class="container">
+    <div class="menu">
             <table class="menu-container" border="0">
                 <tr>
                     <td style="padding:10px" colspan="2">
                         <table border="0" class="profile-container">
                             <tr>
-                                <td width="30%" style="padding-left:20px">
+                                <td width="30%" style="padding-left:20px" >
                                     <img src="../img/user.png" alt="" width="100%" style="border-radius:50%">
                                 </td>
                                 <td style="padding:0px;margin:0px;">
-                                    <p class="profile-title"><?php echo substr($username, 0, 13)  ?>..</p>
-                                    <p class="profile-subtitle"><?php echo substr($useremail, 0, 22)  ?></p>
+                                    <p class="profile-title"><?php echo substr($username, 0, 13) ?>..</p>
+                                    <p class="profile-subtitle"><?php echo substr(htmlspecialchars($useremail), 0, 22) ?></p>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <a href="../logout.php"><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
+                                    <a href="../logout.php" ><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
                                 </td>
                             </tr>
-                        </table>
+                    </table>
+                    </td>
+                </tr>
+                <tr class="menu-row" >
+                    <td class="menu-btn menu-icon-dashbord" >
+                        <a href="index.php" class="non-style-link-menu "><div><p class="menu-text">Dashboard</p></a></div></a>
                     </td>
                 </tr>
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-dashbord ">
-                        <a href="index.php" class="non-style-link-menu ">
-                            <div>
-                                <p class="menu-text">Dashboard</p>
-                        </a>
-        </div></a>
-        </td>
-        </tr>
-        <tr class="menu-row">
-            <td class="menu-btn menu-icon-appoinment  ">
-                <a href="appointment.php" class="non-style-link-menu">
-                    <div>
-                        <p class="menu-text">My Appointments</p>
-                </a>
-    </div>
-    </td>
-    </tr>
+                    <td class="menu-btn menu-icon-appoinment">
+                        <a href="appointment.php" class="non-style-link-menu"><div><p class="menu-text">My Appointments</p></a></div>
+                    </td>
+                </tr>
+                
+                <tr class="menu-row" >
+                    <td class="menu-btn menu-icon-session menu-active menu-icon-session-active">
+                        <a href="schedule.php" class="non-style-link-menu   non-style-link-menu-active"><div><p class="menu-text">My Sessions</p></div></a>
+                    </td>
+                </tr>
+                <tr class="menu-row" >
+                    <td class="menu-btn menu-icon-patient">
+                        <a href="patient.php" class="non-style-link-menu"><div><p class="menu-text">My Patients</p></a></div>
+                    </td>
+                </tr>
+                <tr class="menu-row" >
+                    <td class="menu-btn menu-icon-settings   ">
+                        <a href="settings.php" class="non-style-link-menu"><div><p class="menu-text">Settings</p></a></div>
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
 
-    <tr class="menu-row">
-        <td class="menu-btn menu-icon-session menu-active menu-icon-session-active">
-            <a href="schedule.php" class="non-style-link-menu non-style-link-menu-active">
-                <div>
-                    <p class="menu-text">My Sessions</p>
-                </div>
-            </a>
-        </td>
-    </tr>
-    <tr class="menu-row">
-        <td class="menu-btn menu-icon-patient">
-            <a href="patient.php" class="non-style-link-menu">
-                <div>
-                    <p class="menu-text">My Patients</p>
-            </a></div>
-        </td>
-    </tr>
-    <tr class="menu-row">
-        <td class="menu-btn menu-icon-settings">
-            <a href="settings.php" class="non-style-link-menu">
-                <div>
-                    <p class="menu-text">Settings</p>
-            </a></div>
-        </td>
-    </tr>
-
-    </table>
-    </div>
     <div class="dash-body">
         <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;margin-top:25px; ">
             <tr>
