@@ -8,6 +8,7 @@ This repository contains the source code for the 6005CEM-CW2 Group 11 Applicatio
 - [Git](https://git-scm.com/downloads) - Version control system
 - Web browser ([Chrome](https://www.google.com/chrome/), [Firefox](https://www.mozilla.org/firefox/), or [Edge](https://www.microsoft.com/edge))
 - MySQL instance with SSL certificate ([MySQL Community Downloads](https://dev.mysql.com/downloads/))
+- ([HTTPS Certificate Files](https://drive.google.com/drive/folders/1Ln_trnyt1CoUVFMH2XZQyVLU-yAmTzSa?usp=drive_link)]
 - [Mailjet](https://www.mailjet.com/) account for API credentials
 
 ## Installation Steps
